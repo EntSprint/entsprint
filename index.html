@@ -5,6 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#f5f3ee">
     <meta name="description" content="Интерактивное обучение и экзамен по истории Казахстана">
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="ru_RU">
+    <meta property="og:title" content="История Казахстана — ЕНТ тренажёр">
+    <meta property="og:description" content="Интервальное заучивание и тест по истории Казахстана">
+    <meta name="twitter:card" content="summary">
     <title>История Казахстана — ЕНТ тренажёр</title>
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%231c3228'/%3E%3Cpath d='M16 18h32v28H16z' fill='none' stroke='%23f5f3ee' stroke-width='4'/%3E%3Cpath d='M23 18v28M23 32h25' fill='none' stroke='%23f5f3ee' stroke-width='3'/%3E%3C/svg%3E">
     <style>
@@ -19,7 +24,7 @@
             --red: #a53b32;
             --red-soft: #f8ecea;
             --amber: #967344;
-            --shadow: 0 18px 50px rgba(35, 43, 37, 0.08);
+            --shadow: none;
         }
 
         * { box-sizing: border-box; }
@@ -35,9 +40,9 @@
         button, select { font: inherit; }
 
         .shell {
-            width: min(760px, calc(100% - 32px));
+            width: min(820px, calc(100% - 32px));
             margin: 0 auto;
-            padding: 28px 0 48px;
+            padding: 32px 0 56px;
         }
 
         .topbar {
@@ -50,7 +55,7 @@
 
         .brand {
             font-family: Georgia, "Times New Roman", serif;
-            font-size: 20px;
+            font-size: 22px;
             font-weight: 700;
             letter-spacing: -0.2px;
         }
@@ -58,16 +63,16 @@
         .mode-switch {
             display: inline-grid;
             grid-template-columns: 1fr 1fr;
-            padding: 4px;
+            padding: 3px;
             border: 1px solid var(--line);
-            border-radius: 10px;
+            border-radius: 6px;
             background: var(--surface);
         }
 
         .mode-btn {
             border: 0;
-            border-radius: 7px;
-            padding: 8px 13px;
+            border-radius: 4px;
+            padding: 9px 14px;
             background: transparent;
             color: var(--muted);
             cursor: pointer;
@@ -83,9 +88,8 @@
         .card {
             min-height: 520px;
             border: 1px solid var(--line);
-            border-radius: 18px;
+            border-radius: 8px;
             background: var(--surface);
-            box-shadow: var(--shadow);
             overflow: hidden;
         }
 
@@ -167,7 +171,7 @@
             gap: 14px;
             padding: 12px 16px;
             border: 1px solid var(--line);
-            border-radius: 10px;
+            border-radius: 6px;
             background: #fff;
             color: var(--ink);
             cursor: pointer;
@@ -185,13 +189,13 @@
         .option:disabled { cursor: default; }
 
         .option-index {
-            width: 28px;
-            height: 28px;
-            flex: 0 0 28px;
+            width: 26px;
+            height: 26px;
+            flex: 0 0 26px;
             display: grid;
             place-items: center;
             border: 1px solid var(--line);
-            border-radius: 50%;
+            border-radius: 3px;
             color: var(--muted);
             font-size: 12px;
             font-weight: 800;
@@ -238,7 +242,7 @@
         .next {
             display: none;
             border: 0;
-            border-radius: 9px;
+            border-radius: 5px;
             padding: 12px 18px;
             background: var(--ink);
             color: #fff;
@@ -273,7 +277,7 @@
             grid-template-columns: repeat(3, 1fr);
             margin-bottom: 28px;
             border: 1px solid var(--line);
-            border-radius: 12px;
+            border-radius: 6px;
         }
 
         .stat {
@@ -287,7 +291,7 @@
 
         .restart {
             border: 0;
-            border-radius: 9px;
+            border-radius: 5px;
             padding: 13px 20px;
             background: var(--ink);
             color: #fff;
