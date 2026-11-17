@@ -702,7 +702,11 @@
                 }
             } else {
                 examSelections.set(currentQuestion.id, selectedIndex);
-                renderQuestion(currentQuestion);
+                const buttons = document.getElementById('optionsList').children;
+                Array.from(buttons).forEach(optionButton => {
+                    optionButton.classList.remove('exam-selected');
+                });
+                button.classList.add('exam-selected');
                 document.getElementById('nextBtn').classList.add('visible');
                 document.getElementById('backBtn').classList.toggle('visible', examIndex > 0);
             }
