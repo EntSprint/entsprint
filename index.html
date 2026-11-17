@@ -371,6 +371,7 @@
         let timerId = null;
         let remainingSeconds = 3600;
         let audioContext = null;
+        let wrongSelections = new Set();
 
         async function loadQuestions() {
             try {
@@ -439,6 +440,7 @@
             }
             answered = false;
             wrongInAttempt = false;
+            wrongSelections = new Set();
             currentQuestion = learningQueue.shift();
             renderQuestion(currentQuestion);
             updateLearningStatus();
@@ -480,6 +482,10 @@
                 button.className = 'option';
                 button.innerHTML = `<span class="option-index">${index + 1}</span><span>${escapeHtml(option)}</span>`;
                 button.addEventListener('click', () => selectOption(index, button));
+                if (wrongSelections.has(index)) {
+                    button.classList.add('incorrect');
+                    button.disabled = true;
+                }
                 optionsList.appendChild(button);
             });
         }
@@ -549,6 +555,7 @@
                 } else {
                     button.classList.add('incorrect');
                     button.disabled = true;
+                    wrongSelections.add(selectedIndex);
                     wrongInAttempt = true;
                     streaks.set(currentQuestion.id, 0);
                     playTone(false);
@@ -568,6 +575,7 @@
                     playTone(true);
                 } else {
                     button.classList.add('incorrect');
+                    wrongSelections.add(selectedIndex);
                     buttons[currentQuestion.answer].classList.add('correct');
                     examIncorrect++;
                     playTone(false);
@@ -590,6 +598,7 @@
                 return;
             }
             answered = false;
+            wrongSelections = new Set();
             currentQuestion = baseQuestions[examIndex];
             renderQuestion(currentQuestion);
             document.getElementById('nextBtn').classList.remove('visible');
