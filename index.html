@@ -173,7 +173,7 @@
 
         async function loadQuestions() {
             try {
-                let response = await fetch('questions.json');
+                let response = await fetch('./questions.json');
                 questions = await response.json();
                 changeLesson();
             } catch (error) {
