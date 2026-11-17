@@ -23,6 +23,8 @@
             --green-soft: #edf4ef;
             --red: #a53b32;
             --red-soft: #f8ecea;
+            --blue: #245da8;
+            --blue-soft: #edf3fb;
             --amber: #967344;
             --shadow: none;
         }
@@ -214,20 +216,27 @@
         }
 
         .option.incorrect {
-            border-color: var(--red);
-            background: var(--red-soft);
-            color: #782820;
+            border-color: var(--blue);
+            background: var(--blue-soft);
+            color: #1d477f;
         }
 
         .option.incorrect .option-index {
-            border-color: var(--red);
-            background: var(--red);
+            border-color: var(--blue);
+            background: var(--blue);
             color: #fff;
         }
 
         .option.exam-selected {
-            border-color: var(--ink);
-            background: #f7f7f4;
+            border-color: var(--blue);
+            background: var(--blue-soft);
+            color: #1d477f;
+        }
+
+        .option.exam-selected .option-index {
+            border-color: var(--blue);
+            background: var(--blue);
+            color: #fff;
         }
 
         .footer {
@@ -257,6 +266,25 @@
         }
 
         .next.visible { display: block; }
+
+        .navigation {
+            display: flex;
+            gap: 8px;
+        }
+
+        .back {
+            display: none;
+            border: 1px solid var(--line);
+            border-radius: 5px;
+            padding: 12px 18px;
+            background: #fff;
+            color: var(--ink);
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 800;
+        }
+
+        .back.visible { display: block; }
 
         .results {
             display: none;
@@ -349,7 +377,7 @@
         }
 
         .review-item.incorrect-review .review-number {
-            background: var(--red);
+            background: var(--blue);
         }
 
         .review-name {
@@ -370,7 +398,7 @@
         }
 
         .review-item.incorrect-review .review-status {
-            color: var(--red);
+            color: var(--blue);
         }
 
         .review-detail {
@@ -435,7 +463,10 @@
                 <div class="options" id="optionsList"></div>
                 <div class="footer">
                     <div class="learning-status" id="learningStatus"></div>
-                    <button class="next" id="nextBtn" type="button">Следующий вопрос</button>
+                    <div class="navigation">
+                        <button class="back" id="backBtn" type="button">Назад</button>
+                        <button class="next" id="nextBtn" type="button">Следующий вопрос</button>
+                    </div>
                 </div>
             </div>
 
@@ -469,7 +500,7 @@
         let examCorrect = 0;
         let examIncorrect = 0;
         let examAnswered = 0;
-        let examAttempts = [];
+        let examSelections = new Map();
         let timerId = null;
         let remainingSeconds = 3600;
         let audioContext = null;
@@ -524,7 +555,7 @@
                 examCorrect = 0;
                 examIncorrect = 0;
                 examAnswered = 0;
-                examAttempts = [];
+                examSelections = new Map();
                 remainingSeconds = 3600;
                 updateTimer();
                 timerId = setInterval(() => {
@@ -548,6 +579,7 @@
             renderQuestion(currentQuestion);
             updateLearningStatus();
             document.getElementById('nextBtn').classList.remove('visible');
+            document.getElementById('backBtn').classList.remove('visible');
         }
 
         function showLearningFinished() {
@@ -589,6 +621,9 @@
                 if (wrongSelections.has(index)) {
                     button.classList.add('incorrect');
                     button.disabled = true;
+                }
+                if (mode === 'exam' && examSelections.get(q.id) === index) {
+                    button.classList.add('exam-selected');
                 }
                 optionsList.appendChild(button);
             });
@@ -666,33 +701,10 @@
                     updateLearningStatus();
                 }
             } else {
-                if (answered) return;
-                answered = true;
-                examAnswered++;
-
-                const buttons = document.getElementById('optionsList').children;
-                Array.from(buttons).forEach(el => el.disabled = true);
-
-                if (selectedIndex === currentQuestion.answer) {
-                    examCorrect++;
-                    examAttempts.push({
-                        question: currentQuestion,
-                        selectedIndex,
-                        correct: true
-                    });
-                    playTone(true);
-                } else {
-                    examIncorrect++;
-                    examAttempts.push({
-                        question: currentQuestion,
-                        selectedIndex,
-                        correct: false
-                    });
-                    playTone(false);
-                }
-
-                button.classList.add('exam-selected');
+                examSelections.set(currentQuestion.id, selectedIndex);
+                renderQuestion(currentQuestion);
                 document.getElementById('nextBtn').classList.add('visible');
+                document.getElementById('backBtn').classList.toggle('visible', examIndex > 0);
             }
         }
 
@@ -712,12 +724,25 @@
             wrongSelections = new Set();
             currentQuestion = baseQuestions[examIndex];
             renderQuestion(currentQuestion);
-            document.getElementById('nextBtn').classList.remove('visible');
+            document.getElementById('nextBtn').classList.add('visible');
+            document.getElementById('backBtn').classList.toggle('visible', examIndex > 0);
         }
 
         function nextQuestion() {
-            examIndex++;
-            showExamQuestion();
+            if (mode !== 'exam') return;
+            if (examIndex < baseQuestions.length - 1) {
+                examIndex++;
+                showExamQuestion();
+            } else {
+                finishExam(false);
+            }
+        }
+
+        function previousQuestion() {
+            if (mode === 'exam' && examIndex > 0) {
+                examIndex--;
+                showExamQuestion();
+            }
         }
 
         function finishExam(timedOut) {
@@ -729,7 +754,12 @@
             document.querySelector('#results .topic').textContent =
                 timedOut ? 'Время истекло' : 'Экзамен завершён';
 
-            const unanswered = Math.max(0, baseQuestions.length - examAnswered);
+            examAnswered = examSelections.size;
+            examCorrect = baseQuestions.filter(question =>
+                examSelections.get(question.id) === question.answer
+            ).length;
+            examIncorrect = examAnswered - examCorrect;
+            const unanswered = baseQuestions.length - examAnswered;
             const incorrectTotal = examIncorrect + unanswered;
             const percentage = baseQuestions.length
                 ? Math.round((examCorrect / baseQuestions.length) * 100)
@@ -743,13 +773,13 @@
 
         function renderExamReview() {
             const reviewList = document.getElementById('reviewList');
-            const attemptsById = new Map(examAttempts.map(attempt => [attempt.question.id, attempt]));
             reviewList.innerHTML = '';
             reviewList.style.display = 'grid';
 
             baseQuestions.forEach((question, index) => {
-                const attempt = attemptsById.get(question.id);
-                const correct = attempt ? attempt.correct : false;
+                const selectedIndex = examSelections.get(question.id);
+                const answeredQuestion = selectedIndex !== undefined;
+                const correct = selectedIndex === question.answer;
                 const item = document.createElement('div');
                 item.className = `review-item ${correct ? 'correct-review' : 'incorrect-review'}`;
 
@@ -759,7 +789,7 @@
                 row.innerHTML =
                     `<span class="review-number">${index + 1}</span>` +
                     `<span class="review-name">${escapeHtml(question.q)}</span>` +
-                    `<span class="review-status">${correct ? 'Верно' : attempt ? 'Неверно' : 'Без ответа'}</span>`;
+                    `<span class="review-status">${correct ? 'Верно' : answeredQuestion ? 'Неверно' : 'Без ответа'}</span>`;
 
                 const detail = document.createElement('div');
                 detail.className = 'review-detail';
@@ -792,6 +822,7 @@
         document.getElementById('examMode').addEventListener('click', () => startMode('exam'));
         document.getElementById('lessonSelect').addEventListener('change', changeLesson);
         document.getElementById('nextBtn').addEventListener('click', nextQuestion);
+        document.getElementById('backBtn').addEventListener('click', previousQuestion);
         document.getElementById('restartBtn').addEventListener('click', restartQuiz);
 
         loadQuestions();
