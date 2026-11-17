@@ -225,6 +225,11 @@
             color: #fff;
         }
 
+        .option.exam-selected {
+            border-color: var(--ink);
+            background: #f7f7f4;
+        }
+
         .footer {
             min-height: 68px;
             display: flex;
@@ -677,7 +682,6 @@
                     });
                     playTone(true);
                 } else {
-                    button.classList.add('incorrect');
                     examIncorrect++;
                     examAttempts.push({
                         question: currentQuestion,
@@ -687,6 +691,7 @@
                     playTone(false);
                 }
 
+                button.classList.add('exam-selected');
                 document.getElementById('nextBtn').classList.add('visible');
             }
         }
