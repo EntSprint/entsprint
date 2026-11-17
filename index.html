@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ЕНТ Тесты - История Казахстана</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-color: #f8fafc;
+            --accent-color: #3b82f6;
+            --accent-hover: #2563eb;
+            --border-color: #334155;
+            --correct: #22c55e;
+            --incorrect: #ef4444;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            background: var(--card-bg);
+            padding: 24px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            border: 1px solid var(--border-color);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        select {
+            background: var(--bg-color);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .progress {
+            font-size: 14px;
+            color: #94a3b8;
+        }
+
+        .question-box {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            line-height: 1.4;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .option-btn {
+            background: var(--bg-color);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            padding: 14px 16px;
+            border-radius: 10px;
+            text-align: left;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .option-btn:hover:not(:disabled) {
+            border-color: var(--accent-color);
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        .option-btn.correct {
+            background: rgba(34, 197, 94, 0.2);
+            border-color: var(--correct);
+            color: #86efac;
+        }
+
+        .option-btn.incorrect {
+            background: rgba(239, 68, 68, 0.2);
+            border-color: var(--incorrect);
+            color: #fca5a5;
+        }
+
+        .next-btn {
+            width: 100%;
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            display: none;
+        }
+
+        .next-btn:hover {
+            background: var(--accent-hover);
+        }
+
+        .results {
+            text-align: center;
+        }
+
+        .results h2 {
+            margin-bottom: 10px;
+        }
+
+        .restart-btn {
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container" id="app">
+        <div class="header">
+            <select id="lessonSelect" onchange="changeLesson()">
+                <option value="Урок 1">Урок 1</option>
+            </select>
+            <div class="progress" id="progressText">Вопрос 1 из 50</div>
+        </div>
+
+        <div id="quizContainer">
+            <div class="question-box" id="questionText">Загрузка вопросов...</div>
+            <div class="options-list" id="optionsList"></div>
+            <button class="next-btn" id="nextBtn" onclick="nextQuestion()">Следующий вопрос</button>
+        </div>
+
+        <div id="resultsContainer" class="results" style="display: none;">
+            <h2>Тест завершен! :)</h2>
+            <p id="scoreText"></p>
+            <button class="restart-btn" onclick="restartQuiz()">Пройти снова</button>
+        </div>
+    </div>
+
+    <script>
+        let questions = [];
+        let currentLessonQuestions = [];
+        let currentIndex = 0;
+        let score = 0;
+        let answered = false;
+
+        async function loadQuestions() {
+            try {
+                let response = await fetch('questions.json');
+                questions = await response.json();
+                changeLesson();
+            } catch (error) {
+                document.getElementById('questionText').innerText = "Ошибка загрузки questions.json :(";
+            }
+        }
+
+        function changeLesson() {
+            let selectedLesson = document.getElementById('lessonSelect').value;
+            currentLessonQuestions = questions.filter(q => q.lesson === selectedLesson);
+            currentIndex = 0;
+            score = 0;
+            showQuestion();
+        }
+
+        function showQuestion() {
+            answered = false;
+            let q = currentLessonQuestions[currentIndex];
+            if (!q) return;
+
+            document.getElementById('progressText').innerText = `Вопрос ${currentIndex + 1} из ${currentLessonQuestions.length}`;
+            document.getElementById('questionText').innerText = q.q;
+            
+            let optionsList = document.getElementById('optionsList');
+            optionsList.innerHTML = '';
+
+            q.options.forEach((opt, index) => {
+                let btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.innerText = opt;
+                btn.onclick = () => selectOption(index, btn);
+                optionsList.appendChild(btn);
+            });
+
+            document.getElementById('nextBtn').style.display = 'none';
+        }
+
+        function selectOption(selectedIndex, btn) {
+            if (answered) return;
+            answered = true;
+
+            let q = currentLessonQuestions[currentIndex];
+            let buttons = document.getElementById('optionsList').children;
+
+            if (selectedIndex === q.answer) {
+                btn.classList.add('correct');
+                score++;
+            } else {
+                btn.classList.add('incorrect');
+                buttons[q.answer].classList.add('correct');
+            }
+
+            document.getElementById('nextBtn').style.display = 'block';
+        }
+
+        function nextQuestion() {
+            currentIndex++;
+            if (currentIndex < currentLessonQuestions.length) {
+                showQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function showResults() {
+            document.getElementById('quizContainer').style.display = 'none';
+            document.getElementById('resultsContainer').style.display = 'block';
+            document.getElementById('scoreText').innerText = `Правильных ответов: ${score} из ${currentLessonQuestions.length}`;
+        }
+
+        function restartQuiz() {
+            currentIndex = 0;
+            score = 0;
+            document.getElementById('quizContainer').style.display = 'block';
+            document.getElementById('resultsContainer').style.display = 'none';
+            showQuestion();
+        }
+
+        loadQuestions();
+    </script>
+</body>
+</html>
