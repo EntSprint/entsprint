@@ -547,10 +547,8 @@
                     updateLearningStatus();
                     setTimeout(showLearningQuestion, 650);
                 } else {
-                    Array.from(document.getElementById('optionsList').children).forEach(el => {
-                        el.classList.remove('incorrect');
-                    });
                     button.classList.add('incorrect');
+                    button.disabled = true;
                     wrongInAttempt = true;
                     streaks.set(currentQuestion.id, 0);
                     playTone(false);
