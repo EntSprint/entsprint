@@ -816,7 +816,7 @@
                     <select class="leaderboard-filter full-width" id="leaderboardCriterion" aria-label="Критерий таблицы лидеров">
                         <option value="learned">Больше всего выучено</option>
                         <option value="exam">Лучший результат экзамена</option>
-                        <option value="time">Больше всего времени на уроке</option>
+                        <option value="time">Больше всего времени на сайте</option>
                     </select>
                     <select class="leaderboard-filter" id="leaderboardLesson" aria-label="Номер урока">
                         <option value="all">Все уроки</option>
@@ -1654,17 +1654,13 @@
 
             const ranked = entries.map(entry => {
                 let score = entry.learned || 0;
-                if (criterion === "learned" && lesson !== "all") {
-                    score = entry.lessonStats?.[lesson] || 0;
-                } else if (criterion === "exam") {
+                if (criterion === "exam") {
                     const results = entry.examResults || [];
                     score = examNumber === "all"
                         ? Math.max(0, ...results.map(result => Number(result.score || 0)))
                         : Number(results[Number(examNumber) - 1]?.score || 0);
                 } else if (criterion === "time") {
-                    score = lesson === "all"
-                        ? Number(entry.timeSeconds || 0)
-                        : Number(entry.lessonTimeStats?.[lesson] || 0);
+                    score = Number(entry.timeSeconds || 0);
                 }
                 return { entry, score };
             }).sort((a, b) =>
@@ -1699,9 +1695,7 @@
             const criterion = document.getElementById("leaderboardCriterion").value;
             const lessonFilter = document.getElementById("leaderboardLesson");
             const examFilter = document.getElementById("leaderboardExam");
-
-            const showLesson = criterion === "learned" || criterion === "time";
-            lessonFilter.style.display = showLesson ? "block" : "none";
+            lessonFilter.style.display = "none";
             examFilter.style.display = criterion === "exam" ? "block" : "none";
             updateLeaderboard(getProfile(), null);
         }
