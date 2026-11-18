@@ -42,6 +42,17 @@
         }
         .question-mascot.happy { border-color: var(--success); animation: mascot-jump 500ms ease; }
         .question-mascot.sad { border-color: var(--error); animation: mascot-shake 500ms ease; }
+        .lesson-unlock-panel {
+            margin: 10px 14px 0;
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            background: var(--background);
+            padding: 10px 12px;
+        }
+        .lesson-unlock-panel strong { display: block; margin-bottom: 8px; font-size: 12px; }
+        .unlock-row { display: grid; grid-template-columns: minmax(0, 1fr) 120px; align-items: center; gap: 8px; margin-top: 6px; font-size: 11px; }
+        .unlock-bar { height: 7px; overflow: hidden; border-radius: 999px; background: var(--line); }
+        .unlock-bar span { height: 100%; display: block; border-radius: 999px; background: var(--primary); }
         @keyframes mascot-jump {
             0%, 100% { transform: translateY(0); }
             45% { transform: translateY(-9px) scale(1.05); }
@@ -273,6 +284,39 @@
             color: var(--ink);
             padding: 10px 12px;
         }
+        .password-wrap {
+            position: relative;
+        }
+        .password-wrap input {
+            width: 100%;
+            padding-right: 52px !important;
+        }
+        .password-toggle {
+            position: absolute;
+            right: 4px;
+            top: 4px;
+            width: 44px;
+            height: 44px;
+            display: grid;
+            place-items: center;
+            border: 0;
+            border-radius: 10px;
+            background: transparent;
+            color: var(--muted);
+            cursor: pointer;
+        }
+        .password-toggle svg {
+            width: 20px;
+            height: 20px;
+            stroke: currentColor;
+            fill: none;
+        }
+        .password-hint {
+            margin: 6px 0 0;
+            color: var(--muted);
+            font-size: 11px;
+            line-height: 1.45;
+        }
         .registration-warning {
             margin: 8px 0 0;
             color: var(--error);
@@ -485,6 +529,22 @@
         .feedback-message { min-height: 18px; margin: 8px 0 0; font-size: 12px; font-weight: 800; }
         .feedback-message.success { color: var(--success); }
         .feedback-message.error { color: var(--error); }
+        .feedback-list {
+            display: grid;
+            gap: 8px;
+            margin-top: 16px;
+            text-align: left;
+        }
+        .feedback-item {
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            background: var(--background);
+            padding: 12px;
+        }
+        .feedback-item strong { display: block; }
+        .feedback-item span { color: var(--muted); font-size: 11px; }
+        .feedback-item p { margin: 8px 0 4px; color: var(--ink); white-space: pre-wrap; }
+        .feedback-stars-text { color: var(--gold) !important; letter-spacing: 1px; }
         .anticheat-overlay {
             position: fixed;
             z-index: 150;
@@ -990,6 +1050,7 @@
                     <img class="question-mascot" id="questionMascot" src="./assets/mascot_idle.png" alt="Маскот EntSprint">
                 </div>
             </div>
+            <div class="lesson-unlock-panel" id="lessonUnlockPanel" style="display:none"></div>
 
             <div class="quiz" id="quiz">
                 <div class="streak" id="streak" aria-label="Прогресс заучивания">
@@ -1029,8 +1090,12 @@
 
         <section class="creator-page" id="creatorPage">
             <img class="creator-mascot" src="./assets/mascot_creator.png" alt="Маскот создателя">
-            <h2>Мұстафа Оразалы Асланұлы</h2>
-            <p>EntSprint — тренажёр, созданный специально для жёсткой и эффективной подготовки к ЕНТ.</p>
+            <h2>Mustafa Orazaly Aslanuly</h2>
+            <p>EntSprint - тренажёр, созданный специально для жёсткой и эффективной подготовки к ЕНТ.</p>
+            <div class="creator-notes" style="margin-top:16px;padding:16px;border:1px solid var(--line);border-radius:14px;background:var(--background);text-align:left">
+                <h3>Примечания от разработчика</h3>
+                <p style="margin-bottom:0">Этот сайт я сделал для учеников школы Ньютон - чтобы готовиться к ЕНТ системно: заучивать вопросы до автоматизма и проверять себя на экзамене с таймером и античитом. Тренажёр бесплатный, уроки и предметы будут добавляться. Если нашёл ошибку или не хватает темы - напиши в отзыве ниже.</p>
+            </div>
             <div class="feedback-card">
                 <h3>Обратная связь</h3>
                 <p>Расскажи, чего не хватает или что улучшить.</p>
@@ -1045,9 +1110,10 @@
                 <button class="feedback-submit" id="feedbackSubmit" type="button">Отправить отзыв</button>
                 <p class="feedback-message" id="feedbackMessage" role="status"></p>
             </div>
+            <div class="feedback-list" id="feedbackList"></div>
         </section>
 
-        <p class="credit">Created by Мұстафа Оразалы Асланұлы</p>
+        <p class="credit">Created by Mustafa Orazaly Aslanuly</p>
     <dialog class="confirm-dialog" id="finishConfirmDialog">
         <h2>Завершить тест?</h2>
         <p id="finishConfirmText">Все неотвеченные вопросы будут считаться ошибками.</p>
@@ -1104,7 +1170,13 @@
                     <p class="registration-warning">Обязательно заполните свое имя или фамилию, или будет заблокирован доступ к сайту</p>
                     <label class="registration-label">
                         Пароль
-                        <input id="registerPasswordInput" type="password" autocomplete="new-password" minlength="4" placeholder="Минимум 4 символа">
+                        <div class="password-wrap">
+                            <input id="registerPasswordInput" type="password" autocomplete="new-password" minlength="4" placeholder="Минимум 4 символа">
+                            <button class="password-toggle" type="button" data-password-target="registerPasswordInput" aria-label="Показать пароль">
+                                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12s3.5-5 9.5-5 9.5 5 9.5 5-3.5 5-9.5 5-9.5-5-9.5-5z"/><circle cx="12" cy="12" r="2.5"/></svg>
+                            </button>
+                        </div>
+                        <span class="password-hint">Пароль лучше заскринить - восстановления пароля пока нет.</span>
                     </label>
                     <label class="registration-label">
                         Какой филиал в Ньютон вы посещаете?
@@ -1131,7 +1203,12 @@
                     </label>
                     <label class="registration-label">
                         Пароль
-                        <input id="loginPasswordInput" type="password" autocomplete="current-password" placeholder="Введите пароль">
+                        <div class="password-wrap">
+                            <input id="loginPasswordInput" type="password" autocomplete="current-password" placeholder="Введите пароль">
+                            <button class="password-toggle" type="button" data-password-target="loginPasswordInput" aria-label="Показать пароль">
+                                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12s3.5-5 9.5-5 9.5 5 9.5 5-3.5 5-9.5 5-9.5-5-9.5-5z"/><circle cx="12" cy="12" r="2.5"/></svg>
+                            </button>
+                        </div>
                     </label>
                     <p class="auth-message" id="authMessage"></p>
                     <div class="welcome-actions">
@@ -1145,19 +1222,32 @@
     <script src="./config.js"></script>
     <script>
         const TELEGRAM_GROUP_URL = "https://t.me/+KF7vF9u7-HUyN2Vi";
-        const STREAK_STORAGE_KEY = "ent_streaks_v1";
-        const LEARNED_STORAGE_KEY = "ent_learned_v1";
+        const STREAK_STORAGE_KEY = "ent_streaks_v2";
+        const LEARNED_STORAGE_KEY = "ent_learned_v2";
         const SOUND_STORAGE_KEY = "ent_sound_enabled";
-        const PROFILE_STORAGE_KEY = "ent_profile_v1";
-        const ERRORS_STORAGE_KEY = "ent_errors_v1";
-        const RESET_RELEASE_KEY = "ent_reset_welcome_v1";
-        const LEADERBOARD_STORAGE_KEY = "ent_leaderboard_v1";
-        const ACCOUNTS_STORAGE_KEY = "ent_accounts_v1";
-        const SESSION_STORAGE_KEY = "ent_session_v1";
-        const SITE_TIME_STORAGE_KEY = "ent_site_time_v1";
+        const PROFILE_STORAGE_KEY = "ent_profile_v2";
+        const ERRORS_STORAGE_KEY = "ent_errors_v2";
+        const RESET_RELEASE_KEY = "ent_reset_welcome_v2";
+        const LEADERBOARD_STORAGE_KEY = "ent_leaderboard_v2";
+        const ACCOUNTS_STORAGE_KEY = "ent_accounts_v2";
+        const SESSION_STORAGE_KEY = "ent_session_v2";
+        const SITE_TIME_STORAGE_KEY = "ent_site_time_v2";
+        const FEEDBACK_STORAGE_KEY = "ent_feedback_v2";
+        const UNLOCK_LEARNED_SHARE = 0.8;
+        const UNLOCK_EXAM_SCORE = 70;
 
         if (localStorage.getItem(RESET_RELEASE_KEY) !== "done") {
             [
+                "ent_streaks_v1",
+                "ent_learned_v1",
+                "ent_profile_v1",
+                "ent_errors_v1",
+                "ent_reset_welcome_v1",
+                "ent_leaderboard_v1",
+                "ent_accounts_v1",
+                "ent_session_v1",
+                "ent_site_time_v1",
+                "ent_feedback_v1",
                 PROFILE_STORAGE_KEY,
                 SESSION_STORAGE_KEY,
                 STREAK_STORAGE_KEY,
@@ -1191,6 +1281,8 @@
         let examTerminated = false;
         let lastExamViolationAt = 0;
         let mascotResetTimer = null;
+        let happyMascotIndex = 0;
+        let sadMascotIndex = 0;
 
         function loadJson(key, fallback) {
             try { return JSON.parse(localStorage.getItem(key)) ?? fallback; }
@@ -1215,19 +1307,25 @@
                 const endpoint = window.ENTSPRINT_CONFIG.endpoint.replace(/\/$/, "");
                 const apiKey = window.ENTSPRINT_CONFIG.apiKey;
                 const response = await fetch(
-                    `${endpoint}/entsprint/accounts?key=${encodeURIComponent(apiKey)}`
+                    `${endpoint}/entsprint/accounts_v2?key=${encodeURIComponent(apiKey)}`
                 );
                 if (!response.ok) throw new Error(`Cloud accounts request failed: ${response.status}`);
                 const data = await response.json();
-                const payload = data.fields?.accounts?.stringValue;
+                const payloadField = data.fields?.accounts;
+                const payload = payloadField?.stringValue ??
+                    payloadField?.arrayValue?.values?.map(item =>
+                        item.mapValue ? decodeFirestoreMap(item.mapValue) : item.stringValue
+                    );
                 if (!payload) return [];
-                const accounts = JSON.parse(payload);
+                let accounts = payload;
+                if (typeof payload === "string") {
+                    try { accounts = JSON.parse(payload); }
+                    catch (_) { accounts = []; }
+                }
                 const uniqueAccounts = [];
                 const names = new Set();
                 (Array.isArray(accounts) ? accounts : []).forEach(account => {
-                    const key = normalizeName(account.fullName || "")
-                        .toLocaleLowerCase("ru-RU")
-                        .replace(/\s+/g, " ");
+                    const key = accountNameKey(account.fullName || "");
                     if (!key || names.has(key)) return;
                     names.add(key);
                     uniqueAccounts.push(account);
@@ -1238,8 +1336,25 @@
                 return uniqueAccounts;
             } catch (error) {
                 console.error("Не удалось загрузить облачные аккаунты EntSprint", error);
-                return null;
+                throw error;
             }
+        }
+
+        function decodeFirestoreMap(mapValue) {
+            const result = {};
+            Object.entries(mapValue.fields || {}).forEach(([key, value]) => {
+                if (value.stringValue !== undefined) result[key] = value.stringValue;
+                else if (value.integerValue !== undefined) result[key] = Number(value.integerValue);
+                else if (value.doubleValue !== undefined) result[key] = Number(value.doubleValue);
+                else if (value.booleanValue !== undefined) result[key] = value.booleanValue;
+                else if (value.arrayValue) result[key] = (value.arrayValue.values || []).map(item =>
+                    item.stringValue !== undefined ? item.stringValue :
+                    item.integerValue !== undefined ? Number(item.integerValue) :
+                    item.mapValue ? decodeFirestoreMap(item.mapValue) : null
+                );
+                else if (value.mapValue) result[key] = decodeFirestoreMap(value.mapValue);
+            });
+            return result;
         }
 
         async function saveCloudAccounts(accounts) {
@@ -1258,7 +1373,7 @@
                 const endpoint = window.ENTSPRINT_CONFIG.endpoint.replace(/\/$/, "");
                 const apiKey = window.ENTSPRINT_CONFIG.apiKey;
                 const response = await fetch(
-                    `${endpoint}/entsprint/accounts?key=${encodeURIComponent(apiKey)}&updateMask.fieldPaths=accounts`,
+                    `${endpoint}/entsprint/accounts_v2?key=${encodeURIComponent(apiKey)}&updateMask.fieldPaths=accounts`,
                     {
                         method: "PATCH",
                         headers: { "Content-Type": "application/json" },
@@ -1273,19 +1388,28 @@
                 return true;
             } catch (error) {
                 console.error("Не удалось сохранить облачные аккаунты EntSprint", error);
-                return false;
+                throw error;
             }
         }
 
         async function getAvailableAccounts() {
-            return (await loadCloudAccounts()) || loadJson(ACCOUNTS_STORAGE_KEY, []);
+            if (!cloudIsConfigured()) return loadJson(ACCOUNTS_STORAGE_KEY, []);
+            try {
+                return await loadCloudAccounts();
+            } catch (_) {
+                throw new Error("Нет связи с сервером, проверь интернет");
+            }
         }
 
         async function syncLocalAccountsToCloud() {
             if (!cloudIsConfigured()) return;
             const localAccounts = loadJson(ACCOUNTS_STORAGE_KEY, []);
-            const cloudAccounts = await loadCloudAccounts();
-            if (!cloudAccounts) return;
+            let cloudAccounts;
+            try {
+                cloudAccounts = await loadCloudAccounts();
+            } catch (_) {
+                return;
+            }
             const merged = [...cloudAccounts];
             localAccounts.forEach(localAccount => {
                 const index = merged.findIndex(account =>
@@ -1305,7 +1429,8 @@
         function accountNameKey(value) {
             return normalizeName(value)
                 .toLocaleLowerCase("ru-RU")
-                .replace(/[ё]/g, "е");
+                .replace(/\s+/g, " ")
+                .toLowerCase();
         }
 
         async function passwordHash(password, salt) {
@@ -1464,9 +1589,7 @@
             });
 
             const subjectQuestions = questions.filter(question => subjectOf(question) === subject);
-            const lessons = [...new Set(subjectQuestions.map(question => question.lesson).filter(Boolean))];
-            const lessonSelect = document.getElementById("lessonSelect");
-            lessonSelect.innerHTML = "";
+            const lessons = getSubjectLessons(subject);
 
             if (!lessons.length) {
                 baseQuestions = [];
@@ -1474,12 +1597,7 @@
                 return;
             }
 
-            lessons.forEach(lesson => {
-                const option = document.createElement("option");
-                option.value = lesson;
-                option.textContent = lesson;
-                lessonSelect.appendChild(option);
-            });
+            rebuildLessonSelect();
             const leaderboardLesson = document.getElementById("leaderboardLesson");
             if (leaderboardLesson) {
                 leaderboardLesson.innerHTML = '<option value="all">Все уроки</option>';
@@ -1493,11 +1611,97 @@
             changeLesson();
         }
 
-        function changeLesson() {
-            const lesson = document.getElementById("lessonSelect").value;
-            baseQuestions = questions.filter(question =>
-                subjectOf(question) === currentSubject && question.lesson === lesson
+        function lessonNumber(lesson) {
+            const match = String(lesson || "").match(/(\d+)/);
+            return match ? Number(match[1]) : Number.MAX_SAFE_INTEGER;
+        }
+
+        function getSubjectLessons(subject = currentSubject) {
+            return [...new Set(questions
+                .filter(question => subjectOf(question) === subject)
+                .map(question => question.lesson)
+                .filter(Boolean))]
+                .sort((a, b) => lessonNumber(a) - lessonNumber(b));
+        }
+
+        function getProfileExamResults() {
+            const profile = getProfile();
+            if (!profile) return [];
+            const entry = loadJson(LEADERBOARD_STORAGE_KEY, [])
+                .find(item => item.key === getProfileKey(profile));
+            if (Array.isArray(entry?.examResults)) return entry.examResults;
+            const accounts = loadJson(ACCOUNTS_STORAGE_KEY, []);
+            const account = (Array.isArray(accounts) ? accounts : [])
+                .find(item => accountNameKey(item.fullName || "") === accountNameKey(profile.fullName));
+            return Array.isArray(account?.examResults) ? account.examResults : [];
+        }
+
+        function isLessonUnlocked(lesson) {
+            const lessons = getSubjectLessons(currentSubject);
+            const number = lessonNumber(lesson);
+            if (number === 1) return true;
+            const previousLesson = lessons.find(item => lessonNumber(item) === number - 1);
+            if (!previousLesson) return false;
+
+            const previousQuestions = questions.filter(question =>
+                subjectOf(question) === currentSubject && question.lesson === previousLesson
             );
+            const learnedCount = previousQuestions.filter(question => learned.has(question.id)).length;
+            const required = Math.ceil(UNLOCK_LEARNED_SHARE * previousQuestions.length);
+            const results = getProfileExamResults().filter(result =>
+                result.lesson === previousLesson
+            );
+            const bestScore = results.reduce((best, result) =>
+                Math.max(best, Number(result.score || 0)), 0);
+            return learnedCount >= required && bestScore >= UNLOCK_EXAM_SCORE;
+        }
+
+        function rebuildLessonSelect(preferredLesson = null) {
+            const lessonSelect = document.getElementById("lessonSelect");
+            const lessons = getSubjectLessons(currentSubject);
+            const previousValue = preferredLesson || lessonSelect.value;
+            lessonSelect.innerHTML = "";
+
+            if (lessons.length > 1) {
+                const allOption = document.createElement("option");
+                allOption.value = "all";
+                allOption.textContent = "Все уроки";
+                lessonSelect.appendChild(allOption);
+            }
+            lessons.forEach(lesson => {
+                const option = document.createElement("option");
+                option.value = lesson;
+                option.disabled = !isLessonUnlocked(lesson);
+                option.textContent = option.disabled ? `🔒 ${lesson}` : lesson;
+                lessonSelect.appendChild(option);
+            });
+            if (previousValue && [...lessonSelect.options].some(option =>
+                option.value === previousValue && !option.disabled
+            )) {
+                lessonSelect.value = previousValue;
+            } else {
+                lessonSelect.value = lessons.find(lesson => isLessonUnlocked(lesson)) || "all";
+            }
+        }
+
+        function changeLesson() {
+            const lessonSelect = document.getElementById("lessonSelect");
+            const lesson = lessonSelect.value;
+            const selectedOption = lessonSelect.selectedOptions[0];
+            if (lesson !== "all" && selectedOption?.disabled) {
+                rebuildLessonSelect();
+                document.getElementById("questionText").textContent =
+                    "Этот урок пока закрыт";
+                return;
+            }
+            baseQuestions = lesson === "all"
+                ? questions.filter(question =>
+                    subjectOf(question) === currentSubject &&
+                    isLessonUnlocked(question.lesson)
+                )
+                : questions.filter(question =>
+                    subjectOf(question) === currentSubject && question.lesson === lesson
+                );
             displayedQuestions = new Map();
             document.getElementById("empty").style.display = "none";
             document.getElementById("cardHead").style.display = "grid";
@@ -1529,6 +1733,7 @@
                 document.getElementById("leaderboardPage").classList.remove("visible");
                 document.getElementById("creatorPage").classList.add("visible");
                 document.getElementById("creatorNav").classList.add("active");
+                renderFeedbackList().catch(() => {});
                 return;
             }
 
@@ -1541,7 +1746,7 @@
                 document.getElementById("creatorPage").classList.remove("visible");
                 document.getElementById("leaderboardPage").classList.add("visible");
                 document.getElementById("leadersNav").classList.add("active");
-                updateLeaderboardFilters();
+                updateLeaderboardFromCloud();
                 return;
             }
 
@@ -1681,6 +1886,10 @@
             correct: createAnswerSound("./correct-answer.mp3"),
             wrong: createAnswerSound("./wrong-answer.mp3")
         };
+        ["mascot_idle.png", "mascot_happy.png", "mascot_creator.png", "mascot_angry.png", "mascot_sad.png"].forEach(file => {
+            const image = new Image();
+            image.src = `./assets/${file}`;
+        });
 
         function ensureAudioContext() {
             if (!audioContext) {
@@ -1738,9 +1947,10 @@
                             }
                         }
                         updateProgress();
+                        rebuildLessonSelect(document.getElementById("lessonSelect").value);
+                        updateLessonUnlockPanel();
                         saveAccountProgress(profile).catch(() => {});
                     } else {
-                        setMascot("sad");
                         requeueLearningQuestion();
                         playTone("correct");
                     }
@@ -1844,6 +2054,18 @@
                 ? Math.round((examCorrect / baseQuestions.length) * 100)
                 : 0;
             recordExamResult(percentage);
+            const finishedLesson = document.getElementById("lessonSelect").value;
+            const finishedNumber = lessonNumber(finishedLesson);
+            rebuildLessonSelect(finishedLesson);
+            updateLessonUnlockPanel();
+            const nextLesson = getSubjectLessons(currentSubject).find(lesson =>
+                lessonNumber(lesson) === finishedNumber + 1
+            );
+            if (nextLesson && isLessonUnlocked(nextLesson)) {
+                document.getElementById("resultTitle").textContent =
+                    `${nextLesson} открыт!`;
+                document.getElementById("resultTitle").style.color = "var(--success)";
+            }
             const unanswered = baseQuestions.length - examAnswered;
 
             document.getElementById("scoreText").textContent = `${percentage}%`;
@@ -1859,7 +2081,17 @@
             if (!mascot) return;
             clearTimeout(mascotResetTimer);
             mascot.classList.remove("happy", "sad");
-            mascot.src = `./assets/mascot_${state}.png`;
+            if (state === "happy") {
+                const happyAssets = ["./assets/mascot_happy.png", "./assets/mascot_creator.png"];
+                mascot.src = happyAssets[happyMascotIndex % happyAssets.length];
+                happyMascotIndex++;
+            } else if (state === "sad") {
+                const sadAssets = ["./assets/mascot_angry.png", "./assets/mascot_sad.png"];
+                mascot.src = sadAssets[sadMascotIndex % sadAssets.length];
+                sadMascotIndex++;
+            } else {
+                mascot.src = "./assets/mascot_idle.png";
+            }
             if (state !== "idle") {
                 mascot.classList.add(state);
                 mascotResetTimer = setTimeout(() => setMascot("idle"), 1500);
@@ -1878,36 +2110,74 @@
             finishExam(true);
         }
 
+        async function loadFeedback() {
+            if (cloudIsConfigured()) {
+                try {
+                    const endpoint = window.ENTSPRINT_CONFIG.endpoint.replace(/\/$/, "");
+                    const response = await fetch(
+                        `${endpoint}/feedback_v2?pageSize=100&key=${encodeURIComponent(window.ENTSPRINT_CONFIG.apiKey)}`
+                    );
+                    if (!response.ok) throw new Error(`Feedback request failed: ${response.status}`);
+                    const data = await response.json();
+                    return (data.documents || []).map(document => decodeFirestoreMap({
+                        fields: document.fields || {}
+                    })).filter(item => item && item.key);
+                } catch (error) {
+                    console.error("Не удалось загрузить отзывы", error);
+                }
+            }
+            return loadJson(FEEDBACK_STORAGE_KEY, []);
+        }
+
         async function submitFeedback() {
-            const rating = Number(document.querySelector(".feedback-star.active:last-of-type")?.dataset.rating || 0);
-            const text = document.getElementById("feedbackText").value.trim();
+            const profile = getProfile();
             const message = document.getElementById("feedbackMessage");
+            if (!profile) {
+                message.className = "feedback-message error";
+                message.textContent = "Отзывы могут оставлять только зарегистрированные ученики";
+                return;
+            }
+            const activeStars = document.querySelectorAll(".feedback-star.active");
+            const rating = activeStars.length;
+            const text = document.getElementById("feedbackText").value.trim();
             if (!rating) {
                 message.className = "feedback-message error";
                 message.textContent = "Выберите оценку от 1 до 5 звёзд.";
                 return;
             }
+            const key = getProfileKey(profile);
+            const existingFeedback = await loadFeedback();
+            if (existingFeedback.some(item => item.key === key)) {
+                message.className = "feedback-message error";
+                message.textContent = "Ты уже оставил отзыв";
+                blockFeedbackForm();
+                return;
+            }
             const feedback = {
+                key,
                 rating,
                 text,
-                name: getProfile()?.fullName || "Гость",
+                name: profile.fullName,
+                branch: profile.branch,
                 date: new Date().toISOString()
             };
             if (cloudIsConfigured()) {
                 try {
                     const endpoint = window.ENTSPRINT_CONFIG.endpoint.replace(/\/$/, "");
                     const response = await fetch(
-                        `${endpoint}/feedback?key=${encodeURIComponent(window.ENTSPRINT_CONFIG.apiKey)}`,
+                        `${endpoint}/feedback_v2?key=${encodeURIComponent(window.ENTSPRINT_CONFIG.apiKey)}&documentId=${encodeURIComponent(key)}`,
                         {
                             method: "POST",
                             headers: { "Content-Type": "application/json" },
                             body: JSON.stringify({
-                                fields: Object.fromEntries(
-                                    Object.entries(feedback).map(([key, value]) => [
-                                        key,
-                                        { stringValue: String(value) }
-                                    ])
-                                )
+                                fields: {
+                                    key: { stringValue: feedback.key },
+                                    rating: { integerValue: String(feedback.rating) },
+                                    text: { stringValue: feedback.text },
+                                    name: { stringValue: feedback.name },
+                                    branch: { stringValue: feedback.branch },
+                                    date: { stringValue: feedback.date }
+                                }
                             })
                         }
                     );
@@ -1915,17 +2185,67 @@
                 } catch (error) {
                     console.error("Не удалось отправить отзыв", error);
                     message.className = "feedback-message error";
-                    message.textContent = "Не удалось отправить отзыв. Попробуйте ещё раз.";
+                    message.textContent = "Нет связи с сервером, проверь интернет";
                     return;
                 }
-            } else {
-                const localFeedback = loadJson("ent_feedback_v1", []);
+            }
+            const localFeedback = loadJson(FEEDBACK_STORAGE_KEY, []);
+            if (!localFeedback.some(item => item.key === key)) {
                 localFeedback.push(feedback);
-                saveJson("ent_feedback_v1", localFeedback);
+                saveJson(FEEDBACK_STORAGE_KEY, localFeedback);
             }
             message.className = "feedback-message success";
             message.textContent = "Спасибо! Отзыв сохранён.";
-            document.getElementById("feedbackText").value = "";
+            blockFeedbackForm();
+            await renderFeedbackList();
+        }
+
+        function blockFeedbackForm() {
+            document.getElementById("feedbackSubmit").disabled = true;
+            document.getElementById("feedbackText").disabled = true;
+            document.querySelectorAll(".feedback-star").forEach(star => star.disabled = true);
+        }
+
+        function unblockFeedbackForm() {
+            document.getElementById("feedbackSubmit").disabled = false;
+            document.getElementById("feedbackText").disabled = false;
+            document.querySelectorAll(".feedback-star").forEach(star => star.disabled = false);
+        }
+
+        async function renderFeedbackList() {
+            const profile = getProfile();
+            const card = document.querySelector(".feedback-card");
+            if (!profile) {
+                if (card) card.style.display = "none";
+            } else if (card) {
+                card.style.display = "block";
+            }
+            const list = document.getElementById("feedbackList");
+            list.innerHTML = "";
+            const feedback = await loadFeedback();
+            const own = profile ? feedback.find(item => item.key === getProfileKey(profile)) : null;
+            if (own) {
+                blockFeedbackForm();
+                document.getElementById("feedbackMessage").className = "feedback-message error";
+                document.getElementById("feedbackMessage").textContent = "Ты уже оставил отзыв";
+            } else {
+                unblockFeedbackForm();
+            }
+            feedback.sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0)).forEach(item => {
+                const date = item.date
+                    ? new Date(item.date).toLocaleDateString("ru-RU")
+                    : "";
+                const row = document.createElement("div");
+                row.className = "feedback-item";
+                row.innerHTML =
+                    `<strong>${escapeHtml(item.name || "Ученик")}</strong>` +
+                    `<span>${escapeHtml(item.branch || "")}</span>` +
+                    `<span class="feedback-stars-text" style="display:block">` +
+                    `${"★".repeat(Number(item.rating) || 0)}${"☆".repeat(Math.max(0, 5 - (Number(item.rating) || 0)))}</span>` +
+                    `<p>${escapeHtml(item.text || "")}</p>` +
+                    `<span>${escapeHtml(date)}</span>`;
+                list.appendChild(row);
+            });
         }
 
         function renderExamReview() {
@@ -1979,7 +2299,13 @@
         }
 
         function updateSoundButton() {
-            document.getElementById("soundBtn").textContent = soundEnabled ? "Звук" : "Без звука";
+            const button = document.getElementById("soundBtn");
+            const label = soundEnabled ? "Выключить звук" : "Включить звук";
+            button.title = label;
+            button.setAttribute("aria-label", label);
+            button.innerHTML = soundEnabled
+                ? '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 010 7"/><path d="M18 6a8 8 0 010 12"/></svg>'
+                : '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M16 9l5 6M21 9l-5 6"/></svg>';
         }
 
         function getProfile() {
@@ -2068,11 +2394,53 @@
             document.getElementById("progressRemaining").textContent =
                 Math.max(0, total - learnedInSubject);
             document.getElementById("progressErrors").textContent = errorCount;
+            updateLessonUnlockPanel();
             updateLeaderboard(profile, learnedInSubject);
         }
 
-        function updateLeaderboard(profile, learnedInSubject) {
-            let entries = loadJson(LEADERBOARD_STORAGE_KEY, []);
+        function updateLessonUnlockPanel() {
+            const panel = document.getElementById("lessonUnlockPanel");
+            if (!panel) return;
+            const lessons = getSubjectLessons(currentSubject);
+            const nextLesson = lessons.find(lesson => !isLessonUnlocked(lesson));
+            if (!nextLesson) {
+                panel.style.display = "block";
+                panel.innerHTML =
+                    '<strong>Все уроки открыты</strong>' +
+                    '<div class="unlock-row"><span>Прогресс завершён</span><div class="unlock-bar"><span style="width:100%"></span></div></div>';
+                return;
+            }
+            const number = lessonNumber(nextLesson);
+            const previousLesson = lessons.find(lesson => lessonNumber(lesson) === number - 1);
+            if (!previousLesson) {
+                panel.style.display = "none";
+                return;
+            }
+            const previousQuestions = questions.filter(question =>
+                subjectOf(question) === currentSubject && question.lesson === previousLesson
+            );
+            const learnedCount = previousQuestions.filter(question => learned.has(question.id)).length;
+            const required = Math.ceil(UNLOCK_LEARNED_SHARE * previousQuestions.length);
+            const results = getProfileExamResults().filter(result =>
+                result.lesson === previousLesson
+            );
+            const bestScore = results.reduce((best, result) =>
+                Math.max(best, Number(result.score || 0)), 0);
+            const learnedPercent = required
+                ? Math.min(100, Math.round((learnedCount / required) * 100))
+                : 100;
+            const examPercent = Math.min(100, Math.round((bestScore / UNLOCK_EXAM_SCORE) * 100));
+            panel.style.display = "block";
+            panel.innerHTML =
+                `<strong>${escapeHtml(nextLesson)}: выучено ${learnedCount}/${required} · экзамен ${bestScore}%/${UNLOCK_EXAM_SCORE}%</strong>` +
+                `<div class="unlock-row"><span>Выучено ${learnedCount}/${required}</span><div class="unlock-bar"><span style="width:${learnedPercent}%"></span></div></div>` +
+                `<div class="unlock-row"><span>Экзамен ${bestScore}%/${UNLOCK_EXAM_SCORE}%</span><div class="unlock-bar"><span style="width:${examPercent}%"></span></div></div>`;
+        }
+
+        function updateLeaderboard(profile, learnedInSubject, entriesOverride = null) {
+            let entries = Array.isArray(entriesOverride)
+                ? entriesOverride
+                : loadJson(LEADERBOARD_STORAGE_KEY, []);
             if (!Array.isArray(entries)) entries = [];
 
             if (profile) {
@@ -2115,7 +2483,7 @@
                 (b.score - a.score) ||
                 ((a.entry.errors || 0) - (b.entry.errors || 0)) ||
                 a.entry.fullName.localeCompare(b.entry.fullName, "ru")
-            ).slice(0, 10);
+            );
 
             saveJson(LEADERBOARD_STORAGE_KEY, entries);
 
@@ -2139,13 +2507,74 @@
             });
         }
 
-        function updateLeaderboardFilters() {
+        async function updateLeaderboardFromCloud() {
+            let accounts = loadJson(ACCOUNTS_STORAGE_KEY, []);
+            if (cloudIsConfigured()) {
+                try {
+                    accounts = await getAvailableAccounts();
+                } catch (_) {
+                    accounts = loadJson(ACCOUNTS_STORAGE_KEY, []);
+                }
+            }
+            const entriesByKey = new Map();
+            (Array.isArray(accounts) ? accounts : []).forEach(account => {
+                const fullName = normalizeName(account.fullName || "");
+                const branch = normalizeName(account.branch || "");
+                if (!fullName || !branch) return;
+                const key = `${fullName}||${branch}`;
+                const learnedIds = new Set(Array.isArray(account.learned) ? account.learned : []);
+                const learnedCount = [...learnedIds].filter(id =>
+                    questions.some(question =>
+                        question.id === id && subjectOf(question) === currentSubject
+                    )
+                ).length;
+                entriesByKey.set(key, {
+                    key,
+                    fullName,
+                    branch,
+                    learned: learnedCount,
+                    errors: Number(account.errors || 0),
+                    timeSeconds: Number(account.timeSeconds || 0),
+                    lessonStats: account.lessonStats || {},
+                    examResults: Array.isArray(account.examResults) ? account.examResults : []
+                });
+            });
+            const localEntries = loadJson(LEADERBOARD_STORAGE_KEY, []);
+            (Array.isArray(localEntries) ? localEntries : []).forEach(entry => {
+                if (!entriesByKey.has(entry.key)) entriesByKey.set(entry.key, entry);
+            });
+            const profile = getProfile();
+            if (profile) {
+                const key = getProfileKey(profile);
+                const existing = entriesByKey.get(key);
+                const profileEntry = {
+                    key,
+                    fullName: profile.fullName,
+                    branch: profile.branch,
+                    learned: [...learned].filter(id =>
+                        questions.some(question =>
+                            question.id === id && subjectOf(question) === currentSubject
+                        )
+                    ).length,
+                    errors: errorCount,
+                    timeSeconds: getSiteTimeForProfile(profile),
+                    lessonStats: existing?.lessonStats || {},
+                    examResults: existing?.examResults || []
+                };
+                entriesByKey.set(key, profileEntry);
+            }
+            const mergedEntries = [...entriesByKey.values()];
+            saveJson(LEADERBOARD_STORAGE_KEY, mergedEntries);
+            updateLeaderboardFilters(mergedEntries);
+        }
+
+        function updateLeaderboardFilters(entriesOverride = null) {
             const criterion = document.getElementById("leaderboardCriterion").value;
             const lessonFilter = document.getElementById("leaderboardLesson");
             const examFilter = document.getElementById("leaderboardExam");
             lessonFilter.style.display = "none";
             examFilter.style.display = criterion === "exam" ? "block" : "none";
-            updateLeaderboard(getProfile(), null);
+            updateLeaderboard(getProfile(), null, entriesOverride);
         }
 
         function validateRegistration() {
@@ -2231,6 +2660,17 @@
         document.getElementById("fullNameInput").addEventListener("input", validateRegistration);
         document.getElementById("registerPasswordInput").addEventListener("input", validateRegistration);
         document.getElementById("branchSelect").addEventListener("change", validateRegistration);
+        document.querySelectorAll(".password-toggle").forEach(button => {
+            button.addEventListener("click", () => {
+                const input = document.getElementById(button.dataset.passwordTarget);
+                const visible = input.type === "text";
+                input.type = visible ? "password" : "text";
+                button.setAttribute("aria-label", visible ? "Показать пароль" : "Скрыть пароль");
+                button.innerHTML = visible
+                    ? '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12s3.5-5 9.5-5 9.5 5 9.5 5-3.5 5-9.5 5-9.5-5-9.5-5z"/><circle cx="12" cy="12" r="2.5"/></svg>'
+                    : '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12s3.5-5 9.5-5 9.5 5 9.5 5-3.5 5-9.5 5-9.5-5-9.5-5z"/><circle cx="12" cy="12" r="2.5"/><path d="M4 20L20 4"/></svg>';
+            });
+        });
         document.getElementById("startLearningBtn").addEventListener("click", async () => {
             const fullName = normalizeName(document.getElementById("fullNameInput").value);
             const password = document.getElementById("registerPasswordInput").value;
@@ -2242,7 +2682,40 @@
             const registerButton = document.getElementById("startLearningBtn");
             if (registerButton.disabled) return;
             registerButton.disabled = true;
-            const accounts = await getAvailableAccounts();
+            let accounts;
+            try {
+                accounts = await getAvailableAccounts();
+            } catch (_) {
+                document.getElementById("authMessage").textContent =
+                    "Нет связи с сервером, проверь интернет";
+                const localAccounts = loadJson(ACCOUNTS_STORAGE_KEY, []);
+                const existingLocal = (Array.isArray(localAccounts) ? localAccounts : [])
+                    .find(account => accountNameKey(account.fullName) === accountNameKey(fullName));
+                if (!existingLocal) {
+                    const salt = [...crypto.getRandomValues(new Uint8Array(16))]
+                        .map(value => value.toString(16).padStart(2, "0"))
+                        .join("");
+                    const hash = await passwordHash(password, salt);
+                    const localAccount = {
+                        fullName,
+                        branch,
+                        salt,
+                        hash,
+                        streaks,
+                        learned: [...learned],
+                        errors: errorCount,
+                        timeSeconds: 0,
+                        lessonStats: {},
+                        examResults: []
+                    };
+                    saveJson(ACCOUNTS_STORAGE_KEY, [
+                        ...(Array.isArray(localAccounts) ? localAccounts : []),
+                        localAccount
+                    ]);
+                }
+                registerButton.disabled = false;
+                return;
+            }
             const existing = Array.isArray(accounts)
                 ? accounts.find(account => accountNameKey(account.fullName) === accountNameKey(fullName))
                 : null;
@@ -2273,7 +2746,14 @@
             };
             const updatedAccounts = Array.isArray(accounts) ? [...accounts, account] : [account];
             saveJson(ACCOUNTS_STORAGE_KEY, updatedAccounts);
-            await saveCloudAccounts(updatedAccounts);
+            try {
+                await saveCloudAccounts(updatedAccounts);
+            } catch (_) {
+                document.getElementById("authMessage").textContent =
+                    "Нет связи с сервером, проверь интернет";
+                registerButton.disabled = false;
+                return;
+            }
             saveJson(PROFILE_STORAGE_KEY, { fullName, branch });
             saveJson(SESSION_STORAGE_KEY, fullName);
             document.getElementById("welcomeOverlay").classList.remove("visible");
@@ -2282,7 +2762,14 @@
         document.getElementById("loginBtn").addEventListener("click", async () => {
             const fullName = normalizeName(document.getElementById("loginNameInput").value);
             const password = document.getElementById("loginPasswordInput").value;
-            const accounts = await getAvailableAccounts();
+            let accounts;
+            try {
+                accounts = await getAvailableAccounts();
+            } catch (_) {
+                document.getElementById("authMessage").textContent =
+                    "Нет связи с сервером, проверь интернет";
+                return;
+            }
             const account = Array.isArray(accounts)
                 ? accounts.find(item => accountNameKey(item.fullName) === accountNameKey(fullName))
                 : null;
