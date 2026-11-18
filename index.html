@@ -753,6 +753,17 @@
         const SOUND_STORAGE_KEY = "ent_sound_enabled";
         const PROFILE_STORAGE_KEY = "ent_profile_v1";
         const ERRORS_STORAGE_KEY = "ent_errors_v1";
+        const RESET_RELEASE_KEY = "ent_reset_welcome_v1";
+
+        if (localStorage.getItem(RESET_RELEASE_KEY) !== "done") {
+            [
+                PROFILE_STORAGE_KEY,
+                STREAK_STORAGE_KEY,
+                LEARNED_STORAGE_KEY,
+                ERRORS_STORAGE_KEY
+            ].forEach(key => localStorage.removeItem(key));
+            localStorage.setItem(RESET_RELEASE_KEY, "done");
+        }
 
         let questions = [];
         let currentSubject = "История Казахстана";
