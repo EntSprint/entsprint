@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <meta name="theme-color" content="#eef5f8">
+    <meta name="theme-color" content="#f7f5fc">
     <meta name="description" content="Интерактивное закрепление и тестирование по ЕНТ">
     <meta property="og:type" content="website">
     <meta property="og:locale" content="ru_RU">
@@ -103,7 +103,7 @@
 
         .mode-switch {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: repeat(3, 1fr);
             gap: 4px;
             padding: 4px;
             margin-bottom: 12px;
@@ -126,6 +126,105 @@
             background: var(--primary-dark);
             color: #fff;
         }
+
+        .progress-page {
+            display: none;
+            min-height: 520px;
+            border: 1px solid var(--line);
+            border-radius: 18px;
+            background: var(--surface);
+            box-shadow: var(--shadow);
+            padding: 20px 18px 24px;
+        }
+
+        .progress-page.visible { display: block; }
+        .progress-heading { margin: 0 0 14px; font-size: 20px; }
+        .progress-profile {
+            margin-bottom: 14px;
+            padding: 14px;
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            background: var(--background);
+        }
+        .progress-profile strong { display: block; margin-bottom: 4px; }
+        .progress-profile span { color: var(--muted); font-size: 13px; }
+        .progress-stats {
+            display: grid;
+            margin-bottom: 16px;
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            overflow: hidden;
+        }
+        .progress-stat {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            min-height: 52px;
+            padding: 10px 12px;
+            border-bottom: 1px solid var(--line);
+        }
+        .progress-stat:last-child { border-bottom: 0; }
+        .progress-stat span { color: var(--muted); }
+        .progress-stat strong { font-size: 16px; }
+        .progress-actions { display: grid; gap: 8px; }
+        .progress-actions button {
+            min-height: 52px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 800;
+        }
+        .continue-learning { border: 0; background: var(--primary-dark); color: #fff; }
+        .reset-progress { border: 1px solid var(--line); background: var(--surface); color: var(--error); }
+
+        .welcome-overlay {
+            position: fixed;
+            z-index: 100;
+            inset: 0;
+            display: none;
+            place-items: center;
+            padding: 16px;
+            background: rgba(36, 32, 51, 0.58);
+        }
+        .welcome-overlay.visible { display: grid; }
+        .welcome-dialog {
+            width: min(420px, 100%);
+            border: 1px solid var(--line);
+            border-radius: 18px;
+            background: var(--surface);
+            color: var(--ink);
+            padding: 22px;
+            box-shadow: 0 20px 50px rgba(36, 32, 51, 0.22);
+        }
+        .welcome-dialog h2 { margin: 0 0 10px; font-size: 21px; }
+        .welcome-dialog p { margin: 0 0 16px; color: var(--muted); line-height: 1.55; }
+        .registration-label { display: grid; gap: 7px; margin-top: 12px; font-weight: 800; }
+        .registration-label input, .registration-label select {
+            width: 100%;
+            min-height: 52px;
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            background: var(--surface);
+            color: var(--ink);
+            padding: 10px 12px;
+        }
+        .registration-warning {
+            margin: 8px 0 0;
+            color: var(--error);
+            font-size: 12px;
+            line-height: 1.45;
+            font-weight: 800;
+        }
+        .welcome-actions { display: grid; margin-top: 18px; }
+        .welcome-actions button {
+            min-height: 52px;
+            border: 0;
+            border-radius: 12px;
+            background: var(--primary-dark);
+            color: #fff;
+            cursor: pointer;
+            font-weight: 800;
+        }
+        .welcome-actions button:disabled { opacity: 0.45; cursor: not-allowed; }
 
         .card {
             min-height: 520px;
@@ -527,7 +626,27 @@
         <div class="mode-switch">
             <button class="mode-btn active" id="learnMode" type="button">Заучивание</button>
             <button class="mode-btn" id="examMode" type="button">Тест / Экзамен</button>
+            <button class="mode-btn" id="progressMode" type="button">Прогресс</button>
         </div>
+
+        <section class="progress-page" id="progressPage">
+            <h2 class="progress-heading">Прогресс</h2>
+            <div class="progress-profile">
+                <strong id="progressStudent">Ученик</strong>
+                <span id="progressBranch"></span>
+            </div>
+            <div class="progress-stats">
+                <div class="progress-stat"><span>Предмет</span><strong id="progressSubject">История Казахстана</strong></div>
+                <div class="progress-stat"><span>Всего вопросов</span><strong id="progressTotal">0</strong></div>
+                <div class="progress-stat"><span>Выучено</span><strong id="progressLearned">0</strong></div>
+                <div class="progress-stat"><span>Осталось выучить</span><strong id="progressRemaining">0</strong></div>
+                <div class="progress-stat"><span>Ошибок</span><strong id="progressErrors">0</strong></div>
+            </div>
+            <div class="progress-actions">
+                <button class="continue-learning" id="continueLearningBtn" type="button">Продолжить учить</button>
+                <button class="reset-progress" id="resetProgressBtn" type="button">Сбросить статистику</button>
+            </div>
+        </section>
 
         <section class="card" id="card">
             <div class="card-head" id="cardHead">
@@ -591,11 +710,49 @@
         <a class="nav-btn" id="lessonsNav" href="https://t.me/+KF7vF9u7-HUyN2Vi" target="_blank" rel="noopener noreferrer" style="display:grid;place-items:center;text-decoration:none">Уроки</a>
     </nav>
 
+    <div class="welcome-overlay" id="welcomeOverlay" role="dialog" aria-modal="true" aria-labelledby="welcomeTitle">
+        <div class="welcome-dialog" id="welcomeDialog">
+            <section id="welcomeStep">
+                <h2 id="welcomeTitle">Добро пожаловать!</h2>
+                <p>Этот сайт создан, чтобы закреплять пройденный материал</p>
+                <div class="welcome-actions">
+                    <button id="welcomeContinueBtn" type="button">Продолжить</button>
+                </div>
+            </section>
+            <section id="registrationStep" style="display:none">
+                <h2>Регистрация</h2>
+                <label class="registration-label">
+                    Имя и Фамилия
+                    <input id="fullNameInput" type="text" autocomplete="name" minlength="3" placeholder="Например: Аслан Мусатов">
+                </label>
+                <p class="registration-warning">Обязательно заполните свое имя или фамилию, или будет заблокирован доступ к сайту</p>
+                <label class="registration-label">
+                    Какой филиал в Ньютон вы посещаете?
+                    <select id="branchSelect">
+                        <option value="">Выберите филиал</option>
+                        <option>Проспект Мангилик Ел, 17</option>
+                        <option>Улица Кажымукан, 12а</option>
+                        <option>Улица Сарайшык, 5/4</option>
+                        <option>Проспект Туран, 16</option>
+                        <option>Улица Алматы, 13</option>
+                        <option>Улица Кенесары, 47</option>
+                        <option>Улица Азильхан Нуршаихов, 10/1</option>
+                    </select>
+                </label>
+                <div class="welcome-actions">
+                    <button id="startLearningBtn" type="button" disabled>Начать обучение</button>
+                </div>
+            </section>
+        </div>
+    </div>
+
     <script>
         const TELEGRAM_GROUP_URL = "https://t.me/+KF7vF9u7-HUyN2Vi";
         const STREAK_STORAGE_KEY = "ent_streaks_v1";
         const LEARNED_STORAGE_KEY = "ent_learned_v1";
         const SOUND_STORAGE_KEY = "ent_sound_enabled";
+        const PROFILE_STORAGE_KEY = "ent_profile_v1";
+        const ERRORS_STORAGE_KEY = "ent_errors_v1";
 
         let questions = [];
         let currentSubject = "История Казахстана";
@@ -604,6 +761,7 @@
         let learningQueue = [];
         let streaks = loadJson(STREAK_STORAGE_KEY, {});
         let learned = new Set(loadJson(LEARNED_STORAGE_KEY, []));
+        let errorCount = loadJson(ERRORS_STORAGE_KEY, 0);
         let examSelections = new Map();
         let displayedQuestions = new Map();
         let currentQuestion = null;
@@ -721,11 +879,24 @@
         }
 
         function startMode(nextMode) {
-            if (!baseQuestions.length) return;
             mode = nextMode;
-            displayedQuestions = new Map();
             document.getElementById("learnMode").classList.toggle("active", mode === "learn");
             document.getElementById("examMode").classList.toggle("active", mode === "exam");
+            document.getElementById("progressMode").classList.toggle("active", mode === "progress");
+
+            if (mode === "progress") {
+                clearInterval(timerId);
+                document.getElementById("card").style.display = "none";
+                document.getElementById("progressPage").classList.add("visible");
+                document.getElementById("timer").classList.remove("visible");
+                updateProgress();
+                return;
+            }
+
+            document.getElementById("card").style.display = "block";
+            document.getElementById("progressPage").classList.remove("visible");
+            if (!baseQuestions.length) return;
+            displayedQuestions = new Map();
             document.getElementById("timer").classList.toggle("visible", mode === "exam");
             document.getElementById("streak").style.display = mode === "learn" ? "grid" : "none";
             document.getElementById("learningStatus").style.display = mode === "learn" ? "block" : "none";
@@ -879,6 +1050,7 @@
                         playTone("learned");
                         delete streaks[currentQuestion.id];
                         saveJson(STREAK_STORAGE_KEY, streaks);
+                        updateProgress();
                     } else {
                         requeueLearningQuestion();
                         playTone("correct");
@@ -891,13 +1063,21 @@
                     wrongInAttempt = true;
                     streaks[currentQuestion.id] = 0;
                     saveJson(STREAK_STORAGE_KEY, streaks);
+                    errorCount++;
+                    saveJson(ERRORS_STORAGE_KEY, errorCount);
                     updateStreak();
+                    updateProgress();
                     playTone("wrong");
                     if (navigator.vibrate) navigator.vibrate(60);
                 }
             } else {
                 if (examSelections.has(currentQuestion.id)) return;
                 examSelections.set(currentQuestion.id, selectedIndex);
+                if (selectedIndex !== currentQuestion.answer) {
+                    errorCount++;
+                    saveJson(ERRORS_STORAGE_KEY, errorCount);
+                    updateProgress();
+                }
                 Array.from(document.getElementById("optionsList").children)
                     .forEach((optionButton, index) => {
                         optionButton.classList.remove("exam-selected");
@@ -1030,11 +1210,51 @@
             document.getElementById("soundBtn").textContent = soundEnabled ? "Звук" : "Без звука";
         }
 
+        function getProfile() {
+            return loadJson(PROFILE_STORAGE_KEY, null);
+        }
+
+        function updateProgress() {
+            const profile = getProfile();
+            const subjectQuestions = questions.filter(question =>
+                subjectOf(question) === currentSubject
+            );
+            const total = subjectQuestions.length;
+            const learnedInSubject = [...learned].filter(id =>
+                subjectQuestions.some(question => question.id === id)
+            ).length;
+
+            document.getElementById("progressStudent").textContent =
+                profile ? profile.fullName : "Ученик не зарегистрирован";
+            document.getElementById("progressBranch").textContent =
+                profile ? profile.branch : "";
+            document.getElementById("progressSubject").textContent = currentSubject;
+            document.getElementById("progressTotal").textContent = total;
+            document.getElementById("progressLearned").textContent = learnedInSubject;
+            document.getElementById("progressRemaining").textContent =
+                Math.max(0, total - learnedInSubject);
+            document.getElementById("progressErrors").textContent = errorCount;
+        }
+
+        function validateRegistration() {
+            const nameValid = document.getElementById("fullNameInput").value.trim().length >= 3;
+            const branchValid = Boolean(document.getElementById("branchSelect").value);
+            document.getElementById("startLearningBtn").disabled = !(nameValid && branchValid);
+        }
+
+        function initializeProfile() {
+            if (getProfile()) return;
+            document.getElementById("welcomeOverlay").classList.add("visible");
+            document.getElementById("welcomeStep").style.display = "block";
+            document.getElementById("registrationStep").style.display = "none";
+        }
+
         document.querySelectorAll(".subject-btn").forEach(button => {
             button.addEventListener("click", () => updateSubject(button.dataset.subject));
         });
         document.getElementById("learnMode").addEventListener("click", () => startMode("learn"));
         document.getElementById("examMode").addEventListener("click", () => startMode("exam"));
+        document.getElementById("progressMode").addEventListener("click", () => startMode("progress"));
         document.getElementById("lessonSelect").addEventListener("change", changeLesson);
         document.getElementById("nextBtn").addEventListener("click", nextQuestion);
         document.getElementById("backBtn").addEventListener("click", previousQuestion);
@@ -1055,8 +1275,38 @@
         });
         document.getElementById("restartBtn").addEventListener("click", () => startMode(mode));
         document.getElementById("practiceNav").addEventListener("click", () => {
-            document.getElementById("quiz").style.display = "block";
-            document.getElementById("results").classList.remove("visible");
+            startMode("learn");
+        });
+        document.getElementById("welcomeContinueBtn").addEventListener("click", () => {
+            document.getElementById("welcomeStep").style.display = "none";
+            document.getElementById("registrationStep").style.display = "block";
+            document.getElementById("fullNameInput").focus();
+        });
+        document.getElementById("fullNameInput").addEventListener("input", validateRegistration);
+        document.getElementById("branchSelect").addEventListener("change", validateRegistration);
+        document.getElementById("startLearningBtn").addEventListener("click", () => {
+            const fullName = document.getElementById("fullNameInput").value.trim();
+            const branch = document.getElementById("branchSelect").value;
+            if (fullName.length < 3 || !branch) {
+                validateRegistration();
+                return;
+            }
+            saveJson(PROFILE_STORAGE_KEY, { fullName, branch });
+            document.getElementById("welcomeOverlay").classList.remove("visible");
+            updateProgress();
+        });
+        document.getElementById("continueLearningBtn").addEventListener("click", () => {
+            startMode("learn");
+        });
+        document.getElementById("resetProgressBtn").addEventListener("click", () => {
+            if (!window.confirm("Сбросить выученные вопросы и счётчик ошибок?")) return;
+            streaks = {};
+            learned = new Set();
+            errorCount = 0;
+            saveJson(STREAK_STORAGE_KEY, streaks);
+            saveJson(LEARNED_STORAGE_KEY, []);
+            saveJson(ERRORS_STORAGE_KEY, 0);
+            updateProgress();
         });
         document.getElementById("soundBtn").addEventListener("click", () => {
             soundEnabled = !soundEnabled;
@@ -1067,6 +1317,7 @@
 
         document.addEventListener("pointerdown", ensureAudioContext, { once: true });
         updateSoundButton();
+        initializeProfile();
         loadQuestions();
     </script>
 </body>
