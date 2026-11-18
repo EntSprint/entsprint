@@ -237,15 +237,20 @@
             border-radius: 50%;
             background: var(--background);
         }
-        .welcome-character svg { width: 84px; height: 84px; }
-        .welcome-character svg { animation: character-bounce 1.8s ease-in-out infinite; transform-origin: center bottom; }
-        .welcome-character svg path { transition: transform 180ms ease; }
+        .welcome-character img {
+            width: 96px;
+            height: 96px;
+            object-fit: contain;
+            border-radius: 50%;
+            animation: character-bounce 1.8s ease-in-out infinite;
+            transform-origin: center bottom;
+        }
         @keyframes character-bounce {
             0%, 100% { transform: translateY(0) rotate(0deg); }
             50% { transform: translateY(-6px) rotate(-2deg); }
         }
         .welcome-character { cursor: pointer; }
-        .welcome-character.animated svg {
+        .welcome-character.animated img {
             animation: character-wave 650ms ease-in-out;
         }
         @keyframes character-wave {
@@ -817,16 +822,8 @@
     <div class="welcome-overlay" id="welcomeOverlay" role="dialog" aria-modal="true" aria-labelledby="welcomeTitle">
         <div class="welcome-dialog" id="welcomeDialog">
             <section id="welcomeStep">
-                <div class="welcome-character" id="welcomeCharacter" role="button" tabindex="0" aria-label="Поздороваться с персонажем">
-                    <svg viewBox="0 0 96 96" role="img">
-                        <circle cx="48" cy="34" r="19" fill="#7657c7"/>
-                        <circle cx="41" cy="31" r="2.5" fill="#fff"/>
-                        <circle cx="55" cy="31" r="2.5" fill="#fff"/>
-                        <path d="M40 41c5 4 11 4 16 0" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
-                        <path d="M24 79c2-18 12-25 24-25s22 7 24 25" fill="#50358f"/>
-                        <rect x="33" y="61" width="30" height="20" rx="4" fill="#f5b700"/>
-                        <path d="M48 61v20" stroke="#fff" stroke-width="2"/>
-                    </svg>
+                <div class="welcome-character" id="welcomeCharacter" role="button" tabindex="0" aria-label="Поздороваться с обезьянкой">
+                    <img src="./assets/ent-monkey.jpg" alt="Обезьянка-помощник ЕНТ">
                 </div>
                 <h2 id="welcomeTitle">Добро пожаловать!</h2>
                 <p>Этот сайт создан, чтобы закреплять пройденный материал</p>
@@ -835,16 +832,8 @@
                 </div>
             </section>
             <section id="registrationStep" style="display:none">
-                <div class="welcome-character" id="registrationCharacter" role="button" tabindex="0" aria-label="Поздороваться с персонажем">
-                    <svg viewBox="0 0 96 96" role="img">
-                        <circle cx="48" cy="34" r="19" fill="#7657c7"/>
-                        <circle cx="41" cy="31" r="2.5" fill="#fff"/>
-                        <circle cx="55" cy="31" r="2.5" fill="#fff"/>
-                        <path d="M40 41c5 4 11 4 16 0" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
-                        <path d="M24 79c2-18 12-25 24-25s22 7 24 25" fill="#50358f"/>
-                        <rect x="33" y="61" width="30" height="20" rx="4" fill="#f5b700"/>
-                        <path d="M48 61v20" stroke="#fff" stroke-width="2"/>
-                    </svg>
+                <div class="welcome-character" id="registrationCharacter" role="button" tabindex="0" aria-label="Поздороваться с обезьянкой">
+                    <img src="./assets/ent-monkey.jpg" alt="Обезьянка-помощник ЕНТ">
                 </div>
                 <div class="auth-switch">
                     <button class="auth-tab active" id="registerTab" type="button">Регистрация</button>
