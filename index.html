@@ -175,6 +175,7 @@
         }
         .continue-learning { border: 0; background: var(--primary-dark); color: #fff; }
         .reset-progress { border: 1px solid var(--line); background: var(--surface); color: var(--error); }
+        .logout-account { border: 1px solid var(--line); background: var(--surface); color: var(--primary-dark); }
 
         .welcome-overlay {
             position: fixed;
@@ -237,6 +238,44 @@
             background: var(--background);
         }
         .welcome-character svg { width: 84px; height: 84px; }
+        .welcome-character svg { animation: character-bounce 1.8s ease-in-out infinite; transform-origin: center bottom; }
+        .welcome-character svg path { transition: transform 180ms ease; }
+        @keyframes character-bounce {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-6px) rotate(-2deg); }
+        }
+        .welcome-character { cursor: pointer; }
+        .welcome-character.animated svg {
+            animation: character-wave 650ms ease-in-out;
+        }
+        @keyframes character-wave {
+            0%, 100% { transform: rotate(0deg) scale(1); }
+            25% { transform: rotate(-8deg) scale(1.04); }
+            50% { transform: rotate(8deg) scale(1.08); }
+            75% { transform: rotate(-4deg) scale(1.04); }
+        }
+
+        .auth-switch {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4px;
+            margin-bottom: 12px;
+            padding: 4px;
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            background: var(--background);
+        }
+        .auth-tab {
+            min-height: 42px;
+            border: 0;
+            border-radius: 8px;
+            background: transparent;
+            color: var(--muted);
+            cursor: pointer;
+            font-weight: 800;
+        }
+        .auth-tab.active { background: var(--primary-dark); color: #fff; }
+        .auth-message { min-height: 18px; margin: 8px 0 0; color: var(--error); font-size: 12px; font-weight: 800; }
 
         .leaderboard {
             margin-top: 16px;
@@ -705,6 +744,7 @@
             <div class="progress-actions">
                 <button class="continue-learning" id="continueLearningBtn" type="button">Продолжить учить</button>
                 <button class="reset-progress" id="resetProgressBtn" type="button">Сбросить статистику</button>
+                <button class="logout-account" id="logoutAccountBtn" type="button">Выйти из аккаунта</button>
             </div>
             <section class="leaderboard">
                 <h3>Таблица лидеров</h3>
@@ -777,7 +817,7 @@
     <div class="welcome-overlay" id="welcomeOverlay" role="dialog" aria-modal="true" aria-labelledby="welcomeTitle">
         <div class="welcome-dialog" id="welcomeDialog">
             <section id="welcomeStep">
-                <div class="welcome-character" aria-hidden="true">
+                <div class="welcome-character" id="welcomeCharacter" role="button" tabindex="0" aria-label="Поздороваться с персонажем">
                     <svg viewBox="0 0 96 96" role="img">
                         <circle cx="48" cy="34" r="19" fill="#7657c7"/>
                         <circle cx="41" cy="31" r="2.5" fill="#fff"/>
@@ -795,7 +835,7 @@
                 </div>
             </section>
             <section id="registrationStep" style="display:none">
-                <div class="welcome-character" aria-hidden="true">
+                <div class="welcome-character" id="registrationCharacter" role="button" tabindex="0" aria-label="Поздороваться с персонажем">
                     <svg viewBox="0 0 96 96" role="img">
                         <circle cx="48" cy="34" r="19" fill="#7657c7"/>
                         <circle cx="41" cy="31" r="2.5" fill="#fff"/>
@@ -806,28 +846,53 @@
                         <path d="M48 61v20" stroke="#fff" stroke-width="2"/>
                     </svg>
                 </div>
-                <h2>Регистрация</h2>
-                <label class="registration-label">
-                    Имя и Фамилия
-                    <input id="fullNameInput" type="text" autocomplete="name" minlength="3" placeholder="Например: Аслан Мусатов">
-                </label>
-                <p class="registration-warning">Обязательно заполните свое имя или фамилию, или будет заблокирован доступ к сайту</p>
-                <label class="registration-label">
-                    Какой филиал в Ньютон вы посещаете?
-                    <select id="branchSelect">
-                        <option value="">Выберите филиал</option>
-                        <option>Проспект Мангилик Ел, 17</option>
-                        <option>Улица Кажымукан, 12а</option>
-                        <option>Улица Сарайшык, 5/4</option>
-                        <option>Проспект Туран, 16</option>
-                        <option>Улица Алматы, 13</option>
-                        <option>Улица Кенесары, 47</option>
-                        <option>Улица Азильхан Нуршаихов, 10/1</option>
-                    </select>
-                </label>
-                <div class="welcome-actions">
-                    <button id="startLearningBtn" type="button" disabled>Начать обучение</button>
+                <div class="auth-switch">
+                    <button class="auth-tab active" id="registerTab" type="button">Регистрация</button>
+                    <button class="auth-tab" id="loginTab" type="button">Войти</button>
                 </div>
+
+                <section id="registerForm">
+                    <label class="registration-label">
+                        Имя и Фамилия
+                        <input id="fullNameInput" type="text" autocomplete="name" minlength="3" placeholder="Например: Аслан Мусатов">
+                    </label>
+                    <p class="registration-warning">Обязательно заполните свое имя или фамилию, или будет заблокирован доступ к сайту</p>
+                    <label class="registration-label">
+                        Пароль
+                        <input id="registerPasswordInput" type="password" autocomplete="new-password" minlength="4" placeholder="Минимум 4 символа">
+                    </label>
+                    <label class="registration-label">
+                        Какой филиал в Ньютон вы посещаете?
+                        <select id="branchSelect">
+                            <option value="">Выберите филиал</option>
+                            <option>Проспект Мангилик Ел, 17</option>
+                            <option>Улица Кажымукан, 12а</option>
+                            <option>Улица Сарайшык, 5/4</option>
+                            <option>Проспект Туран, 16</option>
+                            <option>Улица Алматы, 13</option>
+                            <option>Улица Кенесары, 47</option>
+                            <option>Улица Азильхан Нуршаихов, 10/1</option>
+                        </select>
+                    </label>
+                    <div class="welcome-actions">
+                        <button id="startLearningBtn" type="button" disabled>Начать обучение</button>
+                    </div>
+                </section>
+
+                <section id="loginForm" style="display:none">
+                    <label class="registration-label">
+                        Имя и Фамилия
+                        <input id="loginNameInput" type="text" autocomplete="name" placeholder="Введите имя и фамилию">
+                    </label>
+                    <label class="registration-label">
+                        Пароль
+                        <input id="loginPasswordInput" type="password" autocomplete="current-password" placeholder="Введите пароль">
+                    </label>
+                    <p class="auth-message" id="authMessage"></p>
+                    <div class="welcome-actions">
+                        <button id="loginBtn" type="button">Войти</button>
+                    </div>
+                </section>
             </section>
         </div>
     </div>
@@ -841,10 +906,13 @@
         const ERRORS_STORAGE_KEY = "ent_errors_v1";
         const RESET_RELEASE_KEY = "ent_reset_welcome_v1";
         const LEADERBOARD_STORAGE_KEY = "ent_leaderboard_v1";
+        const ACCOUNTS_STORAGE_KEY = "ent_accounts_v1";
+        const SESSION_STORAGE_KEY = "ent_session_v1";
 
         if (localStorage.getItem(RESET_RELEASE_KEY) !== "done") {
             [
                 PROFILE_STORAGE_KEY,
+                SESSION_STORAGE_KEY,
                 STREAK_STORAGE_KEY,
                 LEARNED_STORAGE_KEY,
                 ERRORS_STORAGE_KEY
@@ -880,6 +948,34 @@
 
         function saveJson(key, value) {
             localStorage.setItem(key, JSON.stringify(value));
+        }
+
+        function normalizeName(value) {
+            return value.trim().replace(/\s+/g, " ");
+        }
+
+        async function passwordHash(password, salt) {
+            const encoder = new TextEncoder();
+            const key = await crypto.subtle.importKey(
+                "raw",
+                encoder.encode(password),
+                "PBKDF2",
+                false,
+                ["deriveBits"]
+            );
+            const bits = await crypto.subtle.deriveBits(
+                {
+                    name: "PBKDF2",
+                    salt: encoder.encode(salt),
+                    iterations: 100000,
+                    hash: "SHA-256"
+                },
+                key,
+                256
+            );
+            return [...new Uint8Array(bits)]
+                .map(value => value.toString(16).padStart(2, "0"))
+                .join("");
         }
 
         function shuffled(items) {
@@ -1382,16 +1478,23 @@
         }
 
         function validateRegistration() {
-            const nameValid = document.getElementById("fullNameInput").value.trim().length >= 3;
+            const nameValid = normalizeName(document.getElementById("fullNameInput").value).length >= 3;
+            const passwordValid = document.getElementById("registerPasswordInput").value.length >= 4;
             const branchValid = Boolean(document.getElementById("branchSelect").value);
-            document.getElementById("startLearningBtn").disabled = !(nameValid && branchValid);
+            document.getElementById("startLearningBtn").disabled = !(nameValid && passwordValid && branchValid);
         }
 
         function initializeProfile() {
-            if (getProfile()) return;
+            if (getProfile() && localStorage.getItem(SESSION_STORAGE_KEY)) return;
             document.getElementById("welcomeOverlay").classList.add("visible");
             document.getElementById("welcomeStep").style.display = "block";
             document.getElementById("registrationStep").style.display = "none";
+        }
+
+        function animateCharacter(element) {
+            element.classList.remove("animated");
+            void element.offsetWidth;
+            element.classList.add("animated");
         }
 
         document.querySelectorAll(".subject-btn").forEach(button => {
@@ -1425,23 +1528,101 @@
         document.getElementById("welcomeContinueBtn").addEventListener("click", () => {
             document.getElementById("welcomeStep").style.display = "none";
             document.getElementById("registrationStep").style.display = "block";
-            document.getElementById("fullNameInput").focus();
+            const accounts = loadJson(ACCOUNTS_STORAGE_KEY, []);
+            if (Array.isArray(accounts) && accounts.length) {
+                showAuthForm("login");
+            } else {
+                showAuthForm("register");
+            }
         });
+        function showAuthForm(modeName) {
+            const register = modeName === "register";
+            document.getElementById("registerTab").classList.toggle("active", register);
+            document.getElementById("loginTab").classList.toggle("active", !register);
+            document.getElementById("registerForm").style.display = register ? "block" : "none";
+            document.getElementById("loginForm").style.display = register ? "none" : "block";
+            document.getElementById("authMessage").textContent = "";
+            if (register) document.getElementById("fullNameInput").focus();
+            else document.getElementById("loginNameInput").focus();
+        }
+        document.getElementById("registerTab").addEventListener("click", () => showAuthForm("register"));
+        document.getElementById("loginTab").addEventListener("click", () => showAuthForm("login"));
         document.getElementById("fullNameInput").addEventListener("input", validateRegistration);
+        document.getElementById("registerPasswordInput").addEventListener("input", validateRegistration);
         document.getElementById("branchSelect").addEventListener("change", validateRegistration);
-        document.getElementById("startLearningBtn").addEventListener("click", () => {
-            const fullName = document.getElementById("fullNameInput").value.trim();
+        document.getElementById("startLearningBtn").addEventListener("click", async () => {
+            const fullName = normalizeName(document.getElementById("fullNameInput").value);
+            const password = document.getElementById("registerPasswordInput").value;
             const branch = document.getElementById("branchSelect").value;
-            if (fullName.length < 3 || !branch) {
+            if (fullName.length < 3 || password.length < 4 || !branch) {
                 validateRegistration();
                 return;
             }
+            const accounts = loadJson(ACCOUNTS_STORAGE_KEY, []);
+            const existing = Array.isArray(accounts)
+                ? accounts.find(account => normalizeName(account.fullName).toLowerCase() === fullName.toLowerCase())
+                : null;
+            if (existing) {
+                document.getElementById("authMessage").textContent =
+                    "Такой профиль уже зарегистрирован. Выберите «Войти».";
+                showAuthForm("login");
+                document.getElementById("loginNameInput").value = fullName;
+                return;
+            }
+
+            const salt = [...crypto.getRandomValues(new Uint8Array(16))]
+                .map(value => value.toString(16).padStart(2, "0"))
+                .join("");
+            const hash = await passwordHash(password, salt);
+            const account = { fullName, branch, salt, hash };
+            const updatedAccounts = Array.isArray(accounts) ? [...accounts, account] : [account];
+            saveJson(ACCOUNTS_STORAGE_KEY, updatedAccounts);
             saveJson(PROFILE_STORAGE_KEY, { fullName, branch });
+            saveJson(SESSION_STORAGE_KEY, fullName);
             document.getElementById("welcomeOverlay").classList.remove("visible");
             updateProgress();
         });
+        document.getElementById("loginBtn").addEventListener("click", async () => {
+            const fullName = normalizeName(document.getElementById("loginNameInput").value);
+            const password = document.getElementById("loginPasswordInput").value;
+            const accounts = loadJson(ACCOUNTS_STORAGE_KEY, []);
+            const account = Array.isArray(accounts)
+                ? accounts.find(item => normalizeName(item.fullName).toLowerCase() === fullName.toLowerCase())
+                : null;
+            if (!account) {
+                document.getElementById("authMessage").textContent =
+                    "Профиль не найден. Проверьте имя или зарегистрируйтесь.";
+                return;
+            }
+            const hash = await passwordHash(password, account.salt);
+            if (hash !== account.hash) {
+                document.getElementById("authMessage").textContent = "Неверный пароль.";
+                return;
+            }
+            saveJson(PROFILE_STORAGE_KEY, { fullName: account.fullName, branch: account.branch });
+            saveJson(SESSION_STORAGE_KEY, account.fullName);
+            document.getElementById("welcomeOverlay").classList.remove("visible");
+            updateProgress();
+        });
+        ["welcomeCharacter", "registrationCharacter"].forEach(id => {
+            const character = document.getElementById(id);
+            character.addEventListener("click", () => animateCharacter(character));
+            character.addEventListener("keydown", event => {
+                if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    animateCharacter(character);
+                }
+            });
+        });
         document.getElementById("continueLearningBtn").addEventListener("click", () => {
             startMode("learn");
+        });
+        document.getElementById("logoutAccountBtn").addEventListener("click", () => {
+            localStorage.removeItem(PROFILE_STORAGE_KEY);
+            localStorage.removeItem(SESSION_STORAGE_KEY);
+            document.getElementById("welcomeStep").style.display = "block";
+            document.getElementById("registrationStep").style.display = "none";
+            document.getElementById("welcomeOverlay").classList.add("visible");
         });
         document.getElementById("resetProgressBtn").addEventListener("click", () => {
             if (!window.confirm("Сбросить выученные вопросы и счётчик ошибок?")) return;
