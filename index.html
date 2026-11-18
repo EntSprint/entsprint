@@ -79,7 +79,7 @@
 
         .subject-switch {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: repeat(2, 1fr);
             gap: 8px;
             margin-bottom: 10px;
         }
@@ -329,6 +329,17 @@
             font-size: 10px;
         }
         .leaderboard-score { font-size: 12px; font-weight: 800; }
+        .leaderboard-page {
+            display: none;
+            min-height: 520px;
+            border: 1px solid var(--line);
+            border-radius: 18px;
+            background: var(--surface);
+            box-shadow: var(--shadow);
+            padding: 20px 18px 24px;
+        }
+        .leaderboard-page.visible { display: block; }
+        .leaderboard-page .leaderboard { margin-top: 0; }
 
         .card {
             min-height: 520px;
@@ -665,7 +676,7 @@
             width: min(600px, 100%);
             height: calc(68px + env(safe-area-inset-bottom));
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: repeat(3, 1fr);
             transform: translateX(-50%);
             border-top: 1px solid var(--line);
             background: rgba(255, 255, 255, 0.96);
@@ -751,8 +762,11 @@
                 <button class="reset-progress" id="resetProgressBtn" type="button">Сбросить статистику</button>
                 <button class="logout-account" id="logoutAccountBtn" type="button">Выйти из аккаунта</button>
             </div>
+        </section>
+
+        <section class="leaderboard-page" id="leaderboardPage">
             <section class="leaderboard">
-                <h3>Таблица лидеров</h3>
+                <h2 class="progress-heading">Таблица лидеров</h2>
                 <div class="leaderboard-list" id="leaderboardList"></div>
             </section>
         </section>
@@ -817,6 +831,7 @@
     <nav class="bottom-nav" aria-label="Основная навигация">
         <button class="nav-btn active" id="practiceNav" type="button">Закрепление</button>
         <a class="nav-btn" id="lessonsNav" href="https://t.me/+KF7vF9u7-HUyN2Vi" target="_blank" rel="noopener noreferrer" style="display:grid;place-items:center;text-decoration:none">Уроки</a>
+        <button class="nav-btn" id="leadersNav" type="button">Лидеры</button>
     </nav>
 
     <div class="welcome-overlay" id="welcomeOverlay" role="dialog" aria-modal="true" aria-labelledby="welcomeTitle">
@@ -1066,6 +1081,26 @@
             document.getElementById("learnMode").classList.toggle("active", mode === "learn");
             document.getElementById("examMode").classList.toggle("active", mode === "exam");
             document.getElementById("progressMode").classList.toggle("active", mode === "progress");
+            document.querySelectorAll(".nav-btn").forEach(button => button.classList.remove("active"));
+
+            if (mode === "leaderboard") {
+                clearInterval(timerId);
+                document.querySelector(".subject-switch").style.display = "none";
+                document.querySelector(".mode-switch").style.display = "none";
+                document.getElementById("card").style.display = "none";
+                document.getElementById("progressPage").classList.remove("visible");
+                document.getElementById("leaderboardPage").classList.add("visible");
+                document.getElementById("leadersNav").classList.add("active");
+                updateLeaderboard(getProfile(), null);
+                return;
+            }
+
+            document.querySelector(".subject-switch").style.display = "grid";
+            document.querySelector(".mode-switch").style.display = "grid";
+            document.getElementById("leaderboardPage").classList.remove("visible");
+            if (mode === "learn" || mode === "exam" || mode === "progress") {
+                document.getElementById("practiceNav").classList.add("active");
+            }
 
             if (mode === "progress") {
                 clearInterval(timerId);
@@ -1427,10 +1462,10 @@
             if (profile) {
                 const key = `${profile.fullName}||${profile.branch}`;
                 const existing = entries.find(entry => entry.key === key);
-                if (existing) {
+                if (existing && learnedInSubject !== null) {
                     existing.learned = learnedInSubject;
                     existing.errors = errorCount;
-                } else {
+                } else if (!existing && learnedInSubject !== null) {
                     entries.push({
                         key,
                         fullName: profile.fullName,
@@ -1513,6 +1548,10 @@
         document.getElementById("restartBtn").addEventListener("click", () => startMode(mode));
         document.getElementById("practiceNav").addEventListener("click", () => {
             startMode("learn");
+            document.getElementById("practiceNav").classList.add("active");
+        });
+        document.getElementById("leadersNav").addEventListener("click", () => {
+            startMode("leaderboard");
         });
         document.getElementById("welcomeContinueBtn").addEventListener("click", () => {
             document.getElementById("welcomeStep").style.display = "none";
