@@ -40,10 +40,33 @@
             font-family: "Manrope", sans-serif;
             color: var(--ink);
             background: var(--background);
+            caret-color: transparent;
+            cursor: default;
+            user-select: none;
+            -webkit-user-select: none;
         }
 
         button, select { font: inherit; }
-        button { -webkit-tap-highlight-color: transparent; }
+        button { -webkit-tap-highlight-color: transparent; cursor: pointer; }
+        input, textarea, [contenteditable="true"], select {
+            caret-color: auto;
+            cursor: text;
+            user-select: text;
+            -webkit-user-select: text;
+        }
+        select { cursor: pointer; }
+        .progress-profile,
+        .progress-stats,
+        .leaderboard-row,
+        .progress-heading,
+        .credit,
+        .brand,
+        .question,
+        .topic {
+            cursor: default;
+            user-select: none;
+            -webkit-user-select: none;
+        }
 
         .app {
             width: min(600px, 100%);
