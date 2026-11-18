@@ -1027,7 +1027,7 @@
         function cloudIsConfigured() {
             return Boolean(
                 window.ENTSPRINT_CONFIG?.cloudEnabled &&
-                window.ENTSPRINT_CONFIG.provider === "firebase" &&
+                window.ENTSPRINT_CONFIG.provider === "firebase_firestore" &&
                 window.ENTSPRINT_CONFIG.endpoint
             );
         }
@@ -1036,10 +1036,14 @@
             if (!cloudIsConfigured()) return null;
             try {
                 const endpoint = window.ENTSPRINT_CONFIG.endpoint.replace(/\/$/, "");
-                const response = await fetch(`${endpoint}/entsprint/accounts.json`);
+                const apiKey = window.ENTSPRINT_CONFIG.apiKey;
+                const response = await fetch(
+                    `${endpoint}/entsprint/accounts?key=${encodeURIComponent(apiKey)}`
+                );
                 if (!response.ok) throw new Error(`Cloud accounts request failed: ${response.status}`);
                 const data = await response.json();
-                return Array.isArray(data) ? data : Object.values(data || {});
+                const payload = data.fields?.accounts?.stringValue;
+                return payload ? JSON.parse(payload) : [];
             } catch (error) {
                 console.error("Не удалось загрузить облачные аккаунты EntSprint", error);
                 return null;
@@ -1050,11 +1054,19 @@
             if (!cloudIsConfigured()) return false;
             try {
                 const endpoint = window.ENTSPRINT_CONFIG.endpoint.replace(/\/$/, "");
-                const response = await fetch(`${endpoint}/entsprint/accounts.json`, {
-                    method: "PUT",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(accounts)
-                });
+                const apiKey = window.ENTSPRINT_CONFIG.apiKey;
+                const response = await fetch(
+                    `${endpoint}/entsprint/accounts?key=${encodeURIComponent(apiKey)}&updateMask.fieldPaths=accounts`,
+                    {
+                        method: "PATCH",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            fields: {
+                                accounts: { stringValue: JSON.stringify(accounts) }
+                            }
+                        })
+                    }
+                );
                 if (!response.ok) throw new Error(`Cloud accounts request failed: ${response.status}`);
                 return true;
             } catch (error) {
