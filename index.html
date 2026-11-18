@@ -317,6 +317,43 @@
 
         .next.visible { display: block; }
 
+        .finish-test {
+            display: none;
+            min-height: 48px;
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            background: transparent;
+            color: var(--error);
+            padding: 10px 14px;
+            cursor: pointer;
+            font-weight: 800;
+        }
+
+        .finish-test.visible { display: block; }
+
+        .confirm-dialog {
+            width: min(360px, calc(100% - 32px));
+            border: 1px solid var(--line);
+            border-radius: 18px;
+            background: var(--surface);
+            color: var(--ink);
+            padding: 20px;
+            box-shadow: var(--shadow);
+        }
+
+        .confirm-dialog::backdrop { background: rgba(20, 15, 35, 0.48); }
+        .confirm-dialog h2 { margin: 0 0 8px; font-size: 20px; }
+        .confirm-dialog p { margin: 0; color: var(--muted); line-height: 1.5; }
+        .confirm-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 18px; }
+        .confirm-actions button {
+            min-height: 48px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 800;
+        }
+        .confirm-cancel { border: 1px solid var(--line); background: var(--surface); color: var(--ink); }
+        .confirm-submit { border: 0; background: var(--error); color: #fff; }
+
         .results {
             display: none;
             min-height: 520px;
@@ -511,6 +548,7 @@
                     <div class="navigation">
                         <button class="back" id="backBtn" type="button">Назад</button>
                         <button class="next" id="nextBtn" type="button">Далее</button>
+                        <button class="finish-test" id="finishTestBtn" type="button">Завершить тест</button>
                     </div>
                 </div>
             </div>
@@ -535,6 +573,15 @@
         </section>
 
         <p class="credit">Created by Мұстафа Оразалы Асланұлы</p>
+    <dialog class="confirm-dialog" id="finishConfirmDialog">
+        <h2>Завершить тест?</h2>
+        <p id="finishConfirmText">Все неотвеченные вопросы будут считаться ошибками.</p>
+        <div class="confirm-actions">
+            <button class="confirm-cancel" id="cancelFinishBtn" type="button">Отмена</button>
+            <button class="confirm-submit" id="confirmFinishBtn" type="button">Подтвердить</button>
+        </div>
+    </dialog>
+
     </main>
 
     <nav class="bottom-nav" aria-label="Основная навигация">
@@ -680,6 +727,7 @@
             document.getElementById("timer").classList.toggle("visible", mode === "exam");
             document.getElementById("streak").style.display = mode === "learn" ? "grid" : "none";
             document.getElementById("learningStatus").style.display = mode === "learn" ? "block" : "none";
+            document.getElementById("finishTestBtn").classList.toggle("visible", mode === "exam");
             document.getElementById("cardHead").style.display = "grid";
             document.getElementById("quiz").style.display = "block";
             document.getElementById("results").classList.remove("visible");
@@ -865,6 +913,7 @@
             renderQuestion(currentQuestion);
             document.getElementById("nextBtn").classList.add("visible");
             document.getElementById("backBtn").classList.toggle("visible", examIndex > 0);
+            document.getElementById("finishTestBtn").classList.add("visible");
         }
 
         function nextQuestion() {
@@ -886,6 +935,9 @@
 
         function finishExam(timedOut) {
             clearInterval(timerId);
+            document.getElementById("finishTestBtn").classList.remove("visible");
+            const dialog = document.getElementById("finishConfirmDialog");
+            if (dialog.open) dialog.close();
             examAnswered = examSelections.size;
             examCorrect = baseQuestions.filter(question => {
                 const displayed = displayedQuestions.get(question.id);
@@ -969,6 +1021,21 @@
         document.getElementById("lessonSelect").addEventListener("change", changeLesson);
         document.getElementById("nextBtn").addEventListener("click", nextQuestion);
         document.getElementById("backBtn").addEventListener("click", previousQuestion);
+        document.getElementById("finishTestBtn").addEventListener("click", () => {
+            if (mode !== "exam") return;
+            const unanswered = baseQuestions.length - examSelections.size;
+            document.getElementById("finishConfirmText").textContent =
+                unanswered
+                    ? `Неотвеченных вопросов: ${unanswered}. Они будут считаться ошибками.`
+                    : "Все вопросы отвечены. Завершить тест?";
+            document.getElementById("finishConfirmDialog").showModal();
+        });
+        document.getElementById("cancelFinishBtn").addEventListener("click", () => {
+            document.getElementById("finishConfirmDialog").close();
+        });
+        document.getElementById("confirmFinishBtn").addEventListener("click", () => {
+            finishExam(false);
+        });
         document.getElementById("restartBtn").addEventListener("click", () => startMode(mode));
         document.getElementById("practiceNav").addEventListener("click", () => {
             document.getElementById("quiz").style.display = "block";
