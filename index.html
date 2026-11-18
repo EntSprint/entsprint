@@ -1043,7 +1043,22 @@
                 if (!response.ok) throw new Error(`Cloud accounts request failed: ${response.status}`);
                 const data = await response.json();
                 const payload = data.fields?.accounts?.stringValue;
-                return payload ? JSON.parse(payload) : [];
+                if (!payload) return [];
+                const accounts = JSON.parse(payload);
+                const uniqueAccounts = [];
+                const names = new Set();
+                (Array.isArray(accounts) ? accounts : []).forEach(account => {
+                    const key = normalizeName(account.fullName || "")
+                        .toLocaleLowerCase("ru-RU")
+                        .replace(/\s+/g, " ");
+                    if (!key || names.has(key)) return;
+                    names.add(key);
+                    uniqueAccounts.push(account);
+                });
+                if (uniqueAccounts.length !== accounts.length) {
+                    saveCloudAccounts(uniqueAccounts).catch(() => {});
+                }
+                return uniqueAccounts;
             } catch (error) {
                 console.error("Не удалось загрузить облачные аккаунты EntSprint", error);
                 return null;
@@ -1053,6 +1068,16 @@
         async function saveCloudAccounts(accounts) {
             if (!cloudIsConfigured()) return false;
             try {
+                const uniqueAccounts = [];
+                const names = new Set();
+                (Array.isArray(accounts) ? accounts : []).forEach(account => {
+                    const key = normalizeName(account.fullName || "")
+                        .toLocaleLowerCase("ru-RU")
+                        .replace(/\s+/g, " ");
+                    if (!key || names.has(key)) return;
+                    names.add(key);
+                    uniqueAccounts.push(account);
+                });
                 const endpoint = window.ENTSPRINT_CONFIG.endpoint.replace(/\/$/, "");
                 const apiKey = window.ENTSPRINT_CONFIG.apiKey;
                 const response = await fetch(
@@ -1062,7 +1087,7 @@
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({
                             fields: {
-                                accounts: { stringValue: JSON.stringify(accounts) }
+                                accounts: { stringValue: JSON.stringify(uniqueAccounts) }
                             }
                         })
                     }
@@ -1098,6 +1123,12 @@
 
         function normalizeName(value) {
             return value.trim().replace(/\s+/g, " ");
+        }
+
+        function accountNameKey(value) {
+            return normalizeName(value)
+                .toLocaleLowerCase("ru-RU")
+                .replace(/[ё]/g, "е");
         }
 
         async function passwordHash(password, salt) {
@@ -1861,15 +1892,19 @@
                 validateRegistration();
                 return;
             }
+            const registerButton = document.getElementById("startLearningBtn");
+            if (registerButton.disabled) return;
+            registerButton.disabled = true;
             const accounts = await getAvailableAccounts();
             const existing = Array.isArray(accounts)
-                ? accounts.find(account => normalizeName(account.fullName).toLowerCase() === fullName.toLowerCase())
+                ? accounts.find(account => accountNameKey(account.fullName) === accountNameKey(fullName))
                 : null;
             if (existing) {
                 document.getElementById("authMessage").textContent =
                     "Такой профиль уже зарегистрирован. Выберите «Войти».";
                 showAuthForm("login");
                 document.getElementById("loginNameInput").value = fullName;
+                registerButton.disabled = false;
                 return;
             }
 
@@ -1891,7 +1926,7 @@
             const password = document.getElementById("loginPasswordInput").value;
             const accounts = await getAvailableAccounts();
             const account = Array.isArray(accounts)
-                ? accounts.find(item => normalizeName(item.fullName).toLowerCase() === fullName.toLowerCase())
+                ? accounts.find(item => accountNameKey(item.fullName) === accountNameKey(fullName))
                 : null;
             if (!account) {
                 document.getElementById("authMessage").textContent =
