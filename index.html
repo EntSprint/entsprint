@@ -969,6 +969,7 @@
         </div>
     </div>
 
+    <script src="./config.js"></script>
     <script>
         const TELEGRAM_GROUP_URL = "https://t.me/+KF7vF9u7-HUyN2Vi";
         const STREAK_STORAGE_KEY = "ent_streaks_v1";
@@ -1021,6 +1022,66 @@
 
         function saveJson(key, value) {
             localStorage.setItem(key, JSON.stringify(value));
+        }
+
+        function cloudIsConfigured() {
+            return Boolean(
+                window.ENTSPRINT_CONFIG?.cloudEnabled &&
+                window.ENTSPRINT_CONFIG.provider === "firebase" &&
+                window.ENTSPRINT_CONFIG.endpoint
+            );
+        }
+
+        async function loadCloudAccounts() {
+            if (!cloudIsConfigured()) return null;
+            try {
+                const endpoint = window.ENTSPRINT_CONFIG.endpoint.replace(/\/$/, "");
+                const response = await fetch(`${endpoint}/entsprint/accounts.json`);
+                if (!response.ok) throw new Error(`Cloud accounts request failed: ${response.status}`);
+                const data = await response.json();
+                return Array.isArray(data) ? data : Object.values(data || {});
+            } catch (error) {
+                console.error("Не удалось загрузить облачные аккаунты EntSprint", error);
+                return null;
+            }
+        }
+
+        async function saveCloudAccounts(accounts) {
+            if (!cloudIsConfigured()) return false;
+            try {
+                const endpoint = window.ENTSPRINT_CONFIG.endpoint.replace(/\/$/, "");
+                const response = await fetch(`${endpoint}/entsprint/accounts.json`, {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(accounts)
+                });
+                if (!response.ok) throw new Error(`Cloud accounts request failed: ${response.status}`);
+                return true;
+            } catch (error) {
+                console.error("Не удалось сохранить облачные аккаунты EntSprint", error);
+                return false;
+            }
+        }
+
+        async function getAvailableAccounts() {
+            return (await loadCloudAccounts()) || loadJson(ACCOUNTS_STORAGE_KEY, []);
+        }
+
+        async function syncLocalAccountsToCloud() {
+            if (!cloudIsConfigured()) return;
+            const localAccounts = loadJson(ACCOUNTS_STORAGE_KEY, []);
+            const cloudAccounts = await loadCloudAccounts();
+            if (!cloudAccounts) return;
+            const merged = [...cloudAccounts];
+            localAccounts.forEach(localAccount => {
+                const index = merged.findIndex(account =>
+                    normalizeName(account.fullName).toLowerCase() ===
+                    normalizeName(localAccount.fullName).toLowerCase()
+                );
+                if (index >= 0) merged[index] = localAccount;
+                else merged.push(localAccount);
+            });
+            await saveCloudAccounts(merged);
         }
 
         function normalizeName(value) {
@@ -1708,7 +1769,10 @@
         }
 
         function initializeProfile() {
-            if (getProfile() && localStorage.getItem(SESSION_STORAGE_KEY)) return;
+            if (getProfile() && localStorage.getItem(SESSION_STORAGE_KEY)) {
+                syncLocalAccountsToCloud();
+                return;
+            }
             document.getElementById("welcomeOverlay").classList.add("visible");
             document.getElementById("welcomeStep").style.display = "block";
             document.getElementById("registrationStep").style.display = "none";
@@ -1785,7 +1849,7 @@
                 validateRegistration();
                 return;
             }
-            const accounts = loadJson(ACCOUNTS_STORAGE_KEY, []);
+            const accounts = await getAvailableAccounts();
             const existing = Array.isArray(accounts)
                 ? accounts.find(account => normalizeName(account.fullName).toLowerCase() === fullName.toLowerCase())
                 : null;
@@ -1804,6 +1868,7 @@
             const account = { fullName, branch, salt, hash };
             const updatedAccounts = Array.isArray(accounts) ? [...accounts, account] : [account];
             saveJson(ACCOUNTS_STORAGE_KEY, updatedAccounts);
+            await saveCloudAccounts(updatedAccounts);
             saveJson(PROFILE_STORAGE_KEY, { fullName, branch });
             saveJson(SESSION_STORAGE_KEY, fullName);
             document.getElementById("welcomeOverlay").classList.remove("visible");
@@ -1812,7 +1877,7 @@
         document.getElementById("loginBtn").addEventListener("click", async () => {
             const fullName = normalizeName(document.getElementById("loginNameInput").value);
             const password = document.getElementById("loginPasswordInput").value;
-            const accounts = loadJson(ACCOUNTS_STORAGE_KEY, []);
+            const accounts = await getAvailableAccounts();
             const account = Array.isArray(accounts)
                 ? accounts.find(item => normalizeName(item.fullName).toLowerCase() === fullName.toLowerCase())
                 : null;
@@ -1828,6 +1893,7 @@
             }
             saveJson(PROFILE_STORAGE_KEY, { fullName: account.fullName, branch: account.branch });
             saveJson(SESSION_STORAGE_KEY, account.fullName);
+            saveJson(ACCOUNTS_STORAGE_KEY, accounts);
             document.getElementById("welcomeOverlay").classList.remove("visible");
             updateProgress();
         });
