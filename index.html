@@ -774,9 +774,16 @@
                 .replace(/>/g, "&gt;");
         }
 
+        function createAnswerSound(source) {
+            const sound = new Audio(source);
+            sound.preload = "auto";
+            sound.load();
+            return sound;
+        }
+
         const answerSounds = {
-            correct: new Audio("./correct-answer.mp3"),
-            wrong: new Audio("./wrong-answer.mp3")
+            correct: createAnswerSound("./correct-answer.mp3"),
+            wrong: createAnswerSound("./wrong-answer.mp3")
         };
 
         function ensureAudioContext() {
