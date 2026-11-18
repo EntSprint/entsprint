@@ -367,6 +367,24 @@
         }
         .leaderboard-page.visible { display: block; }
         .leaderboard-page .leaderboard { margin-top: 0; }
+        .leaderboard-filters {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin: 14px 0;
+        }
+        .leaderboard-filter {
+            min-width: 0;
+            min-height: 48px;
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            background: var(--surface);
+            color: var(--ink);
+            padding: 8px 10px;
+            font-size: 12px;
+            font-weight: 800;
+        }
+        .leaderboard-filter.full-width { grid-column: 1 / -1; }
 
         .card {
             min-height: 520px;
@@ -794,6 +812,29 @@
         <section class="leaderboard-page" id="leaderboardPage">
             <section class="leaderboard">
                 <h2 class="progress-heading">Таблица лидеров</h2>
+                <div class="leaderboard-filters">
+                    <select class="leaderboard-filter full-width" id="leaderboardCriterion" aria-label="Критерий таблицы лидеров">
+                        <option value="learned">Больше всего выучено</option>
+                        <option value="exam">Лучший результат экзамена</option>
+                        <option value="time">Больше всего времени на сайте</option>
+                    </select>
+                    <select class="leaderboard-filter" id="leaderboardLesson" aria-label="Номер урока">
+                        <option value="all">Все уроки</option>
+                    </select>
+                    <select class="leaderboard-filter" id="leaderboardExam" aria-label="Номер экзамена">
+                        <option value="all">Все экзамены</option>
+                        <option value="1">Экзамен 1</option>
+                        <option value="2">Экзамен 2</option>
+                        <option value="3">Экзамен 3</option>
+                        <option value="4">Экзамен 4</option>
+                        <option value="5">Экзамен 5</option>
+                        <option value="6">Экзамен 6</option>
+                        <option value="7">Экзамен 7</option>
+                        <option value="8">Экзамен 8</option>
+                        <option value="9">Экзамен 9</option>
+                        <option value="10">Экзамен 10</option>
+                    </select>
+                </div>
                 <div class="leaderboard-list" id="leaderboardList"></div>
             </section>
         </section>
@@ -939,6 +980,7 @@
         const LEADERBOARD_STORAGE_KEY = "ent_leaderboard_v1";
         const ACCOUNTS_STORAGE_KEY = "ent_accounts_v1";
         const SESSION_STORAGE_KEY = "ent_session_v1";
+        const SITE_TIME_STORAGE_KEY = "ent_site_time_v1";
 
         if (localStorage.getItem(RESET_RELEASE_KEY) !== "done") {
             [
@@ -1080,6 +1122,16 @@
                 option.textContent = lesson;
                 lessonSelect.appendChild(option);
             });
+            const leaderboardLesson = document.getElementById("leaderboardLesson");
+            if (leaderboardLesson) {
+                leaderboardLesson.innerHTML = '<option value="all">Все уроки</option>';
+                lessons.forEach(lesson => {
+                    const option = document.createElement("option");
+                    option.value = lesson;
+                    option.textContent = lesson;
+                    leaderboardLesson.appendChild(option);
+                });
+            }
             changeLesson();
         }
 
@@ -1295,6 +1347,20 @@
                         playTone("learned");
                         delete streaks[currentQuestion.id];
                         saveJson(STREAK_STORAGE_KEY, streaks);
+                        const profile = getProfile();
+                        if (profile) {
+                            const entries = loadJson(LEADERBOARD_STORAGE_KEY, []);
+                            const key = getProfileKey(profile);
+                            const entry = Array.isArray(entries)
+                                ? entries.find(item => item.key === key)
+                                : null;
+                            if (entry) {
+                                entry.lessonStats = entry.lessonStats || {};
+                                entry.lessonStats[currentQuestion.lesson || "Все уроки"] =
+                                    Number(entry.lessonStats[currentQuestion.lesson || "Все уроки"] || 0) + 1;
+                                saveJson(LEADERBOARD_STORAGE_KEY, entries);
+                            }
+                        }
                         updateProgress();
                     } else {
                         requeueLearningQuestion();
@@ -1392,6 +1458,7 @@
             const percentage = baseQuestions.length
                 ? Math.round((examCorrect / baseQuestions.length) * 100)
                 : 0;
+            recordExamResult(percentage);
             const unanswered = baseQuestions.length - examAnswered;
 
             document.getElementById("scoreText").textContent = `${percentage}%`;
@@ -1459,6 +1526,51 @@
             return loadJson(PROFILE_STORAGE_KEY, null);
         }
 
+        function getProfileKey(profile) {
+            return profile ? `${profile.fullName}||${profile.branch}` : "";
+        }
+
+        function getSiteTimeForProfile(profile) {
+            if (!profile) return 0;
+            const timeByProfile = loadJson(SITE_TIME_STORAGE_KEY, {});
+            return Number(timeByProfile[getProfileKey(profile)] || 0);
+        }
+
+        function formatSiteTime(seconds) {
+            const hours = Math.floor(seconds / 3600);
+            const minutes = Math.floor((seconds % 3600) / 60);
+            if (hours) return `${hours} ч ${minutes} мин`;
+            if (minutes) return `${minutes} мин`;
+            return `${seconds} сек`;
+        }
+
+        function recordSiteTime() {
+            const profile = getProfile();
+            if (!profile || !localStorage.getItem(SESSION_STORAGE_KEY)) return;
+            const timeByProfile = loadJson(SITE_TIME_STORAGE_KEY, {});
+            const key = getProfileKey(profile);
+            timeByProfile[key] = Number(timeByProfile[key] || 0) + 30;
+            saveJson(SITE_TIME_STORAGE_KEY, timeByProfile);
+            updateLeaderboard(profile, [...learned].filter(id =>
+                questions.some(question => question.id === id)
+            ).length);
+        }
+
+        function recordExamResult(score) {
+            const profile = getProfile();
+            if (!profile) return;
+            const entries = loadJson(LEADERBOARD_STORAGE_KEY, []);
+            if (!Array.isArray(entries)) return;
+            const entry = entries.find(item => item.key === getProfileKey(profile));
+            if (!entry) return;
+            entry.examResults = Array.isArray(entry.examResults) ? entry.examResults : [];
+            entry.examResults.push({
+                lesson: document.getElementById("lessonSelect").value,
+                score: Number(score)
+            });
+            saveJson(LEADERBOARD_STORAGE_KEY, entries);
+        }
+
         function updateProgress() {
             const profile = getProfile();
             const subjectQuestions = questions.filter(question =>
@@ -1492,38 +1604,62 @@
                 if (existing && learnedInSubject !== null) {
                     existing.learned = learnedInSubject;
                     existing.errors = errorCount;
+                    existing.timeSeconds = getSiteTimeForProfile(profile);
                 } else if (!existing && learnedInSubject !== null) {
                     entries.push({
                         key,
                         fullName: profile.fullName,
                         branch: profile.branch,
                         learned: learnedInSubject,
-                        errors: errorCount
+                        errors: errorCount,
+                        timeSeconds: getSiteTimeForProfile(profile),
+                        lessonStats: {},
+                        examResults: []
                     });
                 }
             }
 
-            entries.sort((a, b) =>
-                (b.learned - a.learned) ||
-                (a.errors - b.errors) ||
-                a.fullName.localeCompare(b.fullName, "ru")
-            );
-            entries = entries.slice(0, 10);
+            const criterion = document.getElementById("leaderboardCriterion")?.value || "learned";
+            const lesson = document.getElementById("leaderboardLesson")?.value || "all";
+            const examNumber = document.getElementById("leaderboardExam")?.value || "all";
+
+            const ranked = entries.map(entry => {
+                let score = entry.learned || 0;
+                if (criterion === "learned" && lesson !== "all") {
+                    score = entry.lessonStats?.[lesson] || 0;
+                } else if (criterion === "exam") {
+                    const results = entry.examResults || [];
+                    score = examNumber === "all"
+                        ? Math.max(0, ...results.map(result => Number(result.score || 0)))
+                        : Number(results[Number(examNumber) - 1]?.score || 0);
+                } else if (criterion === "time") {
+                    score = Number(entry.timeSeconds || 0);
+                }
+                return { entry, score };
+            }).sort((a, b) =>
+                (b.score - a.score) ||
+                ((a.entry.errors || 0) - (b.entry.errors || 0)) ||
+                a.entry.fullName.localeCompare(b.entry.fullName, "ru")
+            ).slice(0, 10);
+
             saveJson(LEADERBOARD_STORAGE_KEY, entries);
 
             const list = document.getElementById("leaderboardList");
             list.innerHTML = "";
-            if (!entries.length) {
+            if (!ranked.length) {
                 list.innerHTML = '<div class="leaderboard-row"><span class="leaderboard-place">—</span><span class="leaderboard-name"><strong>Пока нет участников</strong></span></div>';
                 return;
             }
-            entries.forEach((entry, index) => {
+            ranked.forEach(({ entry, score }, index) => {
                 const row = document.createElement("div");
                 row.className = "leaderboard-row";
+                let scoreText = `${score} выучено`;
+                if (criterion === "exam") scoreText = `${score}%`;
+                if (criterion === "time") scoreText = formatSiteTime(score);
                 row.innerHTML =
                     `<span class="leaderboard-place">${index + 1}</span>` +
                     `<span class="leaderboard-name"><strong>${escapeHtml(entry.fullName)}</strong><span>${escapeHtml(entry.branch)}</span></span>` +
-                    `<span class="leaderboard-score">${entry.learned} выучено</span>`;
+                    `<span class="leaderboard-score">${scoreText}</span>`;
                 list.appendChild(row);
             });
         }
@@ -1693,8 +1829,16 @@
                     entry.key !== `${profile.fullName}||${profile.branch}`
                 );
                 saveJson(LEADERBOARD_STORAGE_KEY, entries);
+                const timeByProfile = loadJson(SITE_TIME_STORAGE_KEY, {});
+                timeByProfile[getProfileKey(profile)] = 0;
+                saveJson(SITE_TIME_STORAGE_KEY, timeByProfile);
             }
             updateProgress();
+        });
+        ["leaderboardCriterion", "leaderboardLesson", "leaderboardExam"].forEach(id => {
+            document.getElementById(id).addEventListener("change", () => {
+                updateLeaderboard(getProfile(), null);
+            });
         });
         document.getElementById("soundBtn").addEventListener("click", () => {
             soundEnabled = !soundEnabled;
@@ -1717,6 +1861,7 @@
             if (event.key === "F7") event.preventDefault();
         });
         document.addEventListener("pointerdown", ensureAudioContext, { once: true });
+        setInterval(recordSiteTime, 30000);
         updateSoundButton();
         initializeProfile();
         loadQuestions();
