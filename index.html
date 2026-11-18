@@ -813,6 +813,9 @@
                 if (mode === "exam" && examSelections.get(question.id) === index) {
                     button.classList.add("exam-selected");
                 }
+                if (mode === "exam" && examSelections.has(question.id)) {
+                    button.disabled = true;
+                }
                 list.appendChild(button);
             });
         }
@@ -893,9 +896,16 @@
                     if (navigator.vibrate) navigator.vibrate(60);
                 }
             } else {
+                if (examSelections.has(currentQuestion.id)) return;
                 examSelections.set(currentQuestion.id, selectedIndex);
                 Array.from(document.getElementById("optionsList").children)
-                    .forEach(optionButton => optionButton.classList.remove("exam-selected"));
+                    .forEach((optionButton, index) => {
+                        optionButton.classList.remove("exam-selected");
+                        optionButton.disabled = true;
+                        if (index === selectedIndex) {
+                            optionButton.classList.add("exam-selected");
+                        }
+                    });
                 button.classList.add("exam-selected");
                 document.getElementById("nextBtn").classList.add("visible");
             }
@@ -961,7 +971,7 @@
 
             document.getElementById("scoreText").textContent = `${percentage}%`;
             document.getElementById("correctStat").textContent = examCorrect;
-            document.getElementById("incorrectStat").textContent = examIncorrect + unanswered;
+            document.getElementById("incorrectStat").textContent = examIncorrect;
             document.getElementById("totalStat").textContent = baseQuestions.length;
             renderExamReview();
         }
