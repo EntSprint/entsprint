@@ -33,6 +33,10 @@
 
         * { box-sizing: border-box; }
 
+        *:not(input):not(textarea):not([contenteditable="true"]):not(select) {
+            caret-color: transparent !important;
+        }
+
         body {
             margin: 0;
             min-height: 100vh;
@@ -1699,6 +1703,19 @@
             if (soundEnabled) playTone("correct");
         });
 
+        document.addEventListener("pointerdown", event => {
+            if (event.pointerType !== "mouse") return;
+            const editableTarget = event.target.closest(
+                "input, textarea, select, button, a, [contenteditable='true'], label"
+            );
+            if (!editableTarget) {
+                event.preventDefault();
+                window.getSelection()?.removeAllRanges();
+            }
+        }, true);
+        document.addEventListener("keydown", event => {
+            if (event.key === "F7") event.preventDefault();
+        });
         document.addEventListener("pointerdown", ensureAudioContext, { once: true });
         updateSoundButton();
         initializeProfile();
