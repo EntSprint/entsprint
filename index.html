@@ -1065,7 +1065,7 @@
         }
 
         function prepareDisplayedQuestion(question) {
-            if (displayedQuestions.has(question.id)) {
+            if (mode === "exam" && displayedQuestions.has(question.id)) {
                 return displayedQuestions.get(question.id);
             }
             const paired = question.options.map((text, index) => ({
@@ -1080,6 +1080,20 @@
                     item => item.originalIndex === question.answer
                 )
             };
+            if (mode === "learn") {
+                const previous = displayedQuestions.get(question.id);
+                if (previous && prepared.answer === previous.answer) {
+                    const availableIndexes = prepared.options
+                        .map((_, index) => index)
+                        .filter(index => index !== prepared.answer);
+                    const targetIndex = availableIndexes[
+                        Math.floor(Math.random() * availableIndexes.length)
+                    ];
+                    const correctOption = prepared.options.splice(prepared.answer, 1)[0];
+                    prepared.options.splice(targetIndex, 0, correctOption);
+                    prepared.answer = targetIndex;
+                }
+            }
             displayedQuestions.set(question.id, prepared);
             return prepared;
         }
