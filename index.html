@@ -789,8 +789,11 @@
 
         function playTone(type) {
             if (!soundEnabled) return;
+            Object.values(answerSounds).forEach(sound => {
+                sound.pause();
+                sound.currentTime = 0;
+            });
             const sound = answerSounds[type === "wrong" ? "wrong" : "correct"];
-            sound.currentTime = 0;
             sound.volume = 0.8;
             const playback = sound.play();
             if (playback) playback.catch(() => {});
