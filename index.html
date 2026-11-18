@@ -226,6 +226,66 @@
         }
         .welcome-actions button:disabled { opacity: 0.45; cursor: not-allowed; }
 
+        .welcome-character {
+            width: 108px;
+            height: 108px;
+            display: grid;
+            place-items: center;
+            margin: 0 auto 14px;
+            border: 1px solid var(--line);
+            border-radius: 50%;
+            background: var(--background);
+        }
+        .welcome-character svg { width: 84px; height: 84px; }
+
+        .leaderboard {
+            margin-top: 16px;
+        }
+        .leaderboard h3 { margin: 0 0 8px; font-size: 16px; }
+        .leaderboard-list {
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            overflow: hidden;
+        }
+        .leaderboard-row {
+            display: grid;
+            grid-template-columns: 28px minmax(0, 1fr) auto;
+            align-items: center;
+            gap: 8px;
+            min-height: 48px;
+            padding: 8px 10px;
+            border-bottom: 1px solid var(--line);
+        }
+        .leaderboard-row:last-child { border-bottom: 0; }
+        .leaderboard-place {
+            width: 26px;
+            height: 26px;
+            display: grid;
+            place-items: center;
+            border-radius: 8px;
+            background: var(--background);
+            color: var(--primary-dark);
+            font-size: 12px;
+            font-weight: 800;
+        }
+        .leaderboard-name { min-width: 0; }
+        .leaderboard-name strong {
+            display: block;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-size: 12px;
+        }
+        .leaderboard-name span {
+            display: block;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            color: var(--muted);
+            font-size: 10px;
+        }
+        .leaderboard-score { font-size: 12px; font-weight: 800; }
+
         .card {
             min-height: 520px;
             border: 1px solid var(--line);
@@ -646,6 +706,10 @@
                 <button class="continue-learning" id="continueLearningBtn" type="button">Продолжить учить</button>
                 <button class="reset-progress" id="resetProgressBtn" type="button">Сбросить статистику</button>
             </div>
+            <section class="leaderboard">
+                <h3>Таблица лидеров</h3>
+                <div class="leaderboard-list" id="leaderboardList"></div>
+            </section>
         </section>
 
         <section class="card" id="card">
@@ -713,6 +777,17 @@
     <div class="welcome-overlay" id="welcomeOverlay" role="dialog" aria-modal="true" aria-labelledby="welcomeTitle">
         <div class="welcome-dialog" id="welcomeDialog">
             <section id="welcomeStep">
+                <div class="welcome-character" aria-hidden="true">
+                    <svg viewBox="0 0 96 96" role="img">
+                        <circle cx="48" cy="34" r="19" fill="#7657c7"/>
+                        <circle cx="41" cy="31" r="2.5" fill="#fff"/>
+                        <circle cx="55" cy="31" r="2.5" fill="#fff"/>
+                        <path d="M40 41c5 4 11 4 16 0" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
+                        <path d="M24 79c2-18 12-25 24-25s22 7 24 25" fill="#50358f"/>
+                        <rect x="33" y="61" width="30" height="20" rx="4" fill="#f5b700"/>
+                        <path d="M48 61v20" stroke="#fff" stroke-width="2"/>
+                    </svg>
+                </div>
                 <h2 id="welcomeTitle">Добро пожаловать!</h2>
                 <p>Этот сайт создан, чтобы закреплять пройденный материал</p>
                 <div class="welcome-actions">
@@ -720,6 +795,17 @@
                 </div>
             </section>
             <section id="registrationStep" style="display:none">
+                <div class="welcome-character" aria-hidden="true">
+                    <svg viewBox="0 0 96 96" role="img">
+                        <circle cx="48" cy="34" r="19" fill="#7657c7"/>
+                        <circle cx="41" cy="31" r="2.5" fill="#fff"/>
+                        <circle cx="55" cy="31" r="2.5" fill="#fff"/>
+                        <path d="M40 41c5 4 11 4 16 0" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
+                        <path d="M24 79c2-18 12-25 24-25s22 7 24 25" fill="#50358f"/>
+                        <rect x="33" y="61" width="30" height="20" rx="4" fill="#f5b700"/>
+                        <path d="M48 61v20" stroke="#fff" stroke-width="2"/>
+                    </svg>
+                </div>
                 <h2>Регистрация</h2>
                 <label class="registration-label">
                     Имя и Фамилия
@@ -754,6 +840,7 @@
         const PROFILE_STORAGE_KEY = "ent_profile_v1";
         const ERRORS_STORAGE_KEY = "ent_errors_v1";
         const RESET_RELEASE_KEY = "ent_reset_welcome_v1";
+        const LEADERBOARD_STORAGE_KEY = "ent_leaderboard_v1";
 
         if (localStorage.getItem(RESET_RELEASE_KEY) !== "done") {
             [
@@ -1245,6 +1332,53 @@
             document.getElementById("progressRemaining").textContent =
                 Math.max(0, total - learnedInSubject);
             document.getElementById("progressErrors").textContent = errorCount;
+            updateLeaderboard(profile, learnedInSubject);
+        }
+
+        function updateLeaderboard(profile, learnedInSubject) {
+            let entries = loadJson(LEADERBOARD_STORAGE_KEY, []);
+            if (!Array.isArray(entries)) entries = [];
+
+            if (profile) {
+                const key = `${profile.fullName}||${profile.branch}`;
+                const existing = entries.find(entry => entry.key === key);
+                if (existing) {
+                    existing.learned = learnedInSubject;
+                    existing.errors = errorCount;
+                } else {
+                    entries.push({
+                        key,
+                        fullName: profile.fullName,
+                        branch: profile.branch,
+                        learned: learnedInSubject,
+                        errors: errorCount
+                    });
+                }
+            }
+
+            entries.sort((a, b) =>
+                (b.learned - a.learned) ||
+                (a.errors - b.errors) ||
+                a.fullName.localeCompare(b.fullName, "ru")
+            );
+            entries = entries.slice(0, 10);
+            saveJson(LEADERBOARD_STORAGE_KEY, entries);
+
+            const list = document.getElementById("leaderboardList");
+            list.innerHTML = "";
+            if (!entries.length) {
+                list.innerHTML = '<div class="leaderboard-row"><span class="leaderboard-place">—</span><span class="leaderboard-name"><strong>Пока нет участников</strong></span></div>';
+                return;
+            }
+            entries.forEach((entry, index) => {
+                const row = document.createElement("div");
+                row.className = "leaderboard-row";
+                row.innerHTML =
+                    `<span class="leaderboard-place">${index + 1}</span>` +
+                    `<span class="leaderboard-name"><strong>${escapeHtml(entry.fullName)}</strong><span>${escapeHtml(entry.branch)}</span></span>` +
+                    `<span class="leaderboard-score">${entry.learned} выучено</span>`;
+                list.appendChild(row);
+            });
         }
 
         function validateRegistration() {
@@ -1317,6 +1451,13 @@
             saveJson(STREAK_STORAGE_KEY, streaks);
             saveJson(LEARNED_STORAGE_KEY, []);
             saveJson(ERRORS_STORAGE_KEY, 0);
+            const profile = getProfile();
+            if (profile) {
+                const entries = loadJson(LEADERBOARD_STORAGE_KEY, []).filter(entry =>
+                    entry.key !== `${profile.fullName}||${profile.branch}`
+                );
+                saveJson(LEADERBOARD_STORAGE_KEY, entries);
+            }
             updateProgress();
         });
         document.getElementById("soundBtn").addEventListener("click", () => {
