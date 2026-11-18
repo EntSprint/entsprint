@@ -30,6 +30,26 @@
             --error-soft: #fbeeea;
             --shadow: 0 10px 30px rgba(80, 53, 143, 0.08);
         }
+        .question-mascot {
+            width: 64px;
+            height: 64px;
+            flex: 0 0 64px;
+            border: 2px solid var(--line);
+            border-radius: 50%;
+            object-fit: cover;
+            transition: border-color 180ms ease, transform 180ms ease;
+        }
+        .question-mascot.happy { border-color: var(--success); animation: mascot-jump 500ms ease; }
+        .question-mascot.sad { border-color: var(--error); animation: mascot-shake 500ms ease; }
+        @keyframes mascot-jump {
+            0%, 100% { transform: translateY(0); }
+            45% { transform: translateY(-9px) scale(1.05); }
+        }
+        @keyframes mascot-shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px) rotate(-4deg); }
+            75% { transform: translateX(5px) rotate(4deg); }
+        }
 
         * { box-sizing: border-box; }
 
@@ -77,7 +97,7 @@
             min-height: 100vh;
             min-height: 100dvh;
             margin: 0 auto;
-            padding: 16px 16px calc(86px + env(safe-area-inset-bottom));
+            padding: 16px 16px calc(90px + env(safe-area-inset-bottom));
         }
 
         .header {
@@ -92,6 +112,13 @@
             font-size: 17px;
             font-weight: 800;
         }
+        .brand-logo {
+            width: auto;
+            height: 38px;
+            max-width: 190px;
+            display: block;
+            object-fit: contain;
+        }
 
         .sound-btn {
             width: 40px;
@@ -103,6 +130,7 @@
             cursor: pointer;
             font-weight: 800;
         }
+        .nav-icon { display: block; height: 20px; margin: 0 auto 3px; }
 
         .subject-switch {
             display: grid;
@@ -130,7 +158,7 @@
 
         .mode-switch {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(4, 1fr);
             gap: 4px;
             padding: 4px;
             margin-bottom: 12px;
@@ -385,6 +413,100 @@
             font-weight: 800;
         }
         .leaderboard-filter.full-width { grid-column: 1 / -1; }
+        .creator-page {
+            display: none;
+            min-height: 520px;
+            border: 1px solid var(--line);
+            border-radius: 18px;
+            background: var(--surface);
+            box-shadow: var(--shadow);
+            padding: 24px 18px 28px;
+            text-align: center;
+        }
+        .creator-page.visible { display: block; }
+        .creator-mascot {
+            width: 130px;
+            height: 130px;
+            object-fit: cover;
+            border-radius: 16px;
+            margin: 0 auto 16px;
+        }
+        .creator-page h2 { margin: 0 0 10px; }
+        .creator-page p { color: var(--muted); line-height: 1.55; }
+        .feedback-card {
+            margin-top: 24px;
+            padding-top: 20px;
+            border-top: 1px solid var(--line);
+            text-align: left;
+        }
+        .feedback-stars { display: flex; gap: 5px; margin: 10px 0 14px; }
+        .feedback-star {
+            border: 0;
+            background: transparent;
+            color: var(--line);
+            cursor: pointer;
+            font-size: 28px;
+            line-height: 1;
+            padding: 0;
+        }
+        .feedback-star.active { color: var(--gold); }
+        .feedback-card textarea {
+            width: 100%;
+            min-height: 110px;
+            resize: vertical;
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            padding: 12px;
+            background: var(--surface);
+            color: var(--ink);
+            font: inherit;
+        }
+        .feedback-submit {
+            width: 100%;
+            min-height: 48px;
+            margin-top: 10px;
+            border: 0;
+            border-radius: 12px;
+            background: var(--primary-dark);
+            color: #fff;
+            cursor: pointer;
+            font-weight: 800;
+        }
+        .feedback-message { min-height: 18px; margin: 8px 0 0; font-size: 12px; font-weight: 800; }
+        .feedback-message.success { color: var(--success); }
+        .feedback-message.error { color: var(--error); }
+        .anticheat-overlay {
+            position: fixed;
+            z-index: 150;
+            inset: 0;
+            display: none;
+            place-items: center;
+            padding: 20px;
+            background: rgba(36, 32, 51, 0.96);
+            color: #fff;
+            text-align: center;
+        }
+        .anticheat-overlay.visible { display: grid; }
+        .anticheat-dialog { width: min(420px, 100%); }
+        .anticheat-dialog img {
+            width: 120px;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 50%;
+            margin-bottom: 16px;
+        }
+        .anticheat-dialog h2 { margin: 0 0 10px; }
+        .anticheat-dialog p { margin: 0 0 18px; line-height: 1.5; }
+        .anticheat-dialog button {
+            min-height: 48px;
+            padding: 0 22px;
+            border: 0;
+            border-radius: 12px;
+            background: #fff;
+            color: var(--primary-dark);
+            cursor: pointer;
+            font-weight: 800;
+        }
 
         .card {
             min-height: 520px;
@@ -774,7 +896,7 @@
 <body>
     <main class="app">
         <header class="header">
-            <div class="brand">ЕНТ тренажёр</div>
+            <div class="brand"><img class="brand-logo" src="./assets/logo.png" alt="EntSprint"></div>
             <button class="sound-btn" id="soundBtn" type="button" aria-label="Звук">Звук</button>
         </header>
 
@@ -845,6 +967,7 @@
                 <div class="meta">
                     <span id="progressText"></span>
                     <time class="timer" id="timer">60:00</time>
+                    <img class="question-mascot" id="questionMascot" src="./assets/mascot_idle.png" alt="Маскот EntSprint">
                 </div>
             </div>
 
@@ -884,6 +1007,26 @@
             </div>
         </section>
 
+        <section class="creator-page" id="creatorPage">
+            <img class="creator-mascot" src="./assets/mascot_creator.png" alt="Маскот создателя">
+            <h2>Мұстафа Оразалы Асланұлы</h2>
+            <p>EntSprint — тренажёр, созданный специально для жёсткой и эффективной подготовки к ЕНТ.</p>
+            <div class="feedback-card">
+                <h3>Обратная связь</h3>
+                <p>Расскажи, чего не хватает или что улучшить.</p>
+                <div class="feedback-stars" id="feedbackStars" aria-label="Оценка от 1 до 5">
+                    <button class="feedback-star" type="button" data-rating="1" aria-label="1 звезда">★</button>
+                    <button class="feedback-star" type="button" data-rating="2" aria-label="2 звезды">★</button>
+                    <button class="feedback-star" type="button" data-rating="3" aria-label="3 звезды">★</button>
+                    <button class="feedback-star" type="button" data-rating="4" aria-label="4 звезды">★</button>
+                    <button class="feedback-star" type="button" data-rating="5" aria-label="5 звезд">★</button>
+                </div>
+                <textarea id="feedbackText" maxlength="1000" placeholder="Напиши, чего не хватает или что улучшить..."></textarea>
+                <button class="feedback-submit" id="feedbackSubmit" type="button">Отправить отзыв</button>
+                <p class="feedback-message" id="feedbackMessage" role="status"></p>
+            </div>
+        </section>
+
         <p class="credit">Created by Мұстафа Оразалы Асланұлы</p>
     <dialog class="confirm-dialog" id="finishConfirmDialog">
         <h2>Завершить тест?</h2>
@@ -897,16 +1040,26 @@
     </main>
 
     <nav class="bottom-nav" aria-label="Основная навигация">
-        <button class="nav-btn active" id="practiceNav" type="button">Закрепление</button>
-        <a class="nav-btn" id="lessonsNav" href="https://t.me/+KF7vF9u7-HUyN2Vi" target="_blank" rel="noopener noreferrer" style="display:grid;place-items:center;text-decoration:none">Уроки</a>
-        <button class="nav-btn" id="leadersNav" type="button">Лидеры</button>
+        <button class="nav-btn active" id="practiceNav" type="button"><span class="nav-icon">✓</span>Закрепление</button>
+        <a class="nav-btn" id="lessonsNav" href="https://t.me/+KF7vF9u7-HUyN2Vi" target="_blank" rel="noopener noreferrer" style="display:grid;place-items:center;text-decoration:none"><span class="nav-icon">▤</span>Уроки</a>
+        <button class="nav-btn" id="leadersNav" type="button"><span class="nav-icon">♛</span>Лидеры</button>
+        <button class="nav-btn" id="creatorNav" type="button"><span class="nav-icon">★</span>Creator</button>
     </nav>
+
+    <div class="anticheat-overlay" id="anticheatOverlay" role="alertdialog" aria-modal="true">
+        <div class="anticheat-dialog">
+            <img src="./assets/mascot_angry.png" alt="Злой маскот">
+            <h2>Куда полез?</h2>
+            <p>На ЕНТ списать не получится! Зафиксировано нарушение.</p>
+            <button id="anticheatCloseBtn" type="button">Вернуться к экзамену</button>
+        </div>
+    </div>
 
     <div class="welcome-overlay" id="welcomeOverlay" role="dialog" aria-modal="true" aria-labelledby="welcomeTitle">
         <div class="welcome-dialog" id="welcomeDialog">
             <section id="welcomeStep">
                 <div class="welcome-character" id="welcomeCharacter" role="button" tabindex="0" aria-label="Поздороваться с обезьянкой">
-                    <img src="./assets/ent-monkey.jpg" alt="Обезьянка-помощник ЕНТ">
+                    <img src="./assets/mascot_idle.png" alt="Обезьянка-помощник ЕНТ">
                 </div>
                 <h2 id="welcomeTitle">Добро пожаловать!</h2>
                 <p>Этот сайт создан, чтобы закреплять пройденный материал</p>
@@ -916,7 +1069,7 @@
             </section>
             <section id="registrationStep" style="display:none">
                 <div class="welcome-character" id="registrationCharacter" role="button" tabindex="0" aria-label="Поздороваться с обезьянкой">
-                    <img src="./assets/ent-monkey.jpg" alt="Обезьянка-помощник ЕНТ">
+                    <img src="./assets/mascot_idle.png" alt="Обезьянка-помощник ЕНТ">
                 </div>
                 <div class="auth-switch">
                     <button class="auth-tab active" id="registerTab" type="button">Регистрация</button>
@@ -1014,6 +1167,10 @@
         let wrongInAttempt = false;
         let audioContext = null;
         let soundEnabled = localStorage.getItem(SOUND_STORAGE_KEY) !== "false";
+        let examViolationCount = 0;
+        let examTerminated = false;
+        let lastExamViolationAt = 0;
+        let mascotResetTimer = null;
 
         function loadJson(key, fallback) {
             try { return JSON.parse(localStorage.getItem(key)) ?? fallback; }
@@ -1343,12 +1500,25 @@
             document.getElementById("progressMode").classList.toggle("active", mode === "progress");
             document.querySelectorAll(".nav-btn").forEach(button => button.classList.remove("active"));
 
+            if (mode === "creator") {
+                clearInterval(timerId);
+                document.querySelector(".subject-switch").style.display = "none";
+                document.querySelector(".mode-switch").style.display = "none";
+                document.getElementById("card").style.display = "none";
+                document.getElementById("progressPage").classList.remove("visible");
+                document.getElementById("leaderboardPage").classList.remove("visible");
+                document.getElementById("creatorPage").classList.add("visible");
+                document.getElementById("creatorNav").classList.add("active");
+                return;
+            }
+
             if (mode === "leaderboard") {
                 clearInterval(timerId);
                 document.querySelector(".subject-switch").style.display = "none";
                 document.querySelector(".mode-switch").style.display = "none";
                 document.getElementById("card").style.display = "none";
                 document.getElementById("progressPage").classList.remove("visible");
+                document.getElementById("creatorPage").classList.remove("visible");
                 document.getElementById("leaderboardPage").classList.add("visible");
                 document.getElementById("leadersNav").classList.add("active");
                 updateLeaderboardFilters();
@@ -1358,6 +1528,7 @@
             document.querySelector(".subject-switch").style.display = "grid";
             document.querySelector(".mode-switch").style.display = "grid";
             document.getElementById("leaderboardPage").classList.remove("visible");
+            document.getElementById("creatorPage").classList.remove("visible");
             if (mode === "learn" || mode === "exam" || mode === "progress") {
                 document.getElementById("practiceNav").classList.add("active");
             }
@@ -1394,6 +1565,8 @@
             } else {
                 examIndex = 0;
                 examSelections = new Map();
+                examViolationCount = 0;
+                examTerminated = false;
                 remainingSeconds = 3600;
                 updateTimer();
                 timerId = setInterval(() => {
@@ -1448,6 +1621,7 @@
                     : `Вопрос ${examIndex + 1} из ${baseQuestions.length}`;
             document.getElementById("topicText").textContent = question.topic || "";
             document.getElementById("questionText").textContent = question.q;
+            setMascot("idle");
 
             const list = document.getElementById("optionsList");
             list.innerHTML = "";
@@ -1514,6 +1688,7 @@
             if (mode === "learn") {
                 if (button.classList.contains("correct")) return;
                 if (selectedIndex === currentQuestion.answer) {
+                    setMascot("happy");
                     button.classList.add("correct");
                     Array.from(document.getElementById("optionsList").children)
                         .forEach(optionButton => optionButton.disabled = true);
@@ -1545,6 +1720,7 @@
                         updateProgress();
                         saveAccountProgress(profile).catch(() => {});
                     } else {
+                        setMascot("sad");
                         requeueLearningQuestion();
                         playTone("correct");
                     }
@@ -1568,10 +1744,13 @@
                 if (examSelections.has(currentQuestion.id)) return;
                 examSelections.set(currentQuestion.id, selectedIndex);
                 if (selectedIndex !== currentQuestion.answer) {
+                    setMascot("sad");
                     errorCount++;
                     saveJson(ERRORS_STORAGE_KEY, errorCount);
                     updateProgress();
                     saveAccountProgress(getProfile()).catch(() => {});
+                } else {
+                    setMascot("happy");
                 }
                 Array.from(document.getElementById("optionsList").children)
                     .forEach((optionButton, index) => {
@@ -1621,6 +1800,8 @@
         }
 
         function finishExam(timedOut) {
+            if (examTerminated) return;
+            examTerminated = true;
             clearInterval(timerId);
             document.getElementById("finishTestBtn").classList.remove("visible");
             const dialog = document.getElementById("finishConfirmDialog");
@@ -1650,6 +1831,81 @@
             document.getElementById("incorrectStat").textContent = examIncorrect;
             document.getElementById("totalStat").textContent = baseQuestions.length;
             renderExamReview();
+            saveAccountProgress(getProfile()).catch(() => {});
+        }
+
+        function setMascot(state) {
+            const mascot = document.getElementById("questionMascot");
+            if (!mascot) return;
+            clearTimeout(mascotResetTimer);
+            mascot.classList.remove("happy", "sad");
+            mascot.src = `./assets/mascot_${state}.png`;
+            if (state !== "idle") {
+                mascot.classList.add(state);
+                mascotResetTimer = setTimeout(() => setMascot("idle"), 1500);
+            }
+        }
+
+        function handleExamLeave() {
+            if (mode !== "exam" || examTerminated || !timerId) return;
+            if (Date.now() - lastExamViolationAt < 1000) return;
+            lastExamViolationAt = Date.now();
+            examViolationCount++;
+            if (examViolationCount === 1) {
+                document.getElementById("anticheatOverlay").classList.add("visible");
+                return;
+            }
+            finishExam(true);
+        }
+
+        async function submitFeedback() {
+            const rating = Number(document.querySelector(".feedback-star.active:last-of-type")?.dataset.rating || 0);
+            const text = document.getElementById("feedbackText").value.trim();
+            const message = document.getElementById("feedbackMessage");
+            if (!rating) {
+                message.className = "feedback-message error";
+                message.textContent = "Выберите оценку от 1 до 5 звёзд.";
+                return;
+            }
+            const feedback = {
+                rating,
+                text,
+                name: getProfile()?.fullName || "Гость",
+                date: new Date().toISOString()
+            };
+            if (cloudIsConfigured()) {
+                try {
+                    const endpoint = window.ENTSPRINT_CONFIG.endpoint.replace(/\/$/, "");
+                    const response = await fetch(
+                        `${endpoint}/feedback?key=${encodeURIComponent(window.ENTSPRINT_CONFIG.apiKey)}`,
+                        {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({
+                                fields: Object.fromEntries(
+                                    Object.entries(feedback).map(([key, value]) => [
+                                        key,
+                                        { stringValue: String(value) }
+                                    ])
+                                )
+                            })
+                        }
+                    );
+                    if (!response.ok) throw new Error(`Feedback request failed: ${response.status}`);
+                } catch (error) {
+                    console.error("Не удалось отправить отзыв", error);
+                    message.className = "feedback-message error";
+                    message.textContent = "Не удалось отправить отзыв. Попробуйте ещё раз.";
+                    return;
+                }
+            } else {
+                const localFeedback = loadJson("ent_feedback_v1", []);
+                localFeedback.push(feedback);
+                saveJson("ent_feedback_v1", localFeedback);
+            }
+            message.className = "feedback-message success";
+            message.textContent = "Спасибо! Отзыв сохранён.";
+            document.getElementById("feedbackText").value = "";
         }
 
         function renderExamReview() {
@@ -1927,6 +2183,9 @@
         document.getElementById("leadersNav").addEventListener("click", () => {
             startMode("leaderboard");
         });
+        document.getElementById("creatorNav").addEventListener("click", () => {
+            startMode("creator");
+        });
         document.getElementById("welcomeContinueBtn").addEventListener("click", () => {
             document.getElementById("welcomeStep").style.display = "none";
             document.getElementById("registrationStep").style.display = "block";
@@ -2079,6 +2338,18 @@
             updateSoundButton();
             if (soundEnabled) playTone("correct");
         });
+        document.querySelectorAll(".feedback-star").forEach(star => {
+            star.addEventListener("click", () => {
+                const rating = Number(star.dataset.rating);
+                document.querySelectorAll(".feedback-star").forEach(item => {
+                    item.classList.toggle("active", Number(item.dataset.rating) <= rating);
+                });
+            });
+        });
+        document.getElementById("feedbackSubmit").addEventListener("click", submitFeedback);
+        document.getElementById("anticheatCloseBtn").addEventListener("click", () => {
+            document.getElementById("anticheatOverlay").classList.remove("visible");
+        });
 
         document.addEventListener("pointerdown", event => {
             if (event.pointerType !== "mouse") return;
@@ -2097,9 +2368,11 @@
         setInterval(recordSiteTime, 30000);
         document.addEventListener("visibilitychange", () => {
             if (document.visibilityState === "hidden") {
+                handleExamLeave();
                 saveAccountProgress(getProfile()).catch(() => {});
             }
         });
+        window.addEventListener("blur", handleExamLeave);
         window.addEventListener("pagehide", () => {
             saveAccountProgress(getProfile()).catch(() => {});
         });
