@@ -13,22 +13,22 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%230a6f94'/%3E%3Cpath d='M17 18h30v28H17zM17 32h30M32 18v28' fill='none' stroke='%23fff' stroke-width='4'/%3E%3C/svg%3E">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%237657c7'/%3E%3Cpath d='M17 18h30v28H17zM17 32h30M32 18v28' fill='none' stroke='%23fff' stroke-width='4'/%3E%3C/svg%3E">
     <style>
         :root {
-            --background: #eef5f8;
+            --background: #f7f5fc;
             --surface: #ffffff;
-            --ink: #10252f;
-            --muted: #71828a;
-            --line: #d9e4e8;
-            --primary: #0a6f94;
-            --primary-dark: #0a4c6a;
+            --ink: #242033;
+            --muted: #77718a;
+            --line: #e5e0f0;
+            --primary: #7657c7;
+            --primary-dark: #50358f;
             --gold: #f5b700;
             --success: #1b8a4f;
             --success-soft: #eaf5ef;
             --error: #c8372d;
             --error-soft: #fbeeea;
-            --shadow: 0 10px 30px rgba(10, 76, 106, 0.08);
+            --shadow: 0 10px 30px rgba(80, 53, 143, 0.08);
         }
 
         * { box-sizing: border-box; }
@@ -450,18 +450,19 @@
 
         @media (prefers-color-scheme: dark) {
             :root {
-                --background: #091b23;
-                --surface: #102730;
-                --ink: #edf6f8;
-                --muted: #9cb0b8;
-                --line: #29424d;
-                --primary-dark: #1a86ac;
+                --background: #171323;
+                --surface: #241d33;
+                --ink: #f5f1ff;
+                --muted: #b7aecb;
+                --line: #403553;
+                --primary: #a68ae8;
+                --primary-dark: #8d6bd8;
                 --success-soft: #18382a;
                 --error-soft: #3b2422;
                 --shadow: none;
             }
-            .bottom-nav { background: rgba(16, 39, 48, 0.96); }
-            .option.exam-selected { background: #17394a; }
+            .bottom-nav { background: rgba(36, 29, 51, 0.96); }
+            .option.exam-selected { background: #332653; }
             .back { background: var(--surface); }
         }
 
@@ -773,6 +774,11 @@
                 .replace(/>/g, "&gt;");
         }
 
+        const answerSounds = {
+            correct: new Audio("./correct-answer.mp3"),
+            wrong: new Audio("./wrong-answer.mp3")
+        };
+
         function ensureAudioContext() {
             if (!audioContext) {
                 const AudioCtx = window.AudioContext || window.webkitAudioContext;
@@ -783,29 +789,11 @@
 
         function playTone(type) {
             if (!soundEnabled) return;
-            ensureAudioContext();
-            if (!audioContext) return;
-
-            const sequences = {
-                correct: [523.25, 659.25],
-                wrong: [196, 155],
-                learned: [523.25, 659.25, 783.99, 1046.5]
-            };
-            const now = audioContext.currentTime;
-            (sequences[type] || sequences.correct).forEach((frequency, index) => {
-                const oscillator = audioContext.createOscillator();
-                const gain = audioContext.createGain();
-                oscillator.type = "sine";
-                oscillator.frequency.value = frequency;
-                const start = now + index * 0.09;
-                gain.gain.setValueAtTime(0.0001, start);
-                gain.gain.exponentialRampToValueAtTime(0.3, start + 0.012);
-                gain.gain.exponentialRampToValueAtTime(0.0001, start + 0.17);
-                oscillator.connect(gain);
-                gain.connect(audioContext.destination);
-                oscillator.start(start);
-                oscillator.stop(start + 0.18);
-            });
+            const sound = answerSounds[type === "wrong" ? "wrong" : "correct"];
+            sound.currentTime = 0;
+            sound.volume = 0.8;
+            const playback = sound.play();
+            if (playback) playback.catch(() => {});
         }
 
         function selectOption(selectedIndex, button) {
