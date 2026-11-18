@@ -1155,6 +1155,69 @@
                 .join("");
         }
 
+        function applyAccountProgress(account) {
+            streaks = account.streaks && typeof account.streaks === "object"
+                ? account.streaks : {};
+            learned = new Set(Array.isArray(account.learned) ? account.learned : []);
+            errorCount = Number.isFinite(account.errors) ? account.errors : 0;
+            saveJson(STREAK_STORAGE_KEY, streaks);
+            saveJson(LEARNED_STORAGE_KEY, [...learned]);
+            saveJson(ERRORS_STORAGE_KEY, errorCount);
+
+            const timeByProfile = loadJson(SITE_TIME_STORAGE_KEY, {});
+            timeByProfile[getProfileKey(getProfile())] = Number(account.timeSeconds || 0);
+            saveJson(SITE_TIME_STORAGE_KEY, timeByProfile);
+
+            const entries = loadJson(LEADERBOARD_STORAGE_KEY, []);
+            const key = getProfileKey(getProfile());
+            const existing = Array.isArray(entries)
+                ? entries.findIndex(entry => entry.key === key)
+                : -1;
+            const leaderboardEntry = {
+                key,
+                fullName: account.fullName,
+                branch: account.branch,
+                learned: learned.size,
+                errors: errorCount,
+                timeSeconds: Number(account.timeSeconds || 0),
+                lessonStats: account.lessonStats || {},
+                examResults: Array.isArray(account.examResults) ? account.examResults : []
+            };
+            const nextEntries = Array.isArray(entries) ? [...entries] : [];
+            if (existing >= 0) nextEntries[existing] = leaderboardEntry;
+            else nextEntries.push(leaderboardEntry);
+            saveJson(LEADERBOARD_STORAGE_KEY, nextEntries);
+        }
+
+        async function saveAccountProgress(account) {
+            const profile = getProfile();
+            if (!profile) return;
+            const entries = loadJson(LEADERBOARD_STORAGE_KEY, []);
+            const key = getProfileKey(profile);
+            const leaderboardEntry = Array.isArray(entries)
+                ? entries.find(entry => entry.key === key)
+                : null;
+            const timeByProfile = loadJson(SITE_TIME_STORAGE_KEY, {});
+
+            const accounts = await getAvailableAccounts();
+            if (!Array.isArray(accounts)) return;
+            const index = accounts.findIndex(item =>
+                accountNameKey(item.fullName) === accountNameKey(profile.fullName)
+            );
+            if (index < 0) return;
+            accounts[index] = {
+                ...accounts[index],
+                streaks,
+                learned: [...learned],
+                errors: errorCount,
+                timeSeconds: Number(timeByProfile[key] || leaderboardEntry?.timeSeconds || 0),
+                lessonStats: leaderboardEntry?.lessonStats || {},
+                examResults: leaderboardEntry?.examResults || []
+            };
+            saveJson(ACCOUNTS_STORAGE_KEY, accounts);
+            await saveCloudAccounts(accounts);
+        }
+
         function shuffled(items) {
             const copy = [...items];
             for (let i = copy.length - 1; i > 0; i--) {
@@ -1480,6 +1543,7 @@
                             }
                         }
                         updateProgress();
+                        saveAccountProgress(profile).catch(() => {});
                     } else {
                         requeueLearningQuestion();
                         playTone("correct");
@@ -1496,6 +1560,7 @@
                     saveJson(ERRORS_STORAGE_KEY, errorCount);
                     updateStreak();
                     updateProgress();
+                    saveAccountProgress(getProfile()).catch(() => {});
                     playTone("wrong");
                     if (navigator.vibrate) navigator.vibrate(60);
                 }
@@ -1506,6 +1571,7 @@
                     errorCount++;
                     saveJson(ERRORS_STORAGE_KEY, errorCount);
                     updateProgress();
+                    saveAccountProgress(getProfile()).catch(() => {});
                 }
                 Array.from(document.getElementById("optionsList").children)
                     .forEach((optionButton, index) => {
@@ -1687,6 +1753,7 @@
             updateLeaderboard(profile, [...learned].filter(id =>
                 questions.some(question => question.id === id)
             ).length);
+            saveAccountProgress(null).catch(() => {});
         }
 
         function recordExamResult(score) {
@@ -1702,6 +1769,7 @@
                 score: Number(score)
             });
             saveJson(LEADERBOARD_STORAGE_KEY, entries);
+            saveAccountProgress(profile).catch(() => {});
         }
 
         function updateProgress() {
@@ -1912,7 +1980,18 @@
                 .map(value => value.toString(16).padStart(2, "0"))
                 .join("");
             const hash = await passwordHash(password, salt);
-            const account = { fullName, branch, salt, hash };
+            const account = {
+                fullName,
+                branch,
+                salt,
+                hash,
+                streaks,
+                learned: [...learned],
+                errors: errorCount,
+                timeSeconds: 0,
+                lessonStats: {},
+                examResults: []
+            };
             const updatedAccounts = Array.isArray(accounts) ? [...accounts, account] : [account];
             saveJson(ACCOUNTS_STORAGE_KEY, updatedAccounts);
             await saveCloudAccounts(updatedAccounts);
@@ -1941,6 +2020,7 @@
             saveJson(PROFILE_STORAGE_KEY, { fullName: account.fullName, branch: account.branch });
             saveJson(SESSION_STORAGE_KEY, account.fullName);
             saveJson(ACCOUNTS_STORAGE_KEY, accounts);
+            applyAccountProgress(account);
             document.getElementById("welcomeOverlay").classList.remove("visible");
             updateProgress();
         });
@@ -1958,6 +2038,7 @@
             startMode("learn");
         });
         document.getElementById("logoutAccountBtn").addEventListener("click", () => {
+            saveAccountProgress(getProfile()).catch(() => {});
             localStorage.removeItem(PROFILE_STORAGE_KEY);
             localStorage.removeItem(SESSION_STORAGE_KEY);
             document.getElementById("welcomeStep").style.display = "block";
@@ -1983,6 +2064,7 @@
                 saveJson(SITE_TIME_STORAGE_KEY, timeByProfile);
             }
             updateProgress();
+            saveAccountProgress(getProfile()).catch(() => {});
         });
         document.getElementById("leaderboardCriterion").addEventListener("change", updateLeaderboardFilters);
         document.getElementById("leaderboardLesson").addEventListener("change", () => {
@@ -2013,6 +2095,14 @@
         });
         document.addEventListener("pointerdown", ensureAudioContext, { once: true });
         setInterval(recordSiteTime, 30000);
+        document.addEventListener("visibilitychange", () => {
+            if (document.visibilityState === "hidden") {
+                saveAccountProgress(getProfile()).catch(() => {});
+            }
+        });
+        window.addEventListener("pagehide", () => {
+            saveAccountProgress(getProfile()).catch(() => {});
+        });
         updateSoundButton();
         initializeProfile();
         loadQuestions();
