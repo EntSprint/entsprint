@@ -555,6 +555,7 @@
         let streaks = loadJson(STREAK_STORAGE_KEY, {});
         let learned = new Set(loadJson(LEARNED_STORAGE_KEY, []));
         let examSelections = new Map();
+        let displayedQuestions = new Map();
         let currentQuestion = null;
         let examIndex = 0;
         let examCorrect = 0;
@@ -586,6 +587,26 @@
 
         function randomInt(min, max) {
             return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        function prepareDisplayedQuestion(question) {
+            if (displayedQuestions.has(question.id)) {
+                return displayedQuestions.get(question.id);
+            }
+            const paired = question.options.map((text, index) => ({
+                text,
+                originalIndex: index
+            }));
+            const shuffledOptions = shuffled(paired);
+            const prepared = {
+                ...question,
+                options: shuffledOptions.map(item => item.text),
+                answer: shuffledOptions.findIndex(
+                    item => item.originalIndex === question.answer
+                )
+            };
+            displayedQuestions.set(question.id, prepared);
+            return prepared;
         }
 
         async function loadQuestions() {
@@ -634,6 +655,7 @@
             baseQuestions = questions.filter(question =>
                 subjectOf(question) === currentSubject && question.lesson === lesson
             );
+            displayedQuestions = new Map();
             document.getElementById("empty").style.display = "none";
             document.getElementById("cardHead").style.display = "grid";
             document.getElementById("quiz").style.display = "block";
@@ -651,6 +673,7 @@
         function startMode(nextMode) {
             if (!baseQuestions.length) return;
             mode = nextMode;
+            displayedQuestions = new Map();
             document.getElementById("learnMode").classList.toggle("active", mode === "learn");
             document.getElementById("examMode").classList.toggle("active", mode === "exam");
             document.getElementById("timer").classList.toggle("visible", mode === "exam");
@@ -717,6 +740,8 @@
         }
 
         function renderQuestion(question) {
+            question = prepareDisplayedQuestion(question);
+            currentQuestion = question;
             document.getElementById("progressText").textContent =
                 mode === "learn"
                     ? `Вопросов: ${learningQueue.length + 1}`
@@ -864,9 +889,11 @@
         function finishExam(timedOut) {
             clearInterval(timerId);
             examAnswered = examSelections.size;
-            examCorrect = baseQuestions.filter(question =>
-                examSelections.get(question.id) === question.answer
-            ).length;
+            examCorrect = baseQuestions.filter(question => {
+                const displayed = displayedQuestions.get(question.id);
+                return examSelections.get(question.id) ===
+                    (displayed ? displayed.answer : question.answer);
+            }).length;
             examIncorrect = examAnswered - examCorrect;
 
             document.getElementById("quiz").style.display = "none";
@@ -895,7 +922,9 @@
             baseQuestions.forEach((question, index) => {
                 const selectedIndex = examSelections.get(question.id);
                 const answeredQuestion = selectedIndex !== undefined;
-                const correct = selectedIndex === question.answer;
+                const displayed = displayedQuestions.get(question.id);
+                const correct = selectedIndex ===
+                    (displayed ? displayed.answer : question.answer);
                 const item = document.createElement("div");
                 item.className = `review-item ${correct ? "correct-review" : "incorrect-review"}`;
 
@@ -911,7 +940,10 @@
                 detail.className = "review-detail";
                 detail.innerHTML =
                     `<strong>Вопрос</strong>${escapeHtml(question.q)}` +
-                    `<strong>Правильный ответ</strong>${escapeHtml(question.options[question.answer])}`;
+                    `<strong>Правильный ответ</strong>${escapeHtml(
+                        displayed ? displayed.options[displayed.answer] :
+                        question.options[question.answer]
+                    )}`;
                 row.addEventListener("click", () => detail.classList.toggle("open"));
                 item.append(row, detail);
                 reviewList.appendChild(item);
