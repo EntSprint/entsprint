@@ -816,7 +816,7 @@
                     <select class="leaderboard-filter full-width" id="leaderboardCriterion" aria-label="Критерий таблицы лидеров">
                         <option value="learned">Больше всего выучено</option>
                         <option value="exam">Лучший результат экзамена</option>
-                        <option value="time">Больше всего времени на сайте</option>
+                        <option value="time">Больше всего времени на уроке</option>
                     </select>
                     <select class="leaderboard-filter" id="leaderboardLesson" aria-label="Номер урока">
                         <option value="all">Все уроки</option>
@@ -1170,7 +1170,7 @@
                 document.getElementById("progressPage").classList.remove("visible");
                 document.getElementById("leaderboardPage").classList.add("visible");
                 document.getElementById("leadersNav").classList.add("active");
-                updateLeaderboard(getProfile(), null);
+                updateLeaderboardFilters();
                 return;
             }
 
@@ -1551,6 +1551,21 @@
             const key = getProfileKey(profile);
             timeByProfile[key] = Number(timeByProfile[key] || 0) + 30;
             saveJson(SITE_TIME_STORAGE_KEY, timeByProfile);
+
+            const entries = loadJson(LEADERBOARD_STORAGE_KEY, []);
+            if (Array.isArray(entries)) {
+                const entry = entries.find(item => item.key === key);
+                if (entry) {
+                    entry.timeSeconds = Number(timeByProfile[key] || 0);
+                    entry.lessonTimeStats = entry.lessonTimeStats || {};
+                    const lesson = document.getElementById("lessonSelect")?.value;
+                    if (lesson) {
+                        entry.lessonTimeStats[lesson] =
+                            Number(entry.lessonTimeStats[lesson] || 0) + 30;
+                    }
+                    saveJson(LEADERBOARD_STORAGE_KEY, entries);
+                }
+            }
             updateLeaderboard(profile, [...learned].filter(id =>
                 questions.some(question => question.id === id)
             ).length);
@@ -1633,7 +1648,9 @@
                         ? Math.max(0, ...results.map(result => Number(result.score || 0)))
                         : Number(results[Number(examNumber) - 1]?.score || 0);
                 } else if (criterion === "time") {
-                    score = Number(entry.timeSeconds || 0);
+                    score = lesson === "all"
+                        ? Number(entry.timeSeconds || 0)
+                        : Number(entry.lessonTimeStats?.[lesson] || 0);
                 }
                 return { entry, score };
             }).sort((a, b) =>
@@ -1662,6 +1679,17 @@
                     `<span class="leaderboard-score">${scoreText}</span>`;
                 list.appendChild(row);
             });
+        }
+
+        function updateLeaderboardFilters() {
+            const criterion = document.getElementById("leaderboardCriterion").value;
+            const lessonFilter = document.getElementById("leaderboardLesson");
+            const examFilter = document.getElementById("leaderboardExam");
+
+            const showLesson = criterion === "learned" || criterion === "time";
+            lessonFilter.style.display = showLesson ? "block" : "none";
+            examFilter.style.display = criterion === "exam" ? "block" : "none";
+            updateLeaderboard(getProfile(), null);
         }
 
         function validateRegistration() {
@@ -1835,10 +1863,12 @@
             }
             updateProgress();
         });
-        ["leaderboardCriterion", "leaderboardLesson", "leaderboardExam"].forEach(id => {
-            document.getElementById(id).addEventListener("change", () => {
-                updateLeaderboard(getProfile(), null);
-            });
+        document.getElementById("leaderboardCriterion").addEventListener("change", updateLeaderboardFilters);
+        document.getElementById("leaderboardLesson").addEventListener("change", () => {
+            updateLeaderboard(getProfile(), null);
+        });
+        document.getElementById("leaderboardExam").addEventListener("change", () => {
+            updateLeaderboard(getProfile(), null);
         });
         document.getElementById("soundBtn").addEventListener("click", () => {
             soundEnabled = !soundEnabled;
