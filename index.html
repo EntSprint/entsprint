@@ -428,10 +428,12 @@
 
         .correct-review .review-number { background: var(--success); }
         .incorrect-review .review-number { background: var(--error); }
+        .unanswered-review .review-number { background: var(--muted); }
         .review-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; font-weight: 700; }
         .review-status { color: var(--muted); font-size: 11px; font-weight: 800; }
         .correct-review .review-status { color: var(--success); }
         .incorrect-review .review-status { color: var(--error); }
+        .unanswered-review .review-status { color: var(--muted); }
 
         .review-detail {
             display: none;
@@ -973,10 +975,15 @@
                 const selectedIndex = examSelections.get(question.id);
                 const answeredQuestion = selectedIndex !== undefined;
                 const displayed = displayedQuestions.get(question.id);
-                const correct = selectedIndex ===
+                const correct = answeredQuestion && selectedIndex ===
                     (displayed ? displayed.answer : question.answer);
+                const reviewClass = !answeredQuestion
+                    ? "unanswered-review"
+                    : correct
+                        ? "correct-review"
+                        : "incorrect-review";
                 const item = document.createElement("div");
-                item.className = `review-item ${correct ? "correct-review" : "incorrect-review"}`;
+                item.className = `review-item ${reviewClass}`;
 
                 const row = document.createElement("button");
                 row.type = "button";
