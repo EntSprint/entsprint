@@ -10,6 +10,7 @@
     <meta property="og:title" content="История Казахстана — ЕНТ тренажёр">
     <meta property="og:description" content="Интервальное заучивание и экзамен по истории Казахстана">
     <title>ЕНТ тренажёр</title>
+    <link rel="icon" type="image/png" href="./assets/favicon.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -133,12 +134,18 @@
         }
         .brand-logo {
             width: auto;
-            height: 40px;
-            max-width: 210px;
+            height: 38px;
+            max-width: 200px;
             display: block;
             border-radius: 8px;
             background: transparent;
             object-fit: contain;
+        }
+        @media (max-width: 480px) {
+            .brand-logo {
+                height: 32px;
+                max-width: 165px;
+            }
         }
 
         .sound-btn {
