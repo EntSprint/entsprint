@@ -1394,17 +1394,28 @@
                 if (!response.ok) throw new Error(`Cloud accounts request failed: ${response.status}`);
                 return true;
             } catch (error) {
-                console.error("Не удалось сохранить облачные аккаунты EntSprint", error);
-                throw error;
+                console.warn("saveCloudAccounts: cloud request failed", error);
+                return false;
             }
         }
 
         async function getAvailableAccounts() {
-            if (!cloudIsConfigured()) return loadJson(ACCOUNTS_STORAGE_KEY, []);
+            const localAccounts = loadJson(ACCOUNTS_STORAGE_KEY, []);
+            if (!cloudIsConfigured()) return localAccounts;
             try {
-                return await loadCloudAccounts();
-            } catch (_) {
-                throw new Error("Нет связи с сервером, проверь интернет");
+                const cloudAccounts = await loadCloudAccounts();
+                const merged = [...cloudAccounts];
+                localAccounts.forEach(localAccount => {
+                    const index = merged.findIndex(account =>
+                        accountNameKey(account.fullName) === accountNameKey(localAccount.fullName)
+                    );
+                    if (index >= 0) merged[index] = localAccount;
+                    else merged.push(localAccount);
+                });
+                return merged;
+            } catch (error) {
+                console.warn("getAvailableAccounts: cloud request failed, using local accounts", error);
+                return localAccounts;
             }
         }
 
@@ -2689,43 +2700,27 @@
             const registerButton = document.getElementById("startLearningBtn");
             if (registerButton.disabled) return;
             registerButton.disabled = true;
-            let accounts;
-            try {
-                accounts = await getAvailableAccounts();
-            } catch (_) {
-                document.getElementById("authMessage").textContent =
-                    "Нет связи с сервером, проверь интернет";
-                const localAccounts = loadJson(ACCOUNTS_STORAGE_KEY, []);
-                const existingLocal = (Array.isArray(localAccounts) ? localAccounts : [])
-                    .find(account => accountNameKey(account.fullName) === accountNameKey(fullName));
-                if (!existingLocal) {
-                    const salt = [...crypto.getRandomValues(new Uint8Array(16))]
-                        .map(value => value.toString(16).padStart(2, "0"))
-                        .join("");
-                    const hash = await passwordHash(password, salt);
-                    const localAccount = {
-                        fullName,
-                        branch,
-                        salt,
-                        hash,
-                        streaks,
-                        learned: [...learned],
-                        errors: errorCount,
-                        timeSeconds: 0,
-                        lessonStats: {},
-                        examResults: []
-                    };
-                    saveJson(ACCOUNTS_STORAGE_KEY, [
-                        ...(Array.isArray(localAccounts) ? localAccounts : []),
-                        localAccount
-                    ]);
+
+            const localAccounts = loadJson(ACCOUNTS_STORAGE_KEY, []);
+            const nameKey = accountNameKey(fullName);
+            const existingLocal = localAccounts.find(account => accountNameKey(account.fullName) === nameKey);
+
+            let accounts = localAccounts;
+            if (cloudIsConfigured()) {
+                try {
+                    const cloudAccounts = await loadCloudAccounts();
+                    accounts = [...cloudAccounts];
+                    localAccounts.forEach(localAccount => {
+                        const index = accounts.findIndex(account =>
+                            accountNameKey(account.fullName) === accountNameKey(localAccount.fullName)
+                        );
+                        if (index >= 0) accounts[index] = localAccount;
+                        else accounts.push(localAccount);
+                    });
+                } catch (_) {
                 }
-                registerButton.disabled = false;
-                return;
             }
-            const existing = Array.isArray(accounts)
-                ? accounts.find(account => accountNameKey(account.fullName) === accountNameKey(fullName))
-                : null;
+            const existing = accounts.find(account => accountNameKey(account.fullName) === nameKey);
             if (existing) {
                 document.getElementById("authMessage").textContent =
                     "Такой профиль уже зарегистрирован. Выберите «Войти».";
@@ -2751,32 +2746,21 @@
                 lessonStats: {},
                 examResults: []
             };
-            const updatedAccounts = Array.isArray(accounts) ? [...accounts, account] : [account];
+            const updatedAccounts = [...localAccounts, account];
             saveJson(ACCOUNTS_STORAGE_KEY, updatedAccounts);
-            try {
-                await saveCloudAccounts(updatedAccounts);
-            } catch (_) {
-                document.getElementById("authMessage").textContent =
-                    "Нет связи с сервером, проверь интернет";
-                registerButton.disabled = false;
-                return;
-            }
             saveJson(PROFILE_STORAGE_KEY, { fullName, branch });
             saveJson(SESSION_STORAGE_KEY, fullName);
             document.getElementById("welcomeOverlay").classList.remove("visible");
             updateProgress();
+
+            saveCloudAccounts(updatedAccounts).catch(error => {
+                console.warn("saveCloudAccounts: background sync failed", error);
+            });
         });
         document.getElementById("loginBtn").addEventListener("click", async () => {
             const fullName = normalizeName(document.getElementById("loginNameInput").value);
             const password = document.getElementById("loginPasswordInput").value;
-            let accounts;
-            try {
-                accounts = await getAvailableAccounts();
-            } catch (_) {
-                document.getElementById("authMessage").textContent =
-                    "Нет связи с сервером, проверь интернет";
-                return;
-            }
+            const accounts = await getAvailableAccounts();
             const account = Array.isArray(accounts)
                 ? accounts.find(item => accountNameKey(item.fullName) === accountNameKey(fullName))
                 : null;
