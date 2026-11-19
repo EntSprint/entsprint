@@ -3079,7 +3079,7 @@
         });
 
         (function initAdminPanel() {
-            const ADMIN_PASSWORD_HASH = "8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92"; // SHA-256("admin2026")
+            const ADMIN_PASSWORD_HASH = "6051fc84a7a0d74c225fb18a496b09952da5642e60723ecae543298edd7d82d6"; // SHA-256("admin2026")
             const adminOverlay = document.getElementById("adminOverlay");
             const adminCloseBtn = document.getElementById("adminCloseBtn");
             const adminPrompt = document.getElementById("adminPrompt");
@@ -3095,7 +3095,7 @@
 
             function hashPassword(password) {
                 const encoder = new TextEncoder();
-                const data = encoder.encode(password);
+                const data = encoder.encode(password.trim());
                 return crypto.subtle.digest("SHA-256", data).then(buffer => {
                     return [...new Uint8Array(buffer)].map(b => b.toString(16).padStart(2, "0")).join("");
                 });
