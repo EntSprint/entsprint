@@ -2691,7 +2691,7 @@
         });
         document.getElementById("startLearningBtn").addEventListener("click", async () => {
             const fullName = normalizeName(document.getElementById("fullNameInput").value);
-            const password = document.getElementById("registerPasswordInput").value;
+            const password = document.getElementById("registerPasswordInput").value.trim();
             const branch = document.getElementById("branchSelect").value;
             if (fullName.length < 3 || password.length < 4 || !branch) {
                 validateRegistration();
@@ -2723,9 +2723,10 @@
             const existing = accounts.find(account => accountNameKey(account.fullName) === nameKey);
             if (existing) {
                 document.getElementById("authMessage").textContent =
-                    "Такой профиль уже зарегистрирован. Выберите «Войти».";
+                    "Аккаунт уже существует, нажмите Войти.";
                 showAuthForm("login");
                 document.getElementById("loginNameInput").value = fullName;
+                document.getElementById("loginPasswordInput").value = password;
                 registerButton.disabled = false;
                 return;
             }
@@ -2759,18 +2760,23 @@
         });
         document.getElementById("loginBtn").addEventListener("click", async () => {
             const fullName = normalizeName(document.getElementById("loginNameInput").value);
-            const password = document.getElementById("loginPasswordInput").value;
+            const password = document.getElementById("loginPasswordInput").value.trim();
             const accounts = await getAvailableAccounts();
             const account = Array.isArray(accounts)
                 ? accounts.find(item => accountNameKey(item.fullName) === accountNameKey(fullName))
                 : null;
             if (!account) {
+                console.warn("loginBtn: account not found", { searchedName: fullName, accountsCount: Array.isArray(accounts) ? accounts.length : 0, source: cloudIsConfigured() ? "cloud+local" : "local" });
                 document.getElementById("authMessage").textContent =
                     "Профиль не найден. Проверьте имя или зарегистрируйтесь.";
                 return;
             }
+            const hasSalt = Boolean(account.salt);
+            const hasHash = Boolean(account.hash);
             const hash = await passwordHash(password, account.salt);
-            if (hash !== account.hash) {
+            const hashMatch = hash === account.hash;
+            console.warn("loginBtn: password check", { fullName: account.fullName, hasSalt, hasHash, hashMatch });
+            if (!hashMatch) {
                 document.getElementById("authMessage").textContent = "Неверный пароль.";
                 return;
             }
