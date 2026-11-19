@@ -978,6 +978,152 @@
             .subject-btn { font-size: 12px; }
             .quiz { padding-inline: 12px; }
         }
+
+        .admin-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(36, 29, 51, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 16px;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 200ms ease, visibility 200ms ease;
+        }
+        .admin-overlay.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+        .admin-modal {
+            background: var(--surface);
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            width: 100%;
+            max-width: 480px;
+            max-height: 90vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transform: scale(0.95);
+            transition: transform 200ms ease;
+        }
+        .admin-overlay.visible .admin-modal {
+            transform: scale(1);
+        }
+        .admin-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--line);
+        }
+        .admin-header h3 {
+            margin: 0;
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--ink);
+        }
+        .admin-close {
+            width: 36px;
+            height: 36px;
+            border: none;
+            background: transparent;
+            color: var(--muted);
+            font-size: 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .admin-close:hover { background: var(--background); color: var(--ink); }
+        .admin-content {
+            padding: 16px 20px;
+            overflow-y: auto;
+            flex: 1;
+        }
+        .admin-prompt {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            text-align: center;
+        }
+        .admin-prompt label {
+            font-size: 14px;
+            color: var(--muted);
+        }
+        .admin-prompt input {
+            padding: 12px 14px;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            background: var(--surface);
+            color: var(--ink);
+            font-size: 16px;
+        }
+        .admin-prompt input:focus { outline: none; border-color: var(--primary); }
+        .admin-btn {
+            padding: 12px 16px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        .admin-btn-primary {
+            background: var(--primary);
+            color: #fff;
+        }
+        .admin-btn-primary:hover { background: var(--primary-dark); }
+        .admin-btn-danger {
+            background: var(--error-soft);
+            color: var(--error);
+        }
+        .admin-btn-danger:hover { background: var(--error); color: #fff; }
+        .admin-table-wrap { overflow-x: auto; }
+        .admin-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        .admin-table th,
+        .admin-table td {
+            padding: 10px 8px;
+            text-align: left;
+            border-bottom: 1px solid var(--line);
+        }
+        .admin-table th {
+            color: var(--muted);
+            font-weight: 600;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .admin-table td { color: var(--ink); }
+        .admin-table tr:last-child td { border-bottom: none; }
+        .admin-actions { display: flex; gap: 6px; }
+        .admin-action-btn {
+            padding: 6px 10px;
+            border: none;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .admin-action-btn.delete { background: var(--error-soft); color: var(--error); }
+        .admin-action-btn.delete:hover { background: var(--error); color: #fff; }
+        .admin-action-btn.change { background: var(--background); color: var(--primary); border: 1px solid var(--line); }
+        .admin-action-btn.change:hover { background: var(--primary); color: #fff; }
+        .admin-empty {
+            text-align: center;
+            padding: 32px 16px;
+            color: var(--muted);
+        }
+        @media (max-width: 480px) {
+            .admin-modal { max-height: 100vh; border-radius: 0; max-width: 100%; }
+            .admin-table th:nth-child(3), .admin-table td:nth-child(3) { display: none; }
+        }
     </style>
 </head>
 <body>
@@ -1129,6 +1275,38 @@
             <button class="confirm-submit" id="confirmFinishBtn" type="button">Подтвердить</button>
         </div>
     </dialog>
+
+    <div class="admin-overlay" id="adminOverlay" role="dialog" aria-modal="true" aria-labelledby="adminTitle">
+        <div class="admin-modal">
+            <div class="admin-header">
+                <h3 id="adminTitle">Панель администратора</h3>
+                <button class="admin-close" id="adminCloseBtn" type="button" aria-label="Закрыть">×</button>
+            </div>
+            <div class="admin-content" id="adminContent">
+                <div class="admin-prompt" id="adminPrompt">
+                    <label for="adminPasswordInput">Введите пароль администратора</label>
+                    <input type="password" id="adminPasswordInput" placeholder="Пароль" autocomplete="off" aria-label="Пароль администратора">
+                    <button class="admin-btn admin-btn-primary" id="adminSubmitBtn" type="button">Войти</button>
+                </div>
+                <div class="admin-panel" id="adminPanel" style="display:none">
+                    <div class="admin-table-wrap">
+                        <table class="admin-table" id="adminTable">
+                            <thead>
+                                <tr>
+                                    <th>Имя</th>
+                                    <th>Филиал</th>
+                                    <th>Выучено</th>
+                                    <th>Действия</th>
+                                </tr>
+                            </thead>
+                            <tbody id="adminTableBody"></tbody>
+                        </table>
+                    </div>
+                    <div class="admin-empty" id="adminEmpty" style="display:none">Аккаунтов не найдено</div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     </main>
 
@@ -2854,6 +3032,152 @@
         document.getElementById("anticheatCloseBtn").addEventListener("click", () => {
             document.getElementById("anticheatOverlay").classList.remove("visible");
         });
+
+        (function initAdminPanel() {
+            const ADMIN_PASSWORD_HASH = "8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92"; // SHA-256("admin2026")
+            const adminOverlay = document.getElementById("adminOverlay");
+            const adminCloseBtn = document.getElementById("adminCloseBtn");
+            const adminPrompt = document.getElementById("adminPrompt");
+            const adminPanel = document.getElementById("adminPanel");
+            const adminPasswordInput = document.getElementById("adminPasswordInput");
+            const adminSubmitBtn = document.getElementById("adminSubmitBtn");
+            const adminTableBody = document.getElementById("adminTableBody");
+            const adminEmpty = document.getElementById("adminEmpty");
+            const brandLogo = document.querySelector(".brand-logo");
+
+            let clickCount = 0;
+            let clickTimer = null;
+
+            function hashPassword(password) {
+                const encoder = new TextEncoder();
+                const data = encoder.encode(password);
+                return crypto.subtle.digest("SHA-256", data).then(buffer => {
+                    return [...new Uint8Array(buffer)].map(b => b.toString(16).padStart(2, "0")).join("");
+                });
+            }
+
+            function showAdminOverlay() {
+                adminOverlay.classList.add("visible");
+                adminPrompt.style.display = "flex";
+                adminPanel.style.display = "none";
+                adminPasswordInput.value = "";
+                adminPasswordInput.focus();
+            }
+
+            function hideAdminOverlay() {
+                adminOverlay.classList.remove("visible");
+            }
+
+            async function verifyAdminPassword(password) {
+                const hash = await hashPassword(password);
+                return hash === ADMIN_PASSWORD_HASH;
+            }
+
+            async function loadAdminAccounts() {
+                const accounts = await getAvailableAccounts();
+                return Array.isArray(accounts) ? accounts : [];
+            }
+
+            function renderAdminTable(accounts) {
+                adminTableBody.innerHTML = "";
+                if (!accounts.length) {
+                    adminEmpty.style.display = "block";
+                    return;
+                }
+                adminEmpty.style.display = "none";
+                accounts.forEach(account => {
+                    const learnedCount = Array.isArray(account.learned) ? account.learned.length : 0;
+                    const tr = document.createElement("tr");
+                    tr.innerHTML = `
+                        <td>${escapeHtml(account.fullName || "")}</td>
+                        <td>${escapeHtml(account.branch || "")}</td>
+                        <td>${learnedCount}</td>
+                        <td>
+                            <div class="admin-actions">
+                                <button class="admin-action-btn change" data-action="change" data-name="${escapeHtml(account.fullName || "")}" type="button">Пароль</button>
+                                <button class="admin-action-btn delete" data-action="delete" data-name="${escapeHtml(account.fullName || "")}" type="button">Удалить</button>
+                            </div>
+                        </td>
+                    `;
+                    adminTableBody.appendChild(tr);
+                });
+            }
+
+            async function refreshAdminTable() {
+                const accounts = await loadAdminAccounts();
+                renderAdminTable(accounts);
+            }
+
+            adminCloseBtn.addEventListener("click", hideAdminOverlay);
+            adminOverlay.addEventListener("click", e => {
+                if (e.target === adminOverlay) hideAdminOverlay();
+            });
+
+            adminSubmitBtn.addEventListener("click", async () => {
+                const password = adminPasswordInput.value;
+                if (!password) return;
+                const ok = await verifyAdminPassword(password);
+                if (!ok) {
+                    adminPasswordInput.value = "";
+                    adminPasswordInput.placeholder = "Неверный пароль";
+                    adminPasswordInput.style.borderColor = "var(--error)";
+                    setTimeout(() => {
+                        adminPasswordInput.placeholder = "Пароль";
+                        adminPasswordInput.style.borderColor = "";
+                    }, 2000);
+                    return;
+                }
+                adminPrompt.style.display = "none";
+                adminPanel.style.display = "block";
+                await refreshAdminTable();
+            });
+
+            adminPasswordInput.addEventListener("keydown", e => {
+                if (e.key === "Enter") adminSubmitBtn.click();
+            });
+
+            adminTableBody.addEventListener("click", async e => {
+                const btn = e.target.closest(".admin-action-btn");
+                if (!btn) return;
+                const action = btn.dataset.action;
+                const name = btn.dataset.name;
+                if (action === "delete") {
+                    if (!confirm(`Удалить аккаунт "${name}"?`)) return;
+                    const accounts = await loadAdminAccounts();
+                    const filtered = accounts.filter(a => accountNameKey(a.fullName) !== accountNameKey(name));
+                    saveJson(ACCOUNTS_STORAGE_KEY, filtered);
+                    await saveCloudAccounts(filtered);
+                    await refreshAdminTable();
+                } else if (action === "change") {
+                    const newPassword = prompt(`Новый пароль для "${name}":`);
+                    if (!newPassword || newPassword.length < 4) return;
+                    const accounts = await loadAdminAccounts();
+                    const account = accounts.find(a => accountNameKey(a.fullName) === accountNameKey(name));
+                    if (!account) return;
+                    const salt = [...crypto.getRandomValues(new Uint8Array(16))]
+                        .map(v => v.toString(16).padStart(2, "0")).join("");
+                    const hash = await passwordHash(newPassword.trim(), salt);
+                    account.salt = salt;
+                    account.hash = hash;
+                    saveJson(ACCOUNTS_STORAGE_KEY, accounts);
+                    await saveCloudAccounts(accounts);
+                    await refreshAdminTable();
+                }
+            });
+
+            if (brandLogo) {
+                brandLogo.addEventListener("click", () => {
+                    clickCount++;
+                    if (clickCount === 1) {
+                        clickTimer = setTimeout(() => { clickCount = 0; }, 2000);
+                    } else if (clickCount >= 5) {
+                        clearTimeout(clickTimer);
+                        clickCount = 0;
+                        showAdminOverlay();
+                    }
+                });
+            }
+        })();
 
         document.addEventListener("pointerdown", event => {
             if (event.pointerType !== "mouse") return;
