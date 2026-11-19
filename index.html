@@ -297,6 +297,7 @@
         .password-wrap input {
             width: 100%;
             padding-right: 52px !important;
+            -webkit-text-security: disc;
         }
         .password-toggle {
             position: absolute;
@@ -1124,6 +1125,37 @@
             .admin-modal { max-height: 100vh; border-radius: 0; max-width: 100%; }
             .admin-table th:nth-child(3), .admin-table td:nth-child(3) { display: none; }
         }
+
+        .learned-toast {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px) scale(0.9);
+            background: var(--success);
+            color: #fff;
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 15px;
+            box-shadow: var(--shadow);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 200ms ease, visibility 200ms ease, transform 200ms ease;
+            z-index: 100;
+        }
+        .learned-toast.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) translateY(0) scale(1);
+        }
+        .learned-toast svg {
+            width: 20px;
+            height: 20px;
+            flex-shrink: 0;
+        }
     </style>
 </head>
 <body>
@@ -1244,11 +1276,7 @@
         <section class="creator-page" id="creatorPage">
             <img class="creator-mascot" src="./assets/mascot_creator.png" alt="Маскот создателя">
             <h2>Mustafa Orazaly Aslanuly</h2>
-            <p>EntSprint - тренажёр, созданный специально для жёсткой и эффективной подготовки к ЕНТ.</p>
-            <div class="creator-notes" style="margin-top:16px;padding:16px;border:1px solid var(--line);border-radius:14px;background:var(--background);text-align:left">
-                <h3>Примечания от разработчика</h3>
-                <p style="margin-bottom:0">Этот сайт я сделал для учеников школы Ньютон - чтобы готовиться к ЕНТ системно: заучивать вопросы до автоматизма и проверять себя на экзамене с таймером и античитом. Тренажёр бесплатный, уроки и предметы будут добавляться. Если нашёл ошибку или не хватает темы - напиши в отзыве ниже.</p>
-            </div>
+            <p>EntSprint-тренажёр, созданный специально для эффективного закрепления пройденного материала.</p>
             <div class="feedback-card">
                 <h3>Обратная связь</h3>
                 <p>Расскажи, чего не хватает или что улучшить.</p>
@@ -1326,6 +1354,11 @@
         </div>
     </div>
 
+    <div class="learned-toast" id="learnedToast" role="status" aria-live="polite">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+        <span>Выучено ✓</span>
+    </div>
+
     <div class="welcome-overlay" id="welcomeOverlay" role="dialog" aria-modal="true" aria-labelledby="welcomeTitle">
         <div class="welcome-dialog" id="welcomeDialog">
             <section id="welcomeStep">
@@ -1356,7 +1389,7 @@
                     <label class="registration-label">
                         Пароль
                         <div class="password-wrap">
-                            <input id="registerPasswordInput" type="password" autocomplete="new-password" minlength="4" placeholder="Минимум 4 символа">
+                            <input id="registerPasswordInput" type="text" autocomplete="new-password" minlength="4" placeholder="Минимум 4 символa">
                             <button class="password-toggle" type="button" data-password-target="registerPasswordInput" aria-label="Показать пароль">
                                 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12s3.5-5 9.5-5 9.5 5 9.5 5-3.5 5-9.5 5-9.5-5-9.5-5z"/><circle cx="12" cy="12" r="2.5"/></svg>
                             </button>
@@ -1389,7 +1422,7 @@
                     <label class="registration-label">
                         Пароль
                         <div class="password-wrap">
-                            <input id="loginPasswordInput" type="password" autocomplete="current-password" placeholder="Введите пароль">
+                            <input id="loginPasswordInput" type="text" autocomplete="current-password" placeholder="Введите пароль">
                             <button class="password-toggle" type="button" data-password-target="loginPasswordInput" aria-label="Показать пароль">
                                 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12s3.5-5 9.5-5 9.5 5 9.5 5-3.5 5-9.5 5-9.5-5-9.5-5z"/><circle cx="12" cy="12" r="2.5"/></svg>
                             </button>
@@ -2126,6 +2159,7 @@
                         learned.add(currentQuestion.id);
                         saveJson(LEARNED_STORAGE_KEY, [...learned]);
                         playTone("learned");
+                        showLearnedToast();
                         delete streaks[currentQuestion.id];
                         saveJson(STREAK_STORAGE_KEY, streaks);
                         const profile = getProfile();
@@ -2570,6 +2604,15 @@
             saveAccountProgress(profile).catch(() => {});
         }
 
+        function showLearnedToast() {
+            const toast = document.getElementById("learnedToast");
+            if (!toast) return;
+            toast.classList.add("show");
+            setTimeout(() => {
+                toast.classList.remove("show");
+            }, 1500);
+        }
+
         function updateProgress() {
             const profile = getProfile();
             const subjectQuestions = questions.filter(question =>
@@ -2859,8 +2902,8 @@
         document.querySelectorAll(".password-toggle").forEach(button => {
             button.addEventListener("click", () => {
                 const input = document.getElementById(button.dataset.passwordTarget);
-                const visible = input.type === "text";
-                input.type = visible ? "password" : "text";
+                const visible = input.style.webkitTextSecurity === "none";
+                input.style.webkitTextSecurity = visible ? "disc" : "none";
                 button.setAttribute("aria-label", visible ? "Показать пароль" : "Скрыть пароль");
                 button.innerHTML = visible
                     ? '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12s3.5-5 9.5-5 9.5 5 9.5 5-3.5 5-9.5 5-9.5-5-9.5-5z"/><circle cx="12" cy="12" r="2.5"/></svg>'
@@ -3007,12 +3050,14 @@
             updateProgress();
             saveAccountProgress(getProfile()).catch(() => {});
         });
-        document.getElementById("leaderboardCriterion").addEventListener("change", updateLeaderboardFilters);
-        document.getElementById("leaderboardLesson").addEventListener("change", () => {
-            updateLeaderboard(getProfile(), null);
+        document.getElementById("leaderboardCriterion").addEventListener("change", async () => {
+            await updateLeaderboardFromCloud();
         });
-        document.getElementById("leaderboardExam").addEventListener("change", () => {
-            updateLeaderboard(getProfile(), null);
+        document.getElementById("leaderboardLesson").addEventListener("change", async () => {
+            await updateLeaderboardFromCloud();
+        });
+        document.getElementById("leaderboardExam").addEventListener("change", async () => {
+            await updateLeaderboardFromCloud();
         });
         document.getElementById("soundBtn").addEventListener("click", () => {
             soundEnabled = !soundEnabled;
