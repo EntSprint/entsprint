@@ -884,6 +884,7 @@
             padding: 0;
         }
         .feedback-star.active { color: var(--gold); }
+        .feedback-star.hover { color: var(--gold); }
         .feedback-star:hover { color: var(--gold); }
         .feedback-card textarea {
             width: 100%;
@@ -4617,6 +4618,17 @@ const PROFILE_COMBINATIONS = [
                 const rating = Number(star.dataset.rating);
                 document.querySelectorAll(".feedback-star").forEach(item => {
                     item.classList.toggle("active", Number(item.dataset.rating) <= rating);
+                });
+            });
+            star.addEventListener("mouseenter", () => {
+                const rating = Number(star.dataset.rating);
+                document.querySelectorAll(".feedback-star").forEach(item => {
+                    item.classList.toggle("hover", Number(item.dataset.rating) <= rating);
+                });
+            });
+            star.addEventListener("mouseleave", () => {
+                document.querySelectorAll(".feedback-star").forEach(item => {
+                    item.classList.remove("hover");
                 });
             });
         });
