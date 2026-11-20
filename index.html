@@ -390,6 +390,36 @@
         .logout-account { border: 1px solid var(--line); background: var(--surface); color: var(--primary-dark); }
         .edit-profile { border: 1px solid var(--line); background: var(--surface); color: var(--ink); }
 
+        .progress-subjects-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+        @media (min-width: 900px) {
+            .progress-subjects-grid { grid-template-columns: 1fr 1fr; }
+        }
+
+        .progress-subject-card {
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            background: var(--surface);
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+        }
+        .subject-card-header { margin-bottom: 12px; }
+        .subject-card-title { margin: 0; font-size: 16px; font-weight: 700; color: var(--ink); }
+        .subject-card-stats { display: flex; flex-direction: column; gap: 8px; }
+        .stat-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--line); }
+        .stat-row:last-child { border-bottom: none; }
+        .stat-label { color: var(--muted); font-size: 13px; }
+        .stat-value { font-size: 16px; font-weight: 700; }
+        .progress-bar-wrap { margin-top: 12px; height: 8px; border-radius: 999px; background: var(--line); overflow: hidden; }
+        .progress-bar { height: 100%; border-radius: 999px; background: var(--primary); display: flex; align-items: center; }
+        .progress-bar span { height: 100%; display: block; border-radius: 999px; background: var(--primary); }
+        .subject-coming-soon { margin-top: 12px; text-align: center; color: var(--muted); font-size: 13px; }
+
         .profile-editor {
             border: 1px solid var(--line);
             border-radius: 16px;
@@ -1710,7 +1740,7 @@
 
         <div class="mode-switch">
             <button class="mode-btn active" id="learnMode" type="button">Заучивание</button>
-            <button class="mode-btn" id="examMode" type="button">Тест / Экзамен</button>
+            <button class="mode-btn" id="examMode" type="button">Тест</button>
             <button class="mode-btn" id="progressMode" type="button">Прогресс</button>
         </div>
 
@@ -1720,17 +1750,38 @@
                 <strong id="progressStudent">Ученик</strong>
                 <span id="progressBranch"></span>
             </div>
-            <div class="progress-stats">
-                <div class="progress-stat"><span>Предмет</span><strong id="progressSubject">История Казахстана</strong></div>
-                <div class="progress-stat"><span>Всего вопросов</span><strong id="progressTotal">0</strong></div>
-                <div class="progress-stat"><span>Выучено</span><strong id="progressLearned">0</strong></div>
-                <div class="progress-stat"><span>Осталось выучить</span><strong id="progressRemaining">0</strong></div>
-                <div class="progress-stat"><span>Ошибок</span><strong id="progressErrors">0</strong></div>
-            </div>
-            <div class="progress-actions">
-                <button class="continue-learning" id="continueLearningBtn" type="button">Продолжить учить</button>
-                <button class="reset-progress" id="resetProgressBtn" type="button">Сбросить статистику</button>
-                <button class="logout-account" id="logoutAccountBtn" type="button">Выйти из аккаунта</button>
+
+            <div class="progress-subjects-grid" id="progressSubjectsGrid">
+                <article class="progress-subject-card" data-subject="История Казахстана">
+                    <header class="subject-card-header">
+                        <h3 class="subject-card-title">История Казахстана</h3>
+                    </header>
+                    <div class="subject-card-stats">
+                        <div class="stat-row"><span class="stat-label">Всего вопросов</span><strong class="stat-value" id="progressTotal-Hist">0</strong></div>
+                        <div class="stat-row"><span class="stat-label">Выучено</span><strong class="stat-value" id="progressLearned-Hist">0</strong></div>
+                        <div class="stat-row"><span class="stat-label">Осталось выучить</span><strong class="stat-value" id="progressRemaining-Hist">0</strong></div>
+                        <div class="stat-row"><span class="stat-label">Ошибок</span><strong class="stat-value" id="progressErrors-Hist">0</strong></div>
+                    </div>
+                    <div class="progress-bar-wrap">
+                        <div class="progress-bar" id="progressBar-Hist"><span></span></div>
+                    </div>
+                </article>
+
+                <article class="progress-subject-card" data-subject="Мат. грамотность">
+                    <header class="subject-card-header">
+                        <h3 class="subject-card-title">Мат. грамотность</h3>
+                    </header>
+                    <div class="subject-card-stats" id="mathStats">
+                        <div class="stat-row"><span class="stat-label">Всего вопросов</span><strong class="stat-value" id="progressTotal-Math">0</strong></div>
+                        <div class="stat-row"><span class="stat-label">Выучено</span><strong class="stat-value" id="progressLearned-Math">0</strong></div>
+                        <div class="stat-row"><span class="stat-label">Осталось выучить</span><strong class="stat-value" id="progressRemaining-Math">0</strong></div>
+                        <div class="stat-row"><span class="stat-label">Ошибок</span><strong class="stat-value" id="progressErrors-Math">0</strong></div>
+                    </div>
+                    <div class="progress-bar-wrap" id="mathBarWrap">
+                        <div class="progress-bar" id="progressBar-Math"><span></span></div>
+                    </div>
+                    <p class="subject-coming-soon" id="mathComingSoon" style="display:none">Скоро добавим вопросы</p>
+                </article>
             </div>
 
             <div class="profile-editor" id="profileEditor" style="display:none; margin-top: 24px;">
@@ -2401,7 +2452,6 @@
             try {
                 const response = await fetch("./questions.json");
                 questions = await response.json();
-                document.getElementById("lessonsNav").href = TELEGRAM_GROUP_URL;
                 updateSubject(currentSubject);
             } catch (_) {
                 document.getElementById("questionText").textContent = "Ошибка загрузки вопросов";
@@ -2813,10 +2863,19 @@
             return sound;
         }
 
-        const answerSounds = {
-            correct: createAnswerSound("./correct-answer.mp3"),
-            wrong: createAnswerSound("./wrong-answer.mp3")
-        };
+        let answerSounds = null;
+
+        function initAnswerSounds() {
+            if (answerSounds) return;
+            try {
+                answerSounds = {
+                    correct: createAnswerSound("./correct-answer.mp3"),
+                    wrong: createAnswerSound("./wrong-answer.mp3")
+                };
+            } catch (_) {
+                answerSounds = { correct: null, wrong: null };
+            }
+        }
         ["mascot_idle.png", "mascot_happy.png", "mascot_creator.png", "mascot_angry.png", "mascot_sad.png"].forEach(file => {
             const image = new Image();
             image.src = `./assets/${file}`;
@@ -2832,6 +2891,8 @@
 
         function playTone(type) {
             if (!soundEnabled) return;
+            initAnswerSounds();
+            if (!answerSounds || !answerSounds.correct || !answerSounds.wrong) return;
             Object.values(answerSounds).forEach(sound => {
                 sound.pause();
                 sound.currentTime = 0;
@@ -2913,9 +2974,6 @@
                             optionButton.classList.add("exam-selected");
                         }
                     });
-            }
-                button.classList.add("exam-selected");
-                document.getElementById("nextBtn").classList.add("visible");
             }
         }
 
@@ -3039,25 +3097,6 @@
                 return;
             }
             finishExam(true);
-        }
-
-        async function loadFeedback() {
-            if (cloudIsConfigured()) {
-                try {
-                    const endpoint = window.ENTSPRINT_CONFIG.endpoint.replace(/\/$/, "");
-                    const response = await fetch(
-                        `${endpoint}/feedback_v2?pageSize=100&key=${encodeURIComponent(window.ENTSPRINT_CONFIG.apiKey)}`
-                    );
-                    if (!response.ok) throw new Error(`Feedback request failed: ${response.status}`);
-                    const data = await response.json();
-                    return (data.documents || []).map(document => decodeFirestoreMap({
-                        fields: document.fields || {}
-                    })).filter(item => item && item.key);
-                } catch (error) {
-                    console.error("Не удалось загрузить отзывы", error);
-                }
-            }
-            return loadJson(FEEDBACK_STORAGE_KEY, []);
         }
 
         const REACTION_TYPES = ["❤️", "🔥", "👍", "😂", "😡"];
@@ -3436,26 +3475,54 @@
 
         function updateProgress() {
             const profile = getProfile();
-            const subjectQuestions = questions.filter(question =>
-                subjectOf(question) === currentSubject
-            );
-            const total = subjectQuestions.length;
-            const learnedInSubject = [...learned].filter(id =>
-                subjectQuestions.some(question => question.id === id)
-            ).length;
 
             document.getElementById("progressStudent").textContent =
                 profile ? profile.fullName : "Ученик не зарегистрирован";
             document.getElementById("progressBranch").textContent =
                 profile ? profile.branch : "";
-            document.getElementById("progressSubject").textContent = currentSubject;
-            document.getElementById("progressTotal").textContent = total;
-            document.getElementById("progressLearned").textContent = learnedInSubject;
-            document.getElementById("progressRemaining").textContent =
-                Math.max(0, total - learnedInSubject);
-            document.getElementById("progressErrors").textContent = errorCount;
+
+            // Render progress for each subject
+            renderSubjectProgress("История Казахстана", "Hist");
+            renderSubjectProgress("Мат. грамотность", "Math");
+
             updateLessonUnlockPanel();
-            updateLeaderboard(profile, learnedInSubject);
+            updateLeaderboard(profile, null);
+        }
+
+        function renderSubjectProgress(subjectName, suffix) {
+            const subjectQuestions = questions.filter(question => subjectOf(question) === subjectName);
+            const total = subjectQuestions.length;
+            const learnedInSubject = [...learned].filter(id =>
+                subjectQuestions.some(question => question.id === id)
+            ).length;
+            const remaining = Math.max(0, total - learnedInSubject);
+            const percent = total > 0 ? Math.round((learnedInSubject / total) * 100) : 0;
+
+            document.getElementById(`progressTotal-${suffix}`).textContent = total;
+            document.getElementById(`progressLearned-${suffix}`).textContent = learnedInSubject;
+            document.getElementById(`progressRemaining-${suffix}`).textContent = remaining;
+            document.getElementById(`progressErrors-${suffix}`).textContent = errorCount;
+
+            const bar = document.getElementById(`progressBar-${suffix}`);
+            if (bar) {
+                bar.style.width = `${percent}%`;
+            }
+
+            // Handle Math subject - show "Coming soon" if no questions
+            if (subjectName === "Мат. грамотность") {
+                const mathStats = document.getElementById("mathStats");
+                const mathBarWrap = document.getElementById("mathBarWrap");
+                const mathComingSoon = document.getElementById("mathComingSoon");
+                if (total === 0) {
+                    if (mathStats) mathStats.style.display = "none";
+                    if (mathBarWrap) mathBarWrap.style.display = "none";
+                    if (mathComingSoon) mathComingSoon.style.display = "block";
+                } else {
+                    if (mathStats) mathStats.style.display = "";
+                    if (mathBarWrap) mathBarWrap.style.display = "";
+                    if (mathComingSoon) mathComingSoon.style.display = "none";
+                }
+            }
         }
 
         function updateLessonUnlockPanel() {
