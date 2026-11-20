@@ -2547,6 +2547,17 @@
                 const response = await fetch("./questions.json");
                 questions = await response.json();
                 updateSubject(currentSubject);
+                
+                // If user is already logged in, ensure first question renders
+                const profile = getProfile();
+                if (profile && mode === "learn") {
+                    // Force render first question if card is visible but empty
+                    setTimeout(() => {
+                        if (baseQuestions.length > 0 && learningQueue.length > 0) {
+                            showLearningQuestion();
+                        }
+                    }, 0);
+                }
             } catch (_) {
                 document.getElementById("questionText").textContent = "Ошибка загрузки вопросов";
             }
