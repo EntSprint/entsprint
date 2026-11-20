@@ -794,6 +794,8 @@
             padding: 0;
         }
         .feedback-star.active { color: var(--gold); }
+        .feedback-star.hover { color: var(--gold); opacity: 0.7; }
+        .feedback-star:hover { color: var(--gold); }
         .feedback-card textarea {
             width: 100%;
             min-height: 110px;
@@ -1912,7 +1914,7 @@
         <section class="creator-page" id="creatorPage">
             <img class="creator-mascot" src="./assets/mascot_creator.png" alt="Маскот создателя">
             <h2>Mustafa Orazaly Aslanuly</h2>
-            <p>GradeUp - платформа для эффективной подготовки к ЕНТ.</p>
+            <p>GradeUp - платформа для закрепления пройденного материала.</p>
             <div class="feedback-card">
                 <h3>Обратная связь</h3>
                 <p>Расскажи, чего не хватает или что улучшить.</p>
@@ -4220,6 +4222,17 @@
                 const rating = Number(star.dataset.rating);
                 document.querySelectorAll(".feedback-star").forEach(item => {
                     item.classList.toggle("active", Number(item.dataset.rating) <= rating);
+                });
+            });
+            star.addEventListener("mouseenter", () => {
+                const rating = Number(star.dataset.rating);
+                document.querySelectorAll(".feedback-star").forEach(item => {
+                    item.classList.toggle("hover", Number(item.dataset.rating) <= rating);
+                });
+            });
+            star.addEventListener("mouseleave", () => {
+                document.querySelectorAll(".feedback-star").forEach(item => {
+                    item.classList.remove("hover");
                 });
             });
         });
