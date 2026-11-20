@@ -1555,23 +1555,6 @@
                 font-size: 14px;
             }
 
-            .option-badge {
-                display: inline-flex !important;
-                position: absolute;
-                top: 8px;
-                right: 8px;
-                width: 22px;
-                height: 22px;
-                border-radius: 6px;
-                background: var(--primary);
-                color: #fff;
-                font-size: 11px;
-                font-weight: 700;
-                align-items: center;
-                justify-content: center;
-                pointer-events: none;
-            }
-
             .footer {
                 padding: 0 40px 32px;
             }
@@ -1665,7 +1648,6 @@
             .app { padding-bottom: calc(90px + env(safe-area-inset-bottom)); }
 
             .options { grid-template-columns: 1fr; }
-            .option-badge { display: none !important; }
 
             .leaderboard-row { min-width: 0; }
             .leaderboard-name { min-width: 0; }
@@ -2490,7 +2472,9 @@
                     leaderboardLesson.appendChild(option);
                 });
             }
-            changeLesson();
+
+            const firstUnlocked = lessons.find(l => isLessonUnlocked(l));
+            changeLessonCustom(firstUnlocked || "all");
 
             if (mode === "progress") {
                 updateProgress();
@@ -2549,7 +2533,11 @@
             const optionsContainer = document.getElementById("lessonSelectOptions");
             const dropdown = document.getElementById("lessonSelectDropdown");
             const lessons = getSubjectLessons(currentSubject);
-            const currentValue = preferredLesson || btn.dataset.value || "all";
+            
+            // Find first unlocked lesson as default
+            const firstUnlocked = lessons.find(l => isLessonUnlocked(l));
+            const defaultLesson = firstUnlocked || "all";
+            const currentValue = preferredLesson || btn.dataset.value || defaultLesson;
 
             optionsContainer.innerHTML = "";
 
@@ -2837,8 +2825,7 @@
                 button.className = "option";
                 button.innerHTML =
                     `<span class="option-index">${index + 1}</span>` +
-                    `<span>${escapeHtml(option)}</span>` +
-                    `<span class="option-badge">${index + 1}</span>`;
+                    `<span>${escapeHtml(option)}</span>`;
                 button.addEventListener("click", () => selectOption(index, button));
                 if (mode === "exam" && examSelections.get(question.id) === index) {
                     button.classList.add("exam-selected");
