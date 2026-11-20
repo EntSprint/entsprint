@@ -2097,6 +2097,8 @@
         const SESSION_STORAGE_KEY = "ent_session_v2";
         const SITE_TIME_STORAGE_KEY = "ent_site_time_v2";
         const FEEDBACK_STORAGE_KEY = "ent_feedback_v2";
+        const NAV_STORAGE_KEY = "gradeup_active_nav";
+        const MODE_STORAGE_KEY = "gradeup_active_mode";
         const UNLOCK_LEARNED_SHARE = 0.8;
         const UNLOCK_EXAM_SCORE = 70;
 
@@ -2699,6 +2701,9 @@
         function startMode(nextMode) {
             if (!confirmExitExam()) return;
             mode = nextMode;
+            if (mode === "learn" || mode === "exam" || mode === "progress") {
+                sessionStorage.setItem(MODE_STORAGE_KEY, mode);
+            }
             document.getElementById("learnMode").classList.toggle("active", mode === "learn");
             document.getElementById("examMode").classList.toggle("active", mode === "exam");
             document.getElementById("progressMode").classList.toggle("active", mode === "progress");
@@ -3746,6 +3751,27 @@
 
         function initializeProfile() {
             if (getProfile() && localStorage.getItem(SESSION_STORAGE_KEY)) {
+                const savedNav = sessionStorage.getItem(NAV_STORAGE_KEY);
+                const savedMode = sessionStorage.getItem(MODE_STORAGE_KEY);
+
+                if (savedNav === "leaderboard") {
+                    startMode("leaderboard");
+                    return;
+                }
+                if (savedNav === "creator") {
+                    startMode("creator");
+                    return;
+                }
+
+                if (savedNav === "practice") {
+                    if (savedMode === "exam") {
+                        startMode("learn");
+                    } else {
+                        startMode(savedMode || "learn");
+                    }
+                    return;
+                }
+
                 syncLocalAccountsToCloud();
                 return;
             }
@@ -3788,12 +3814,15 @@
         document.getElementById("practiceNav").addEventListener("click", () => {
             startMode("learn");
             document.getElementById("practiceNav").classList.add("active");
+            sessionStorage.setItem(NAV_STORAGE_KEY, "practice");
         });
         document.getElementById("leadersNav").addEventListener("click", () => {
             startMode("leaderboard");
+            sessionStorage.setItem(NAV_STORAGE_KEY, "leaderboard");
         });
         document.getElementById("creatorNav").addEventListener("click", () => {
             startMode("creator");
+            sessionStorage.setItem(NAV_STORAGE_KEY, "creator");
         });
         document.getElementById("welcomeContinueBtn").addEventListener("click", () => {
             document.getElementById("welcomeStep").style.display = "none";
