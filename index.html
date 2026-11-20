@@ -4226,38 +4226,47 @@
                 }
             });
         });
-        document.getElementById("continueLearningBtn").addEventListener("click", () => {
-            startMode("learn");
-        });
-        document.getElementById("logoutAccountBtn").addEventListener("click", () => {
-            saveAccountProgress(getProfile()).catch(() => {});
-            localStorage.removeItem(PROFILE_STORAGE_KEY);
-            localStorage.removeItem(SESSION_STORAGE_KEY);
-            document.getElementById("welcomeStep").style.display = "block";
-            document.getElementById("registrationStep").style.display = "none";
-            document.getElementById("welcomeOverlay").classList.add("visible");
-        });
-        document.getElementById("resetProgressBtn").addEventListener("click", () => {
-            if (!window.confirm("Сбросить выученные вопросы и счётчик ошибок?")) return;
-            streaks = {};
-            learned = new Set();
-            errorCount = 0;
-            saveJson(STREAK_STORAGE_KEY, streaks);
-            saveJson(LEARNED_STORAGE_KEY, []);
-            saveJson(ERRORS_STORAGE_KEY, 0);
-            const profile = getProfile();
-            if (profile) {
-                const entries = loadJson(LEADERBOARD_STORAGE_KEY, []).filter(entry =>
-                    entry.key !== `${profile.fullName}||${profile.branch}`
-                );
-                saveJson(LEADERBOARD_STORAGE_KEY, entries);
-                const timeByProfile = loadJson(SITE_TIME_STORAGE_KEY, {});
-                timeByProfile[getProfileKey(profile)] = 0;
-                saveJson(SITE_TIME_STORAGE_KEY, timeByProfile);
-            }
-            updateProgress();
-            saveAccountProgress(getProfile()).catch(() => {});
-        });
+        const continueLearningBtn = document.getElementById("continueLearningBtn");
+        if (continueLearningBtn) {
+            continueLearningBtn.addEventListener("click", () => {
+                startMode("learn");
+            });
+        }
+        const logoutAccountBtn = document.getElementById("logoutAccountBtn");
+        if (logoutAccountBtn) {
+            logoutAccountBtn.addEventListener("click", () => {
+                saveAccountProgress(getProfile()).catch(() => {});
+                localStorage.removeItem(PROFILE_STORAGE_KEY);
+                localStorage.removeItem(SESSION_STORAGE_KEY);
+                document.getElementById("welcomeStep").style.display = "block";
+                document.getElementById("registrationStep").style.display = "none";
+                document.getElementById("welcomeOverlay").classList.add("visible");
+            });
+        }
+        const resetProgressBtn = document.getElementById("resetProgressBtn");
+        if (resetProgressBtn) {
+            resetProgressBtn.addEventListener("click", () => {
+                if (!window.confirm("Сбросить выученные вопросы и счётчик ошибок?")) return;
+                streaks = {};
+                learned = new Set();
+                errorCount = 0;
+                saveJson(STREAK_STORAGE_KEY, streaks);
+                saveJson(LEARNED_STORAGE_KEY, []);
+                saveJson(ERRORS_STORAGE_KEY, 0);
+                const profile = getProfile();
+                if (profile) {
+                    const entries = loadJson(LEADERBOARD_STORAGE_KEY, []).filter(entry =>
+                        entry.key !== `${profile.fullName}||${profile.branch}`
+                    );
+                    saveJson(LEADERBOARD_STORAGE_KEY, entries);
+                    const timeByProfile = loadJson(SITE_TIME_STORAGE_KEY, {});
+                    timeByProfile[getProfileKey(profile)] = 0;
+                    saveJson(SITE_TIME_STORAGE_KEY, timeByProfile);
+                }
+                updateProgress();
+                saveAccountProgress(getProfile()).catch(() => {});
+            });
+        }
 
         // Profile Editor
         const PROFILE_AVATARS = [
