@@ -263,6 +263,10 @@
             color: var(--primary-dark);
             cursor: pointer;
             font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 120ms ease, border-color 120ms ease, color 120ms ease;
         }
         .nav-icon {
             width: 20px;
@@ -1808,7 +1812,9 @@
     <main class="app">
         <header class="header">
             <div class="brand"><img class="brand-logo" src="./assets/logo.png" alt="GradeUp"></div>
-            <button class="sound-btn" id="soundBtn" type="button" aria-label="Звук">Звук</button>
+            <button class="sound-btn" id="soundBtn" type="button" aria-label="Звук">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 010 7"/><path d="M18 6a8 8 0 010 12"/></svg>
+            </button>
         </header>
 
         <div class="subject-switch">
