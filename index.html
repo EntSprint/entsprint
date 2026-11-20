@@ -1010,11 +1010,11 @@
             transition: all 120ms ease;
         }
         .leaderboard-filter-btn:hover { border-color: var(--primary); color: var(--primary); }
-        .leaderboard-filter-btn.active {
-            border-color: var(--primary);
-            background: var(--primary);
-            color: #fff;
-        }
+.leaderboard-filter-btn.active {
+    border-color: var(--primary);
+    background: var(--primary);
+    color: #fff !important;
+}
         .leaderboard-list-new {
             display: flex;
             flex-direction: column;
@@ -1201,6 +1201,7 @@
             transition: color 120ms ease, transform 120ms ease;
         }
         .feedback-star-new.active { color: var(--gold); }
+        .feedback-star-new.hover { color: var(--gold); }
         .feedback-star-new:hover { color: var(--gold); transform: scale(1.15); }
         .feedback-textarea {
             width: 100%;
@@ -1384,7 +1385,7 @@
         }
         .stat-icon { width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border-radius: 10px; background: var(--primary-soft); color: var(--primary); }
         .stat-icon svg { width: 20px; height: 20px; }
-        .stat-value { font-size: 20px; font-weight: 800; color: var(--text); }
+        .stat-value { font-size: 20px; font-weight: 800; color: var(--text); white-space: nowrap; }
         .stat-label { font-size: 11px; color: var(--text-muted); font-weight: 600; }
         @media (min-width: 900px) {
             .stat-value { font-size: 22px; }
@@ -1583,9 +1584,9 @@
             line-height: 1.5;
         }
 
-        @media (min-width: 1180px) {
+        @media (min-width: 1100px) {
             .app {
-                grid-template-columns: 240px 1fr 290px;
+                grid-template-columns: 240px 1fr 300px;
             }
 
             .practice-sidebar {
@@ -2255,6 +2256,8 @@
                 margin-bottom: 0;
             }
 
+            .header .brand { display: none; }
+
             .brand-logo { height: 40px; max-width: 220px; }
 
             .subject-switch,
@@ -2628,37 +2631,6 @@
         </section>
 
         <section class="card" id="card">
-            <aside class="practice-sidebar" id="practiceSidebar" aria-label="Статистика ученика">
-                <div class="practice-sidebar-card" id="progressCard">
-                    <h3 class="practice-sidebar-title">Твой прогресс</h3>
-                    <div class="progress-ring-wrap">
-                        <svg class="progress-ring" viewBox="0 0 120 120" role="img" aria-labelledby="progressRingTitle">
-                            <title id="progressRingTitle">Прогресс выученных вопросов</title>
-                            <circle class="progress-ring-bg" cx="60" cy="60" r="54" fill="none" stroke="var(--card-border)" stroke-width="12"/>
-                            <circle class="progress-ring-fill" cx="60" cy="60" r="54" fill="none" stroke="var(--primary)" stroke-width="12" stroke-linecap="round" stroke-dasharray="339.3" stroke-dashoffset="339.3" transform="rotate(-90 60 60)"/>
-                        </svg>
-                        <div class="progress-ring-value" id="progressRingValue">0%</div>
-                    </div>
-                    <div class="progress-ring-stats">
-                        <div class="progress-ring-stat">
-                            <span class="progress-ring-stat-value" id="statLearned">0</span>
-                            <span class="progress-ring-stat-label">Выучено</span>
-                        </div>
-                        <div class="progress-ring-stat">
-                            <span class="progress-ring-stat-value" id="statBestExam">0%</span>
-                            <span class="progress-ring-stat-label">Результат тестов</span>
-                        </div>
-                        <div class="progress-ring-stat">
-                            <span class="progress-ring-stat-value" id="statStudyTime">0 мин</span>
-                            <span class="progress-ring-stat-label">Время обучения</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="practice-sidebar-card" id="weakTopicsCard">
-                    <h3 class="practice-sidebar-title">Слабые темы</h3>
-                    <div class="weak-topics-list" id="weakTopicsList"></div>
-                </div>
-            </aside>
             <div class="card-head" id="cardHead">
                 <div class="lesson-select-wrapper" id="lessonSelectWrapper">
                     <button type="button" class="lesson-select-btn" id="lessonSelectBtn" aria-haspopup="listbox" aria-expanded="false" aria-label="Выбор урока">
@@ -2718,9 +2690,41 @@
             <div class="empty" id="empty" style="display:none">
                 <h2>Здесь скоро будут вопросы</h2>
             </div>
-        </section>
+</section>
 
-<section class="creator-page" id="creatorPage">
+        <aside class="practice-sidebar" id="practiceSidebar" aria-label="Статистика ученика">
+            <div class="practice-sidebar-card" id="progressCard">
+                <h3 class="practice-sidebar-title">Твой прогресс</h3>
+                <div class="progress-ring-wrap">
+                    <svg class="progress-ring" viewBox="0 0 120 120" role="img" aria-labelledby="progressRingTitle">
+                        <title id="progressRingTitle">Прогресс выученных вопросов</title>
+                        <circle class="progress-ring-bg" cx="60" cy="60" r="54" fill="none" stroke="var(--card-border)" stroke-width="12"/>
+                        <circle class="progress-ring-fill" cx="60" cy="60" r="54" fill="none" stroke="var(--primary)" stroke-width="12" stroke-linecap="round" stroke-dasharray="339.3" stroke-dashoffset="339.3" transform="rotate(-90 60 60)"/>
+                    </svg>
+                    <div class="progress-ring-value" id="progressRingValue">0%</div>
+                </div>
+                <div class="progress-ring-stats">
+                    <div class="progress-ring-stat">
+                        <span class="progress-ring-stat-value" id="statLearned">0</span>
+                        <span class="progress-ring-stat-label">Выучено</span>
+                    </div>
+                    <div class="progress-ring-stat">
+                        <span class="progress-ring-stat-value" id="statBestExam">0%</span>
+                        <span class="progress-ring-stat-label">Результат тестов</span>
+                    </div>
+                    <div class="progress-ring-stat">
+                        <span class="progress-ring-stat-value" id="statStudyTime">0 мин</span>
+                        <span class="progress-ring-stat-label">Время обучения</span>
+                    </div>
+                </div>
+            </div>
+            <div class="practice-sidebar-card" id="weakTopicsCard">
+                <h3 class="practice-sidebar-title">Слабые темы</h3>
+                <div class="weak-topics-list" id="weakTopicsList"></div>
+            </div>
+        </aside>
+
+        <section class="creator-page" id="creatorPage">
             <div class="creator-header">
                 <h2>Создатель</h2>
             </div>
@@ -3368,7 +3372,13 @@
         async function loadQuestions() {
             try {
                 const response = await fetch("./questions.json");
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
                 questions = await response.json();
+                if (!Array.isArray(questions) || questions.length === 0) {
+                    throw new Error("Questions data is empty or invalid");
+                }
                 updateSubject(currentSubject);
                 
                 // If user is already logged in, ensure first question renders
@@ -3383,7 +3393,8 @@
                 }
             } catch (error) {
                 console.error("Failed to load questions.json:", error);
-                document.getElementById("questionText").textContent = "Ошибка загрузки вопросов";
+                const qText = document.getElementById("questionText");
+                if (qText) qText.textContent = "Ошибка загрузки вопросов: " + error.message;
             }
         }
 
