@@ -4,12 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="theme-color" content="#f7f5fc">
-    <meta name="description" content="GradeUp — интерактивная платформа для системной подготовки к ЕНТ.">
+    <meta name="description" content="GradeUp - интерактивная платформа для системной подготовки к ЕНТ.">
     <meta property="og:type" content="website">
     <meta property="og:locale" content="ru_RU">
-    <meta property="og:title" content="GradeUp — Платформа подготовки к ЕНТ">
+    <meta property="og:title" content="GradeUp - Платформа подготовки к ЕНТ">
     <meta property="og:description" content="Интервальное заучивание и экзамен по истории Казахстана">
-    <title>GradeUp — Платформа подготовки к ЕНТ</title>
+    <title>GradeUp - Платформа подготовки к ЕНТ</title>
     <link rel="icon" type="image/png" href="./assets/favicon.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1912,7 +1912,7 @@
         <section class="creator-page" id="creatorPage">
             <img class="creator-mascot" src="./assets/mascot_creator.png" alt="Маскот создателя">
             <h2>Mustafa Orazaly Aslanuly</h2>
-            <p>GradeUp — платформа для эффективной подготовки к ЕНТ.</p>
+            <p>GradeUp - платформа для эффективной подготовки к ЕНТ.</p>
             <div class="feedback-card">
                 <h3>Обратная связь</h3>
                 <p>Расскажи, чего не хватает или что улучшить.</p>
@@ -1930,7 +1930,7 @@
             <div class="feedback-list" id="feedbackList"></div>
             <a href="https://t.me/+927v8cf-46yI0ZDi" target="_blank" rel="noopener noreferrer" class="creator-telegram-btn" style="display:inline-flex;align-items:center;gap:8px;margin-top:20px;padding:10px 16px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--primary);font-weight:700;font-size:14px;text-decoration:none;transition:background 150ms ease,color 150ms ease;border-color 150ms ease;" onmouseover="this.style.background='var(--primary)';this.style.color='#fff';this.style.borderColor='var(--primary)'" onmouseout="this.style.background='var(--surface)';this.style.color='var(--primary)';this.style.borderColor='var(--line)'">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"></path></svg>
-                <span>Наш Telegram-канал</span>
+                <span>Telegram-канал с уроками</span>
             </a>
         </section>
 
@@ -1980,7 +1980,6 @@
 
     <nav class="bottom-nav" aria-label="Основная навигация">
         <button class="nav-btn active" id="practiceNav" type="button"><span class="nav-icon">✓</span>Закрепление</button>
-        <button class="nav-btn" id="lessonsNav" type="button"><span class="nav-icon">▤</span>Уроки</button>
         <button class="nav-btn" id="leadersNav" type="button"><span class="nav-icon">♛</span>Лидеры</button>
         <button class="nav-btn" id="creatorNav" type="button"><span class="nav-icon">★</span>Creator</button>
     </nav>
@@ -2804,7 +2803,7 @@
             document.getElementById("resultTitle").textContent = "Заучивание завершено";
             document.getElementById("scoreText").textContent = `${baseQuestions.length} / ${baseQuestions.length}`;
             document.getElementById("correctStat").textContent = baseQuestions.length;
-            document.getElementById("incorrectStat").textContent = "—";
+            document.getElementById("incorrectStat").textContent = "-";
             document.getElementById("totalStat").textContent = baseQuestions.length;
         }
 
@@ -3541,7 +3540,7 @@
             }
             const nextLesson = lessons.find(lesson => !isLessonUnlocked(lesson));
             if (!nextLesson) {
-                // Все уроки открыты — показываем только если всё выучено на 100%
+                // Все уроки открыты - показываем только если всё выучено на 100%
                 const totalQuestions = subjectQuestions.length;
                 const totalLearned = subjectQuestions.filter(q => learned.has(q.id)).length;
                 if (totalLearned >= totalQuestions && totalQuestions > 0) {
@@ -3645,7 +3644,7 @@
             const list = document.getElementById("leaderboardList");
             list.innerHTML = "";
             if (!ranked.length) {
-                list.innerHTML = '<div class="leaderboard-row"><span class="leaderboard-place">—</span><span class="leaderboard-name"><strong>Пока нет участников</strong></span></div>';
+                list.innerHTML = '<div class="leaderboard-row"><span class="leaderboard-place">-</span><span class="leaderboard-name"><strong>Пока нет участников</strong></span></div>';
                 return;
             }
             ranked.forEach(({ entry, score }, index) => {
@@ -3786,10 +3785,6 @@
         document.getElementById("practiceNav").addEventListener("click", () => {
             startMode("learn");
             document.getElementById("practiceNav").classList.add("active");
-        });
-        document.getElementById("lessonsNav").addEventListener("click", () => {
-            startMode("learn");
-            document.getElementById("lessonsNav").classList.add("active");
         });
         document.getElementById("leadersNav").addEventListener("click", () => {
             startMode("leaderboard");
