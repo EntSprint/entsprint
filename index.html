@@ -4327,70 +4327,86 @@ const PROFILE_COMBINATIONS = [
             });
         }
 
-        document.getElementById("editProfileBtn").addEventListener("click", () => {
-            const profile = getProfile();
-            if (!profile) return;
-            const accounts = loadJson(ACCOUNTS_STORAGE_KEY, []);
-            const account = accounts.find(a => accountNameKey(a.fullName) === accountNameKey(profile.fullName));
-            if (!account) return;
+        const editProfileBtn = document.getElementById("editProfileBtn");
+        if (editProfileBtn) {
+            editProfileBtn.addEventListener("click", () => {
+                const profile = getProfile();
+                if (!profile) return;
+                const accounts = loadJson(ACCOUNTS_STORAGE_KEY, []);
+                const account = accounts.find(a => accountNameKey(a.fullName) === accountNameKey(profile.fullName));
+                if (!account) return;
 
-            document.getElementById("profileEditor").style.display = "block";
-            document.getElementById("editProfileBtn").style.display = "none";
-            document.getElementById("resetProgressBtn").style.display = "none";
-            document.getElementById("logoutAccountBtn").style.display = "none";
-            document.getElementById("continueLearningBtn").style.display = "none";
+                document.getElementById("profileEditor").style.display = "block";
+                document.getElementById("editProfileBtn").style.display = "none";
+                document.getElementById("resetProgressBtn").style.display = "none";
+                document.getElementById("logoutAccountBtn").style.display = "none";
+                document.getElementById("continueLearningBtn").style.display = "none";
 
-            renderAvatarOptions(account.avatar || PROFILE_AVATARS[0]);
-            document.getElementById("profileBioInput").value = account.bio || "";
-            renderSubjectCheckboxes(account.subjects || []);
-            document.getElementById("profileInstagramInput").value = account.instagram || "";
-            document.getElementById("profileTikTokInput").value = account.tiktok || "";
-        });
+                renderAvatarOptions(account.avatar || PROFILE_AVATARS[0]);
+                document.getElementById("profileBioInput").value = account.bio || "";
+                renderSubjectCheckboxes(account.subjects || []);
+                document.getElementById("profileInstagramInput").value = account.instagram || "";
+                document.getElementById("profileTikTokInput").value = account.tiktok || "";
+            });
+        }
 
-        document.getElementById("cancelProfileBtn").addEventListener("click", () => {
-            document.getElementById("profileEditor").style.display = "none";
-            document.getElementById("editProfileBtn").style.display = "";
-            document.getElementById("resetProgressBtn").style.display = "";
-            document.getElementById("logoutAccountBtn").style.display = "";
-            document.getElementById("continueLearningBtn").style.display = "";
-        });
+        const cancelProfileBtn = document.getElementById("cancelProfileBtn");
+        if (cancelProfileBtn) {
+            cancelProfileBtn.addEventListener("click", () => {
+                document.getElementById("profileEditor").style.display = "none";
+                const editBtn = document.getElementById("editProfileBtn");
+                if (editBtn) editBtn.style.display = "";
+                const resetBtn = document.getElementById("resetProgressBtn");
+                if (resetBtn) resetBtn.style.display = "";
+                const logoutBtn = document.getElementById("logoutAccountBtn");
+                if (logoutBtn) logoutBtn.style.display = "";
+                const continueBtn = document.getElementById("continueLearningBtn");
+                if (continueBtn) continueBtn.style.display = "";
+            });
+        }
+        const saveProfileBtn = document.getElementById("saveProfileBtn");
+        if (saveProfileBtn) {
+            saveProfileBtn.addEventListener("click", async () => {
+                const profile = getProfile();
+                if (!profile) return;
+                const accounts = loadJson(ACCOUNTS_STORAGE_KEY, []);
+                const index = accounts.findIndex(a => accountNameKey(a.fullName) === accountNameKey(profile.fullName));
+                if (index < 0) return;
 
-        document.getElementById("saveProfileBtn").addEventListener("click", async () => {
-            const profile = getProfile();
-            if (!profile) return;
-            const accounts = loadJson(ACCOUNTS_STORAGE_KEY, []);
-            const index = accounts.findIndex(a => accountNameKey(a.fullName) === accountNameKey(profile.fullName));
-            if (index < 0) return;
+                const avatar = document.getElementById("profileAvatarInput").value;
+                const bio = document.getElementById("profileBioInput").value.trim();
+                const combination = document.getElementById("profileSubjectInput").value;
+                const subjects = combination ? [combination] : [];
+                const instagram = document.getElementById("profileInstagramInput").value.trim();
+                const tiktok = document.getElementById("profileTikTokInput").value.trim();
 
-            const avatar = document.getElementById("profileAvatarInput").value;
-            const bio = document.getElementById("profileBioInput").value.trim();
-            const combination = document.getElementById("profileSubjectInput").value;
-            const subjects = combination ? [combination] : [];
-            const instagram = document.getElementById("profileInstagramInput").value.trim();
-            const tiktok = document.getElementById("profileTikTokInput").value.trim();
+                accounts[index] = {
+                    ...accounts[index],
+                    avatar,
+                    bio,
+                    subjects,
+                    combination,
+                    instagram,
+                    tiktok
+                };
 
-            accounts[index] = {
-                ...accounts[index],
-                avatar,
-                bio,
-                subjects,
-                combination,
-                instagram,
-                tiktok
-            };
+                saveJson(ACCOUNTS_STORAGE_KEY, accounts);
+                await saveCloudAccounts(accounts);
 
-            saveJson(ACCOUNTS_STORAGE_KEY, accounts);
-            await saveCloudAccounts(accounts);
+                document.getElementById("profileEditor").style.display = "none";
+                const editBtn = document.getElementById("editProfileBtn");
+                if (editBtn) editBtn.style.display = "";
+                const resetBtn = document.getElementById("resetProgressBtn");
+                if (resetBtn) resetBtn.style.display = "";
+                const logoutBtn = document.getElementById("logoutAccountBtn");
+                if (logoutBtn) logoutBtn.style.display = "";
+                const continueBtn = document.getElementById("continueLearningBtn");
+                if (continueBtn) continueBtn.style.display = "";
 
-            document.getElementById("profileEditor").style.display = "none";
-            document.getElementById("editProfileBtn").style.display = "";
-            document.getElementById("resetProgressBtn").style.display = "";
-            document.getElementById("logoutAccountBtn").style.display = "";
-            document.getElementById("continueLearningBtn").style.display = "";
-
-            // Update progress page display
-            updateProgress();
-        });
+                // Update progress page display
+                updateProgress();
+            });
+        }
 
         // Menu Page Profile Editor
         function renderAvatarOptionsMenu(selectedAvatar) {
@@ -4835,10 +4851,10 @@ const PROFILE_COMBINATIONS = [
             saveAccountProgress(getProfile()).catch(() => {});
         });
         updateSoundButton();
-        initializeProfile();
 
         async function boot() {
             await loadQuestions();
+            initializeProfile();
             // If user was restored in practice mode, ensure first question renders
             const profile = getProfile();
             if (profile && mode === "learn" && baseQuestions.length > 0) {
