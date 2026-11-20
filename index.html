@@ -1013,6 +1013,159 @@
             font-weight: 700;
         }
 
+        /* ===== Practice Sidebar (Right Column) ===== */
+        .practice-sidebar {
+            display: none;
+            flex-direction: column;
+            gap: 16px;
+            width: 290px;
+            flex-shrink: 0;
+        }
+
+        .practice-sidebar-card {
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            background: var(--card);
+            padding: 20px;
+        }
+
+        .practice-sidebar-title {
+            margin: 0 0 16px;
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .progress-ring-wrap {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 20px;
+        }
+
+        .progress-ring {
+            width: 100%;
+            height: 100%;
+        }
+
+        .progress-ring-fill {
+            transition: stroke-dashoffset 600ms ease;
+        }
+
+        .progress-ring-value {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--text);
+        }
+
+        .progress-ring-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+
+        .progress-ring-stat {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            padding: 8px 4px;
+            background: var(--bg);
+            border-radius: 10px;
+        }
+
+        .progress-ring-stat-value {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .progress-ring-stat-label {
+            font-size: 11px;
+            color: var(--text-muted);
+            text-align: center;
+        }
+
+        .weak-topics-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .weak-topic-item {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .weak-topic-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .weak-topic-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .weak-topic-percent {
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .weak-topic-percent.low { color: var(--error); }
+        .weak-topic-percent.mid { color: var(--accent); }
+        .weak-topic-percent.high { color: var(--success); }
+
+        .weak-topic-bar {
+            height: 8px;
+            background: var(--card-border);
+            border-radius: 999px;
+            overflow: hidden;
+        }
+
+        .weak-topic-bar-fill {
+            height: 100%;
+            border-radius: 999px;
+            transition: width 600ms ease;
+        }
+
+        .weak-topic-bar-fill.low { background: var(--error); }
+        .weak-topic-bar-fill.mid { background: var(--accent); }
+        .weak-topic-bar-fill.high { background: var(--success); }
+
+        .weak-topics-empty {
+            text-align: center;
+            padding: 20px;
+            color: var(--text-muted);
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        @media (min-width: 1180px) {
+            .app {
+                grid-template-columns: 240px 1fr 290px;
+            }
+
+            .practice-sidebar {
+                display: flex;
+            }
+
+            .card, .progress-page, .leaderboard-page, .creator-page {
+                grid-column: 2;
+            }
+        }
+
         .card {
             min-height: 520px;
             border: 1px solid var(--card-border);
@@ -2021,6 +2174,37 @@
         </section>
 
         <section class="card" id="card">
+            <aside class="practice-sidebar" id="practiceSidebar" aria-label="Статистика ученика">
+                <div class="practice-sidebar-card" id="progressCard">
+                    <h3 class="practice-sidebar-title">Твой прогресс</h3>
+                    <div class="progress-ring-wrap">
+                        <svg class="progress-ring" viewBox="0 0 120 120" role="img" aria-labelledby="progressRingTitle">
+                            <title id="progressRingTitle">Прогресс выученных вопросов</title>
+                            <circle class="progress-ring-bg" cx="60" cy="60" r="54" fill="none" stroke="var(--card-border)" stroke-width="12"/>
+                            <circle class="progress-ring-fill" cx="60" cy="60" r="54" fill="none" stroke="var(--primary)" stroke-width="12" stroke-linecap="round" stroke-dasharray="339.3" stroke-dashoffset="339.3" transform="rotate(-90 60 60)"/>
+                        </svg>
+                        <div class="progress-ring-value" id="progressRingValue">0%</div>
+                    </div>
+                    <div class="progress-ring-stats">
+                        <div class="progress-ring-stat">
+                            <span class="progress-ring-stat-value" id="statLearned">0</span>
+                            <span class="progress-ring-stat-label">Выучено</span>
+                        </div>
+                        <div class="progress-ring-stat">
+                            <span class="progress-ring-stat-value" id="statBestExam">0%</span>
+                            <span class="progress-ring-stat-label">Результат тестов</span>
+                        </div>
+                        <div class="progress-ring-stat">
+                            <span class="progress-ring-stat-value" id="statStudyTime">0 мин</span>
+                            <span class="progress-ring-stat-label">Время обучения</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="practice-sidebar-card" id="weakTopicsCard">
+                    <h3 class="practice-sidebar-title">Слабые темы</h3>
+                    <div class="weak-topics-list" id="weakTopicsList"></div>
+                </div>
+            </aside>
             <div class="card-head" id="cardHead">
                 <div class="lesson-select-wrapper" id="lessonSelectWrapper">
                     <button type="button" class="lesson-select-btn" id="lessonSelectBtn" aria-haspopup="listbox" aria-expanded="false" aria-label="Выбор урока">
@@ -3037,6 +3221,12 @@
             document.getElementById("results").classList.remove("visible");
             clearInterval(timerId);
 
+            // Render practice sidebar for logged-in users
+            const profile = getProfile();
+            if (profile) {
+                renderPracticeSidebar();
+            }
+
             if (mode === "learn") {
                 learningQueue = shuffled(baseQuestions.filter(question => !learned.has(question.id)));
                 if (!learningQueue.length) {
@@ -3791,6 +3981,7 @@
 
             updateLessonUnlockPanel();
             updateLeaderboard(profile, null);
+            renderPracticeSidebar();
         }
 
         function renderSubjectProgress(subjectName, suffix) {
@@ -3827,6 +4018,121 @@
                     if (mathComingSoon) mathComingSoon.style.display = "none";
                 }
             }
+        }
+
+        function renderPracticeSidebar() {
+            const profile = getProfile();
+            if (!profile) {
+                document.getElementById("practiceSidebar").style.display = "none";
+                return;
+            }
+            document.getElementById("practiceSidebar").style.display = "flex";
+            renderProgressRing();
+            renderWeakTopics();
+        }
+
+        function renderProgressRing() {
+            const subjectQuestions = questions.filter(question => subjectOf(question) === currentSubject);
+            const total = subjectQuestions.length;
+            const learnedInSubject = [...learned].filter(id =>
+                subjectQuestions.some(question => question.id === id)
+            ).length;
+            const percent = total > 0 ? Math.round((learnedInSubject / total) * 100) : 0;
+
+            // Update ring
+            const ringFill = document.querySelector(".progress-ring-fill");
+            const ringValue = document.getElementById("progressRingValue");
+            const circumference = 2 * Math.PI * 54; // 339.3
+            const offset = circumference * (1 - percent / 100);
+            if (ringFill) ringFill.style.strokeDashoffset = offset;
+            if (ringValue) ringValue.textContent = `${percent}%`;
+
+            // Stats
+            document.getElementById("statLearned").textContent = learnedInSubject;
+
+            // Best exam score for current subject/lesson
+            const profile = getProfile();
+            let bestExam = 0;
+            if (profile) {
+                const entries = loadJson(LEADERBOARD_STORAGE_KEY, []);
+                const entry = entries.find(item => item.key === getProfileKey(profile));
+                if (entry && Array.isArray(entry.examResults)) {
+                    bestExam = entry.examResults.reduce((best, result) =>
+                        Math.max(best, Number(result.score || 0)), 0);
+                }
+            }
+            document.getElementById("statBestExam").textContent = `${bestExam}%`;
+
+            // Study time
+            const studySeconds = getSiteTimeForProfile(profile);
+            document.getElementById("statStudyTime").textContent = formatSiteTime(studySeconds);
+        }
+
+        function renderWeakTopics() {
+            const subjectQuestions = questions.filter(question => subjectOf(question) === currentSubject);
+            const list = document.getElementById("weakTopicsList");
+
+            if (!subjectQuestions.length) {
+                list.innerHTML = '<div class="weak-topics-empty">Нет вопросов по текущему предмету</div>';
+                return;
+            }
+
+            // Calculate correct answer percentage per topic
+            const topicStats = new Map();
+            subjectQuestions.forEach(question => {
+                const topic = question.topic || "Без темы";
+                if (!topicStats.has(topic)) {
+                    topicStats.set(topic, { total: 0, correct: 0 });
+                }
+                const stats = topicStats.get(topic);
+                stats.total++;
+                // Check if question was answered correctly in exams
+                const profile = getProfile();
+                if (profile) {
+                    const entries = loadJson(LEADERBOARD_STORAGE_KEY, []);
+                    const entry = entries.find(item => item.key === getProfileKey(profile));
+                    // We don't have per-topic exam data, so we'll use learning progress as proxy
+                    // A topic is "learned" if all its questions are in learned set
+                    const topicQuestions = subjectQuestions.filter(q => (q.topic || "Без темы") === topic);
+                    const topicLearned = topicQuestions.filter(q => learned.has(q.id)).length;
+                    stats.correct = topicLearned;
+                }
+            });
+
+            // Convert to array and sort by percentage (ascending)
+            const topicsArray = [...topicStats.entries()].map(([topic, stats]) => ({
+                topic,
+                total: stats.total,
+                correct: stats.correct,
+                percent: stats.total > 0 ? Math.round((stats.correct / stats.total) * 100) : 0
+            })).sort((a, b) => a.percent - b.percent);
+
+            // Take top 3 weakest
+            const weakest = topicsArray.slice(0, 3);
+
+            if (weakest.length === 0 || weakest.every(t => t.percent === 0 && t.correct === 0)) {
+                // No answers yet
+                list.innerHTML = '<div class="weak-topics-empty">Начни первый урок, чтобы увидеть слабые темы</div>';
+                return;
+            }
+
+            list.innerHTML = weakest.map(item => {
+                let percentClass = "low";
+                if (item.percent >= 80) percentClass = "high";
+                else if (item.percent >= 50) percentClass = "mid";
+
+                return `
+                    <div class="weak-topic-item">
+                        <div class="weak-topic-header">
+                            <span class="weak-topic-name">${escapeHtml(item.topic)}</span>
+                            <span class="weak-topic-percent ${percentClass}">${item.percent}%</span>
+                        </div>
+                        <div class="weak-topic-bar">
+                            <div class="weak-topic-bar-fill ${percentClass}" style="width: ${item.percent}%"></div>
+                        </div>
+                    </div>
+                `;
+            }).join("");
         }
 
         function renderMenuProfile() {
