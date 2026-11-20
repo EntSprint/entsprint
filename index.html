@@ -2564,7 +2564,8 @@
                         }
                     }, 0);
                 }
-            } catch (_) {
+            } catch (error) {
+                console.error("Failed to load questions.json:", error);
                 document.getElementById("questionText").textContent = "Ошибка загрузки вопросов";
             }
         }
@@ -2601,6 +2602,7 @@
                 });
             }
 
+            // Select first unlocked lesson by default (Урок 1)
             const firstUnlocked = lessons.find(l => isLessonUnlocked(l));
             changeLessonCustom(firstUnlocked || "all");
 
