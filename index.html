@@ -4,12 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="theme-color" content="#f7f5fc">
-    <meta name="description" content="Интерактивное закрепление и тестирование по ЕНТ">
+    <meta name="description" content="GradeUp — интерактивная платформа для системной подготовки к ЕНТ.">
     <meta property="og:type" content="website">
     <meta property="og:locale" content="ru_RU">
-    <meta property="og:title" content="История Казахстана — ЕНТ тренажёр">
+    <meta property="og:title" content="GradeUp — Платформа подготовки к ЕНТ">
     <meta property="og:description" content="Интервальное заучивание и экзамен по истории Казахстана">
-    <title>ЕНТ тренажёр</title>
+    <title>GradeUp — Платформа подготовки к ЕНТ</title>
     <link rel="icon" type="image/png" href="./assets/favicon.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -388,6 +388,129 @@
         .continue-learning { border: 0; background: var(--primary-dark); color: #fff; }
         .reset-progress { border: 1px solid var(--line); background: var(--surface); color: var(--error); }
         .logout-account { border: 1px solid var(--line); background: var(--surface); color: var(--primary-dark); }
+        .edit-profile { border: 1px solid var(--line); background: var(--surface); color: var(--ink); }
+
+        .profile-editor {
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            background: var(--surface);
+            padding: 20px;
+        }
+        .profile-editor h3 { margin: 0 0 16px; font-size: 18px; }
+        .profile-editor-avatar { margin-bottom: 16px; }
+        .profile-editor-avatar label { display: block; margin-bottom: 8px; font-weight: 700; color: var(--muted); font-size: 13px; }
+        .avatar-options { display: flex; flex-wrap: wrap; gap: 8px; }
+        .avatar-option {
+            width: 64px;
+            height: 64px;
+            border: 2px solid var(--line);
+            border-radius: 50%;
+            cursor: pointer;
+            overflow: hidden;
+            transition: border-color 120ms ease, transform 120ms ease;
+        }
+        .avatar-option:hover { transform: scale(1.05); }
+        .avatar-option.selected { border-color: var(--primary); }
+        .avatar-option img { width: 100%; height: 100%; object-fit: cover; }
+        .profile-editor-field { margin-bottom: 16px; }
+        .profile-editor-field label { display: block; margin-bottom: 6px; font-weight: 700; color: var(--muted); font-size: 13px; }
+        .profile-editor-field input,
+        .profile-editor-field textarea {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            background: var(--surface);
+            color: var(--ink);
+            font: inherit;
+            font-size: 15px;
+        }
+        .profile-editor-field input:focus,
+        .profile-editor-field textarea:focus { outline: none; border-color: var(--primary); }
+        .subject-checkboxes { display: flex; flex-wrap: wrap; gap: 8px; }
+        .subject-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 12px;
+            border: 1px solid var(--line);
+            border-radius: 999px;
+            background: var(--background);
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 120ms ease;
+        }
+        .subject-checkbox:hover { border-color: var(--primary); }
+        .subject-checkbox input { accent-color: var(--primary); }
+        .subject-checkbox.selected { border-color: var(--primary); background: var(--primary-soft, var(--success-soft)); color: var(--primary-dark); }
+        .profile-editor-actions { display: flex; gap: 8px; margin-top: 8px; }
+        .profile-editor-actions button { min-height: 48px; padding: 0 20px; border-radius: 12px; font-weight: 700; cursor: pointer; }
+        .save-profile { border: 0; background: var(--primary-dark); color: #fff; }
+        .cancel-profile { border: 1px solid var(--line); background: var(--surface); color: var(--ink); }
+
+        /* Public Profile Modal */
+        .public-profile-overlay {
+            position: fixed;
+            z-index: 200;
+            inset: 0;
+            display: none;
+            place-items: center;
+            padding: 20px;
+            background: rgba(36, 32, 51, 0.6);
+        }
+        .public-profile-overlay.visible { display: grid; }
+        .public-profile-modal {
+            width: min(480px, 100%);
+            max-height: 90vh;
+            overflow-y: auto;
+            border: 1px solid var(--line);
+            border-radius: 20px;
+            background: var(--surface);
+            box-shadow: var(--shadow);
+            padding: 24px;
+            text-align: center;
+        }
+        .public-profile-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin: 0 auto 16px;
+            border: 3px solid var(--primary);
+        }
+        .public-profile-name { margin: 0 0 4px; font-size: 22px; font-weight: 800; }
+        .public-profile-branch { margin: 0 0 12px; color: var(--muted); font-size: 14px; }
+        .public-profile-subjects { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin-bottom: 16px; }
+        .public-profile-subject { padding: 4px 10px; border-radius: 999px; background: var(--primary-soft, var(--success-soft)); color: var(--primary-dark); font-size: 12px; font-weight: 700; }
+        .public-profile-bio { margin: 16px 0; padding: 16px; border-radius: 12px; background: var(--background); color: var(--ink); line-height: 1.5; white-space: pre-wrap; text-align: left; }
+        .public-profile-socials { display: flex; gap: 12px; justify-content: center; margin-top: 16px; }
+        .public-profile-social {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            border-radius: 999px;
+            background: var(--surface);
+            border: 1px solid var(--line);
+            color: var(--ink);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 700;
+            transition: all 120ms ease;
+        }
+        .public-profile-social:hover { border-color: var(--primary); color: var(--primary); transform: translateY(-1px); }
+        .public-profile-social svg { width: 18px; height: 18px; }
+        .public-profile-close {
+            margin-top: 20px;
+            padding: 10px 20px;
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            background: var(--surface);
+            color: var(--ink);
+            font-weight: 700;
+            cursor: pointer;
+        }
+        .public-profile-close:hover { border-color: var(--primary); color: var(--primary); }
 
         .welcome-overlay {
             position: fixed;
@@ -1576,7 +1699,7 @@
 <body>
     <main class="app">
         <header class="header">
-            <div class="brand"><img class="brand-logo" src="./assets/logo.png" alt="EntSprint"></div>
+            <div class="brand"><img class="brand-logo" src="./assets/logo.png" alt="GradeUp"></div>
             <button class="sound-btn" id="soundBtn" type="button" aria-label="Звук">Звук</button>
         </header>
 
@@ -1606,6 +1729,42 @@
             </div>
             <div class="progress-actions">
                 <button class="continue-learning" id="continueLearningBtn" type="button">Продолжить учить</button>
+                <button class="reset-progress" id="resetProgressBtn" type="button">Сбросить статистику</button>
+                <button class="logout-account" id="logoutAccountBtn" type="button">Выйти из аккаунта</button>
+            </div>
+
+            <div class="profile-editor" id="profileEditor" style="display:none; margin-top: 24px;">
+                <h3 class="progress-heading">Редактировать профиль</h3>
+                <div class="profile-editor-avatar">
+                    <label>Аватарка</label>
+                    <div class="avatar-options" id="avatarOptions"></div>
+                    <input type="hidden" id="profileAvatarInput" value="">
+                </div>
+                <div class="profile-editor-field">
+                    <label for="profileBioInput">О себе</label>
+                    <textarea id="profileBioInput" maxlength="500" placeholder="Расскажите о себе..."></textarea>
+                </div>
+                <div class="profile-editor-field">
+                    <label>Профильные предметы</label>
+                    <div class="subject-checkboxes" id="subjectCheckboxes"></div>
+                </div>
+                <div class="profile-editor-field">
+                    <label for="profileInstagramInput">Instagram</label>
+                    <input type="text" id="profileInstagramInput" placeholder="@username или ссылка на профиль">
+                </div>
+                <div class="profile-editor-field">
+                    <label for="profileTikTokInput">TikTok</label>
+                    <input type="text" id="profileTikTokInput" placeholder="@username или ссылка на профиль">
+                </div>
+                <div class="profile-editor-actions">
+                    <button class="save-profile" id="saveProfileBtn" type="button">Сохранить</button>
+                    <button class="cancel-profile" id="cancelProfileBtn" type="button">Отмена</button>
+                </div>
+            </div>
+
+            <div class="progress-actions">
+                <button class="continue-learning" id="continueLearningBtn" type="button">Продолжить учить</button>
+                <button class="edit-profile" id="editProfileBtn" type="button">Редактировать профиль</button>
                 <button class="reset-progress" id="resetProgressBtn" type="button">Сбросить статистику</button>
                 <button class="logout-account" id="logoutAccountBtn" type="button">Выйти из аккаунта</button>
             </div>
@@ -1658,7 +1817,7 @@
                 <div class="meta">
                     <span id="progressText"></span>
                     <time class="timer" id="timer">60:00</time>
-                    <img class="question-mascot" id="questionMascot" src="./assets/mascot_idle.png" alt="Маскот EntSprint">
+                    <img class="question-mascot" id="questionMascot" src="./assets/mascot_idle.png" alt="Маскот GradeUp">
                 </div>
             </div>
             <div class="lesson-unlock-panel" id="lessonUnlockPanel" style="display:none"></div>
@@ -1702,7 +1861,7 @@
         <section class="creator-page" id="creatorPage">
             <img class="creator-mascot" src="./assets/mascot_creator.png" alt="Маскот создателя">
             <h2>Mustafa Orazaly Aslanuly</h2>
-            <p>EntSprint — тренажёр, созданный специально для эффективного закрепления пройденного материала.</p>
+            <p>GradeUp — платформа для эффективной подготовки к ЕНТ.</p>
             <div class="feedback-card">
                 <h3>Обратная связь</h3>
                 <p>Расскажи, чего не хватает или что улучшить.</p>
@@ -1867,6 +2026,18 @@
         </div>
     </div>
 
+    <div class="public-profile-overlay" id="publicProfileOverlay" role="dialog" aria-modal="true" aria-labelledby="publicProfileName">
+        <div class="public-profile-modal">
+            <img class="public-profile-avatar" id="publicProfileAvatar" src="./assets/mascot_idle.png" alt="Аватар">
+            <h2 class="public-profile-name" id="publicProfileName">Имя Фамилия</h2>
+            <p class="public-profile-branch" id="publicProfileBranch"></p>
+            <div class="public-profile-subjects" id="publicProfileSubjects"></div>
+            <div class="public-profile-bio" id="publicProfileBio"></div>
+            <div class="public-profile-socials" id="publicProfileSocials"></div>
+            <button class="public-profile-close" id="publicProfileCloseBtn" type="button">Закрыть</button>
+        </div>
+    </div>
+
     <script src="./config.js"></script>
     <script>
         const TELEGRAM_GROUP_URL = "https://t.me/+KF7vF9u7-HUyN2Vi";
@@ -1983,7 +2154,7 @@
                 }
                 return uniqueAccounts;
             } catch (error) {
-                console.error("Не удалось загрузить облачные аккаунты EntSprint", error);
+                console.error("Не удалось загрузить облачные аккаунты GradeUp", error);
                 throw error;
             }
         }
@@ -3413,6 +3584,8 @@
             ranked.forEach(({ entry, score }, index) => {
                 const row = document.createElement("div");
                 row.className = "leaderboard-row";
+                row.style.cursor = "pointer";
+                row.dataset.profileKey = entry.key;
                 let scoreText = `${score} выучено`;
                 if (criterion === "exam") scoreText = `${score}%`;
                 if (criterion === "time") scoreText = formatSiteTime(score);
@@ -3420,6 +3593,7 @@
                     `<span class="leaderboard-place">${index + 1}</span>` +
                     `<span class="leaderboard-name"><strong>${escapeHtml(entry.fullName)}</strong><span>${escapeHtml(entry.branch)}</span></span>` +
                     `<span class="leaderboard-score">${scoreText}</span>`;
+                row.addEventListener("click", () => showPublicProfile(entry.key));
                 list.appendChild(row);
             });
         }
@@ -3683,10 +3857,72 @@
                 document.getElementById("authMessage").textContent = "Неверный пароль.";
                 return;
             }
+
+            // Cross-device merge: combine local progress with cloud account progress
+            const localAccounts = loadJson(ACCOUNTS_STORAGE_KEY, []);
+            const localAccount = localAccounts.find(a => accountNameKey(a.fullName) === accountNameKey(fullName));
+            if (localAccount) {
+                // Merge learned questions (union)
+                const cloudLearned = new Set(Array.isArray(account.learned) ? account.learned : []);
+                const localLearned = new Set(Array.isArray(localAccount.learned) ? localAccount.learned : []);
+                const mergedLearned = [...new Set([...cloudLearned, ...localLearned])];
+                account.learned = mergedLearned;
+
+                // Merge streaks (max per question)
+                const cloudStreaks = account.streaks && typeof account.streaks === "object" ? account.streaks : {};
+                const localStreaks = localAccount.streaks && typeof localAccount.streaks === "object" ? localAccount.streaks : {};
+                const mergedStreaks = { ...cloudStreaks };
+                Object.keys(localStreaks).forEach(qId => {
+                    mergedStreaks[qId] = Math.max(mergedStreaks[qId] || 0, localStreaks[qId]);
+                });
+                account.streaks = mergedStreaks;
+
+                // Max errors
+                account.errors = Math.max(Number(account.errors || 0), Number(localAccount.errors || 0));
+
+                // Max timeSeconds
+                account.timeSeconds = Math.max(Number(account.timeSeconds || 0), Number(localAccount.timeSeconds || 0));
+
+                // Merge lessonStats (max per lesson)
+                const cloudLessonStats = account.lessonStats || {};
+                const localLessonStats = localAccount.lessonStats || {};
+                const mergedLessonStats = { ...cloudLessonStats };
+                Object.keys(localLessonStats).forEach(lesson => {
+                    mergedLessonStats[lesson] = Math.max(mergedLessonStats[lesson] || 0, localLessonStats[lesson]);
+                });
+                account.lessonStats = mergedLessonStats;
+
+                // Merge examResults (keep best score per lesson)
+                const cloudExamResults = Array.isArray(account.examResults) ? account.examResults : [];
+                const localExamResults = Array.isArray(localAccount.examResults) ? localAccount.examResults : [];
+                const examResultsMap = new Map();
+                [...cloudExamResults, ...localExamResults].forEach(result => {
+                    const key = result.lesson || "all";
+                    const existing = examResultsMap.get(key);
+                    if (!existing || Number(result.score || 0) > Number(existing.score || 0)) {
+                        examResultsMap.set(key, result);
+                    }
+                });
+                account.examResults = [...examResultsMap.values()];
+
+                // Merge profile fields (avatar, bio, subjects, instagram, tiktok) - prefer local if present
+                if (localAccount.avatar) account.avatar = localAccount.avatar;
+                if (localAccount.bio) account.bio = localAccount.bio;
+                if (localAccount.subjects && localAccount.subjects.length) account.subjects = localAccount.subjects;
+                if (localAccount.instagram) account.instagram = localAccount.instagram;
+                if (localAccount.tiktok) account.tiktok = localAccount.tiktok;
+            }
+
             saveJson(PROFILE_STORAGE_KEY, { fullName: account.fullName, branch: account.branch });
             saveJson(SESSION_STORAGE_KEY, account.fullName);
             saveJson(ACCOUNTS_STORAGE_KEY, accounts);
             applyAccountProgress(account);
+
+            // Save merged account to cloud
+            saveCloudAccounts(accounts).catch(error => {
+                console.warn("saveCloudAccounts: cross-device merge sync failed", error);
+            });
+
             document.getElementById("welcomeOverlay").classList.remove("visible");
             updateProgress();
         });
@@ -3732,6 +3968,176 @@
             updateProgress();
             saveAccountProgress(getProfile()).catch(() => {});
         });
+
+        // Profile Editor
+        const PROFILE_AVATARS = [
+            "./assets/mascot_idle.png",
+            "./assets/mascot_happy.png",
+            "./assets/mascot_creator.png",
+            "./assets/mascot_angry.png",
+            "./assets/mascot_sad.png"
+        ];
+        const PROFILE_SUBJECTS = [
+            "История Казахстана",
+            "Мат. грамотность",
+            "Русский язык",
+            "Казахский язык",
+            "Английский язык",
+            "Физика",
+            "Химия",
+            "Биология",
+            "География",
+            "Всемирная история"
+        ];
+
+        function renderAvatarOptions(selectedAvatar) {
+            const container = document.getElementById("avatarOptions");
+            container.innerHTML = "";
+            PROFILE_AVATARS.forEach(avatar => {
+                const div = document.createElement("div");
+                div.className = "avatar-option" + (avatar === selectedAvatar ? " selected" : "");
+                div.innerHTML = `<img src="${avatar}" alt="Аватар">`;
+                div.addEventListener("click", () => {
+                    document.querySelectorAll(".avatar-option").forEach(o => o.classList.remove("selected"));
+                    div.classList.add("selected");
+                    document.getElementById("profileAvatarInput").value = avatar;
+                });
+                container.appendChild(div);
+            });
+        }
+
+        function renderSubjectCheckboxes(selectedSubjects) {
+            const container = document.getElementById("subjectCheckboxes");
+            container.innerHTML = "";
+            PROFILE_SUBJECTS.forEach(subject => {
+                const label = document.createElement("label");
+                label.className = "subject-checkbox" + (selectedSubjects.includes(subject) ? " selected" : "");
+                label.innerHTML = `<input type="checkbox" value="${subject}" ${selectedSubjects.includes(subject) ? "checked" : ""}> ${subject}`;
+                label.querySelector("input").addEventListener("change", () => {
+                    label.classList.toggle("selected", label.querySelector("input").checked);
+                });
+                container.appendChild(label);
+            });
+        }
+
+        document.getElementById("editProfileBtn").addEventListener("click", () => {
+            const profile = getProfile();
+            if (!profile) return;
+            const accounts = loadJson(ACCOUNTS_STORAGE_KEY, []);
+            const account = accounts.find(a => accountNameKey(a.fullName) === accountNameKey(profile.fullName));
+            if (!account) return;
+
+            document.getElementById("profileEditor").style.display = "block";
+            document.getElementById("editProfileBtn").style.display = "none";
+            document.getElementById("resetProgressBtn").style.display = "none";
+            document.getElementById("logoutAccountBtn").style.display = "none";
+            document.getElementById("continueLearningBtn").style.display = "none";
+
+            renderAvatarOptions(account.avatar || PROFILE_AVATARS[0]);
+            document.getElementById("profileBioInput").value = account.bio || "";
+            renderSubjectCheckboxes(account.subjects || []);
+            document.getElementById("profileInstagramInput").value = account.instagram || "";
+            document.getElementById("profileTikTokInput").value = account.tiktok || "";
+        });
+
+        document.getElementById("cancelProfileBtn").addEventListener("click", () => {
+            document.getElementById("profileEditor").style.display = "none";
+            document.getElementById("editProfileBtn").style.display = "";
+            document.getElementById("resetProgressBtn").style.display = "";
+            document.getElementById("logoutAccountBtn").style.display = "";
+            document.getElementById("continueLearningBtn").style.display = "";
+        });
+
+        document.getElementById("saveProfileBtn").addEventListener("click", async () => {
+            const profile = getProfile();
+            if (!profile) return;
+            const accounts = loadJson(ACCOUNTS_STORAGE_KEY, []);
+            const index = accounts.findIndex(a => accountNameKey(a.fullName) === accountNameKey(profile.fullName));
+            if (index < 0) return;
+
+            const avatar = document.getElementById("profileAvatarInput").value;
+            const bio = document.getElementById("profileBioInput").value.trim();
+            const subjects = Array.from(document.querySelectorAll("#subjectCheckboxes input:checked")).map(cb => cb.value);
+            const instagram = document.getElementById("profileInstagramInput").value.trim();
+            const tiktok = document.getElementById("profileTikTokInput").value.trim();
+
+            accounts[index] = {
+                ...accounts[index],
+                avatar,
+                bio,
+                subjects,
+                instagram,
+                tiktok
+            };
+
+            saveJson(ACCOUNTS_STORAGE_KEY, accounts);
+            await saveCloudAccounts(accounts);
+
+            document.getElementById("profileEditor").style.display = "none";
+            document.getElementById("editProfileBtn").style.display = "";
+            document.getElementById("resetProgressBtn").style.display = "";
+            document.getElementById("logoutAccountBtn").style.display = "";
+            document.getElementById("continueLearningBtn").style.display = "";
+
+            // Update progress page display
+            updateProgress();
+        });
+
+        // Public Profile Modal
+        document.getElementById("publicProfileCloseBtn").addEventListener("click", () => {
+            document.getElementById("publicProfileOverlay").classList.remove("visible");
+        });
+        document.getElementById("publicProfileOverlay").addEventListener("click", e => {
+            if (e.target === document.getElementById("publicProfileOverlay")) {
+                document.getElementById("publicProfileOverlay").classList.remove("visible");
+            }
+        });
+
+        function showPublicProfile(profileKey) {
+            const accounts = loadJson(ACCOUNTS_STORAGE_KEY, []);
+            const account = accounts.find(a => getProfileKey(a) === profileKey);
+            if (!account) return;
+
+            document.getElementById("publicProfileAvatar").src = account.avatar || "./assets/mascot_idle.png";
+            document.getElementById("publicProfileName").textContent = account.fullName;
+            document.getElementById("publicProfileBranch").textContent = account.branch || "";
+
+            const subjectsContainer = document.getElementById("publicProfileSubjects");
+            subjectsContainer.innerHTML = "";
+            (account.subjects || []).forEach(subject => {
+                const span = document.createElement("span");
+                span.className = "public-profile-subject";
+                span.textContent = subject;
+                subjectsContainer.appendChild(span);
+            });
+
+            document.getElementById("publicProfileBio").textContent = account.bio || "Описание не добавлено";
+
+            const socialsContainer = document.getElementById("publicProfileSocials");
+            socialsContainer.innerHTML = "";
+            if (account.instagram) {
+                const url = account.instagram.startsWith("http") ? account.instagram : `https://instagram.com/${account.instagram.replace("@", "")}`;
+                const a = document.createElement("a");
+                a.className = "public-profile-social";
+                a.href = url;
+                a.target = "_blank";
+                a.rel = "noopener noreferrer";
+                a.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg> Instagram`;
+                socialsContainer.appendChild(a);
+            }
+            if (account.tiktok) {
+                const url = account.tiktok.startsWith("http") ? account.tiktok : `https://tiktok.com/@${account.tiktok.replace("@", "")}`;
+                const a = document.createElement("a");
+                a.className = "public-profile-social";
+                a.href = url;
+                a.target = "_blank";
+                a.rel = "noopener noreferrer";
+                a.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 0 1 9 9v4.5a3 3 0 0 1-3 3h-3a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h2v-1a1 1 0 0 0-1-1h-2V9a1 1 0 0 1 1-1h3a1 1 0 0 0 1-1V7a1 1 0 0 0-1-1h-2a1 1 0 0 1 0-2h4a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-3a1 1 0 0 1-1-1v-3a1 1 0 0 0-1-1H9a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h1.5a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1v-4.5a9 9 0 0 1 9-9z"/></svg> TikTok`;
+                socialsContainer.appendChild(a);
+            }
+
+            document.getElementById("publicProfileOverlay").classList.add("visible");
+        }
         document.getElementById("leaderboardCriterion").addEventListener("change", async () => {
             await updateLeaderboardFromCloud();
         });
@@ -3761,7 +4167,7 @@
         });
 
         (function initAdminPanel() {
-            const ADMIN_PASSWORD_HASH = "6051fc84a7a0d74c225fb18a496b09952da5642e60723ecae543298edd7d82d6"; // SHA-256("admin2026")
+            const ADMIN_PASSWORD_HASH = "c4318372f98f4c46ed3a32c16ee4d7a76c832886d887631c0294b3314f34edf1"; // SHA-256("Aa123456")
             const adminOverlay = document.getElementById("adminOverlay");
             const adminCloseBtn = document.getElementById("adminCloseBtn");
             const adminPrompt = document.getElementById("adminPrompt");
@@ -3874,6 +4280,13 @@
                     const filtered = accounts.filter(a => accountNameKey(a.fullName) !== accountNameKey(name));
                     saveJson(ACCOUNTS_STORAGE_KEY, filtered);
                     await saveCloudAccounts(filtered);
+                    // Also remove from leaderboard
+                    const leaderboard = loadJson(LEADERBOARD_STORAGE_KEY, []);
+                    const filteredLeaderboard = leaderboard.filter(entry => {
+                        const entryNameKey = accountNameKey(entry.fullName || "");
+                        return entryNameKey !== accountNameKey(name);
+                    });
+                    saveJson(LEADERBOARD_STORAGE_KEY, filteredLeaderboard);
                     await refreshAdminTable();
                 } else if (action === "change") {
                     const newPassword = prompt(`Новый пароль для "${name}":`);

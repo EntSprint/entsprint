@@ -1,4 +1,4 @@
-# Правила проекта EntSprint (entsprint.app)
+# Правила проекта GradeUp (entsprint.app)
 
 - **Стек:** Статический сайт на чистом HTML, CSS и JavaScript (размещён на GitHub Pages).
 - **Главный файл:** `index.html` (содержит весь интерфейс, стили, логику и базу вопросов).
