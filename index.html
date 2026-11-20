@@ -420,6 +420,81 @@
         .progress-bar span { height: 100%; display: block; border-radius: 999px; background: var(--primary); }
         .subject-coming-soon { margin-top: 12px; text-align: center; color: var(--muted); font-size: 13px; }
 
+        /* Menu Page Styles */
+        .menu-page {
+            display: none;
+            min-height: 520px;
+            border: 1px solid var(--line);
+            border-radius: 18px;
+            background: var(--surface);
+            box-shadow: var(--shadow);
+            padding: 20px 18px 24px;
+        }
+        .menu-page.visible { display: block; }
+
+        .menu-profile-card {
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            background: var(--surface);
+            padding: 20px;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+        .menu-profile-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 3px solid var(--primary);
+            margin: 0 auto 12px;
+            overflow: hidden;
+            background: var(--background);
+        }
+        .menu-profile-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .menu-profile-info {
+            margin-bottom: 12px;
+        }
+        .menu-profile-info strong { display: block; margin-bottom: 4px; font-size: 20px; }
+        .menu-profile-info span { color: var(--muted); font-size: 13px; }
+        .menu-profile-subjects {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            justify-content: center;
+            margin-bottom: 12px;
+        }
+        .menu-profile-bio {
+            padding: 12px;
+            border-radius: 12px;
+            background: var(--background);
+            color: var(--ink);
+            line-height: 1.5;
+            margin-bottom: 12px;
+            min-height: 60px;
+        }
+        .menu-profile-socials {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 12px;
+        }
+        .menu-actions {
+            display: grid;
+            gap: 8px;
+        }
+        .menu-actions button {
+            min-height: 52px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 800;
+        }
+        .reset-progress { border: 1px solid var(--line); background: var(--surface); color: var(--error); }
+        .logout-account { border: 1px solid var(--line); background: var(--surface); color: var(--primary-dark); }
+        .edit-profile { border: 1px solid var(--line); background: var(--surface); color: var(--ink); }
+
         .profile-editor {
             border: 1px solid var(--line);
             border-radius: 16px;
@@ -1651,6 +1726,14 @@
             .confirm-actions button { min-height: 52px; font-size: 15px; }
 
             .credit { display: none; }
+
+            .menu-page {
+                grid-column: 2;
+                max-width: 760px;
+                margin: 24px auto;
+                border-radius: 16px;
+                min-height: calc(100vh - 120px);
+            }
         }
 
         /* ===== MOBILE: @media (max-width: 899px) ===== */
@@ -1778,42 +1861,6 @@
                     <p class="subject-coming-soon" id="mathComingSoon" style="display:none">Скоро добавим вопросы</p>
                 </article>
             </div>
-
-            <div class="profile-editor" id="profileEditor" style="display:none; margin-top: 24px;">
-                <h3 class="progress-heading">Редактировать профиль</h3>
-                <div class="profile-editor-avatar">
-                    <label>Аватарка</label>
-                    <div class="avatar-options" id="avatarOptions"></div>
-                    <input type="hidden" id="profileAvatarInput" value="">
-                </div>
-                <div class="profile-editor-field">
-                    <label for="profileBioInput">О себе</label>
-                    <textarea id="profileBioInput" maxlength="500" placeholder="Расскажите о себе..."></textarea>
-                </div>
-                <div class="profile-editor-field">
-                    <label>Профильные предметы</label>
-                    <div class="subject-checkboxes" id="subjectCheckboxes"></div>
-                </div>
-                <div class="profile-editor-field">
-                    <label for="profileInstagramInput">Instagram</label>
-                    <input type="text" id="profileInstagramInput" placeholder="@username или ссылка на профиль">
-                </div>
-                <div class="profile-editor-field">
-                    <label for="profileTikTokInput">TikTok</label>
-                    <input type="text" id="profileTikTokInput" placeholder="@username или ссылка на профиль">
-                </div>
-                <div class="profile-editor-actions">
-                    <button class="save-profile" id="saveProfileBtn" type="button">Сохранить</button>
-                    <button class="cancel-profile" id="cancelProfileBtn" type="button">Отмена</button>
-                </div>
-            </div>
-
-            <div class="progress-actions">
-                <button class="continue-learning" id="continueLearningBtn" type="button">Продолжить учить</button>
-                <button class="edit-profile" id="editProfileBtn" type="button">Редактировать профиль</button>
-                <button class="reset-progress" id="resetProgressBtn" type="button">Сбросить статистику</button>
-                <button class="logout-account" id="logoutAccountBtn" type="button">Выйти из аккаунта</button>
-            </div>
         </section>
 
         <section class="leaderboard-page" id="leaderboardPage">
@@ -1929,6 +1976,56 @@
             </a>
         </section>
 
+        <section class="menu-page" id="menuPage">
+            <h2 class="progress-heading">Меню</h2>
+
+            <div class="menu-profile-card" id="menuProfileCard">
+                <div class="menu-profile-avatar" id="menuProfileAvatar"></div>
+                <div class="menu-profile-info">
+                    <strong id="menuProfileName">Ученик</strong>
+                    <span id="menuProfileBranch"></span>
+                </div>
+                <div class="menu-profile-subjects" id="menuProfileSubjects"></div>
+                <div class="menu-profile-bio" id="menuProfileBio"></div>
+                <div class="menu-profile-socials" id="menuProfileSocials"></div>
+            </div>
+
+            <div class="menu-actions">
+                <button class="edit-profile" id="editProfileBtnMenu" type="button">Редактировать профиль</button>
+                <button class="reset-progress" id="resetProgressBtnMenu" type="button">Сбросить статистику</button>
+                <button class="logout-account" id="logoutAccountBtnMenu" type="button">Выйти из аккаунта</button>
+            </div>
+
+            <div class="profile-editor" id="profileEditorMenu" style="display:none; margin-top: 24px;">
+                <h3 class="progress-heading">Редактировать профиль</h3>
+                <div class="profile-editor-avatar">
+                    <label>Аватарка</label>
+                    <div class="avatar-options" id="avatarOptionsMenu"></div>
+                    <input type="hidden" id="profileAvatarInputMenu" value="">
+                </div>
+                <div class="profile-editor-field">
+                    <label for="profileBioInputMenu">О себе</label>
+                    <textarea id="profileBioInputMenu" maxlength="500" placeholder="Расскажите о себе..."></textarea>
+                </div>
+                <div class="profile-editor-field">
+                    <label>Профильные предметы</label>
+                    <div class="subject-checkboxes" id="subjectCheckboxesMenu"></div>
+                </div>
+                <div class="profile-editor-field">
+                    <label for="profileInstagramInputMenu">Instagram</label>
+                    <input type="text" id="profileInstagramInputMenu" placeholder="@username или ссылка на профиль">
+                </div>
+                <div class="profile-editor-field">
+                    <label for="profileTikTokInputMenu">TikTok</label>
+                    <input type="text" id="profileTikTokInputMenu" placeholder="@username или ссылка на профиль">
+                </div>
+                <div class="profile-editor-actions">
+                    <button class="save-profile" id="saveProfileBtnMenu" type="button">Сохранить</button>
+                    <button class="cancel-profile" id="cancelProfileBtnMenu" type="button">Отмена</button>
+                </div>
+            </div>
+        </section>
+
         <p class="credit">Created by Mustafa Orazaly Aslanuly</p>
     <dialog class="confirm-dialog" id="finishConfirmDialog">
         <h2>Завершить тест?</h2>
@@ -1977,6 +2074,7 @@
         <button class="nav-btn active" id="practiceNav" type="button"><span class="nav-icon">✓</span>Закрепление</button>
         <button class="nav-btn" id="leadersNav" type="button"><span class="nav-icon">♛</span>Лидеры</button>
         <button class="nav-btn" id="creatorNav" type="button"><span class="nav-icon">★</span>Creator</button>
+        <button class="nav-btn" id="menuNav" type="button"><span class="nav-icon">☰</span>Меню</button>
     </nav>
 
     <div class="anticheat-overlay" id="anticheatOverlay" role="alertdialog" aria-modal="true">
@@ -2716,6 +2814,7 @@
                 document.getElementById("card").style.display = "none";
                 document.getElementById("progressPage").classList.remove("visible");
                 document.getElementById("leaderboardPage").classList.remove("visible");
+                document.getElementById("menuPage").classList.remove("visible");
                 document.getElementById("creatorPage").classList.add("visible");
                 document.getElementById("creatorNav").classList.add("active");
                 renderFeedbackList().catch(() => {});
@@ -2729,9 +2828,24 @@
                 document.getElementById("card").style.display = "none";
                 document.getElementById("progressPage").classList.remove("visible");
                 document.getElementById("creatorPage").classList.remove("visible");
+                document.getElementById("menuPage").classList.remove("visible");
                 document.getElementById("leaderboardPage").classList.add("visible");
                 document.getElementById("leadersNav").classList.add("active");
                 updateLeaderboardFromCloud();
+                return;
+            }
+
+            if (mode === "menu") {
+                clearInterval(timerId);
+                document.querySelector(".subject-switch").style.display = "none";
+                document.querySelector(".mode-switch").style.display = "none";
+                document.getElementById("card").style.display = "none";
+                document.getElementById("progressPage").classList.remove("visible");
+                document.getElementById("creatorPage").classList.remove("visible");
+                document.getElementById("leaderboardPage").classList.remove("visible");
+                document.getElementById("menuPage").classList.add("visible");
+                document.getElementById("menuNav").classList.add("active");
+                renderMenuProfile();
                 return;
             }
 
@@ -2742,6 +2856,7 @@
             }
             document.getElementById("leaderboardPage").classList.remove("visible");
             document.getElementById("creatorPage").classList.remove("visible");
+            document.getElementById("menuPage").classList.remove("visible");
             if (mode === "learn" || mode === "exam" || mode === "progress") {
                 document.getElementById("practiceNav").classList.add("active");
             }
@@ -3532,6 +3647,55 @@
             }
         }
 
+        function renderMenuProfile() {
+            const profile = getProfile();
+            if (!profile) return;
+            const accounts = loadJson(ACCOUNTS_STORAGE_KEY, []);
+            const account = accounts.find(a => accountNameKey(a.fullName) === accountNameKey(profile.fullName));
+            if (!account) return;
+
+            document.getElementById("menuProfileAvatar").innerHTML = account.avatar
+                ? `<img src="${account.avatar}" alt="Аватар">`
+                : `<img src="./assets/mascot_idle.png" alt="Аватар">`;
+            document.getElementById("menuProfileName").textContent = account.fullName;
+            document.getElementById("menuProfileBranch").textContent = account.branch || "";
+
+            const subjectsContainer = document.getElementById("menuProfileSubjects");
+            subjectsContainer.innerHTML = "";
+            const displaySubject = account.combination || (account.subjects && account.subjects[0]) || "";
+            if (displaySubject) {
+                const span = document.createElement("span");
+                span.className = "public-profile-subject";
+                span.textContent = displaySubject;
+                subjectsContainer.appendChild(span);
+            }
+
+            document.getElementById("menuProfileBio").textContent = account.bio || "Описание не добавлено";
+
+            const socialsContainer = document.getElementById("menuProfileSocials");
+            socialsContainer.innerHTML = "";
+            if (account.instagram) {
+                const url = account.instagram.startsWith("http") ? account.instagram : `https://instagram.com/${account.instagram.replace("@", "")}`;
+                const a = document.createElement("a");
+                a.className = "public-profile-social";
+                a.href = url;
+                a.target = "_blank";
+                a.rel = "noopener noreferrer";
+                a.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg> Instagram`;
+                socialsContainer.appendChild(a);
+            }
+            if (account.tiktok) {
+                const url = account.tiktok.startsWith("http") ? account.tiktok : `https://tiktok.com/@${account.tiktok.replace("@", "")}`;
+                const a = document.createElement("a");
+                a.className = "public-profile-social";
+                a.href = url;
+                a.target = "_blank";
+                a.rel = "noopener noreferrer";
+                a.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 0 1 9 9v4.5a3 3 0 0 1-3 3h-3a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h2v-1a1 1 0 0 0-1-1h-2V9a1 1 0 0 1 1-1h3a1 1 0 0 0 1-1V7a1 1 0 0 0-1-1h-2a1 1 0 0 1 0-2h4a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-3a1 1 0 0 1-1-1v-3a1 1 0 0 0-1-1H9a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h1.5a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1v-4.5a9 9 0 0 1 9-9z"/></svg> TikTok`;
+                socialsContainer.appendChild(a);
+            }
+        }
+
         function updateLessonUnlockPanel() {
             const panel = document.getElementById("lessonUnlockPanel");
             if (!panel) return;
@@ -3762,6 +3926,10 @@
                     startMode("creator");
                     return;
                 }
+                if (savedNav === "menu") {
+                    startMode("menu");
+                    return;
+                }
 
                 if (savedNav === "practice") {
                     if (savedMode === "exam") {
@@ -3823,6 +3991,10 @@
         document.getElementById("creatorNav").addEventListener("click", () => {
             startMode("creator");
             sessionStorage.setItem(NAV_STORAGE_KEY, "creator");
+        });
+        document.getElementById("menuNav").addEventListener("click", () => {
+            startMode("menu");
+            sessionStorage.setItem(NAV_STORAGE_KEY, "menu");
         });
         document.getElementById("welcomeContinueBtn").addEventListener("click", () => {
             document.getElementById("welcomeStep").style.display = "none";
@@ -4186,6 +4358,142 @@ const PROFILE_COMBINATIONS = [
 
             // Update progress page display
             updateProgress();
+        });
+
+        document.getElementById("publicProfileOverlay").classList.add("visible");
+        }
+
+        // Menu Page Profile Editor
+        function renderAvatarOptionsMenu(selectedAvatar) {
+            const container = document.getElementById("avatarOptionsMenu");
+            container.innerHTML = "";
+            PROFILE_AVATARS.forEach(avatar => {
+                const div = document.createElement("div");
+                div.className = "avatar-option" + (avatar === selectedAvatar ? " selected" : "");
+                div.innerHTML = `<img src="${avatar}" alt="Аватар">`;
+                div.addEventListener("click", () => {
+                    document.querySelectorAll("#avatarOptionsMenu .avatar-option").forEach(o => o.classList.remove("selected"));
+                    div.classList.add("selected");
+                    document.getElementById("profileAvatarInputMenu").value = avatar;
+                });
+                container.appendChild(div);
+            });
+        }
+
+        function renderSubjectSelectorMenu(selectedCombination) {
+            const container = document.getElementById("subjectCheckboxesMenu");
+            container.innerHTML = "";
+
+            const select = document.createElement("select");
+            select.id = "profileSubjectSelectMenu";
+            select.className = "profile-subject-select";
+            select.innerHTML = '<option value="">Выберите профильную комбинацию</option>' +
+                PROFILE_COMBINATIONS.map(combo =>
+                    `<option value="${combo}" ${combo === selectedCombination ? "selected" : ""}>${combo}</option>`
+                ).join("");
+            select.addEventListener("change", () => {
+                document.getElementById("profileSubjectInputMenu").value = select.value;
+            });
+            container.appendChild(select);
+
+            const hiddenInput = document.createElement("input");
+            hiddenInput.type = "hidden";
+            hiddenInput.id = "profileSubjectInputMenu";
+            hiddenInput.value = selectedCombination || "";
+            container.appendChild(hiddenInput);
+        }
+
+        document.getElementById("editProfileBtnMenu").addEventListener("click", () => {
+            const profile = getProfile();
+            if (!profile) return;
+            const accounts = loadJson(ACCOUNTS_STORAGE_KEY, []);
+            const account = accounts.find(a => accountNameKey(a.fullName) === accountNameKey(profile.fullName));
+            if (!account) return;
+
+            document.getElementById("profileEditorMenu").style.display = "block";
+            document.getElementById("editProfileBtnMenu").style.display = "none";
+            document.getElementById("resetProgressBtnMenu").style.display = "none";
+            document.getElementById("logoutAccountBtnMenu").style.display = "none";
+
+            renderAvatarOptionsMenu(account.avatar || PROFILE_AVATARS[0]);
+            document.getElementById("profileBioInputMenu").value = account.bio || "";
+            renderSubjectSelectorMenu(account.combination || "");
+            document.getElementById("profileInstagramInputMenu").value = account.instagram || "";
+            document.getElementById("profileTikTokInputMenu").value = account.tiktok || "";
+        });
+
+        document.getElementById("cancelProfileBtnMenu").addEventListener("click", () => {
+            document.getElementById("profileEditorMenu").style.display = "none";
+            document.getElementById("editProfileBtnMenu").style.display = "";
+            document.getElementById("resetProgressBtnMenu").style.display = "";
+            document.getElementById("logoutAccountBtnMenu").style.display = "";
+        });
+
+        document.getElementById("saveProfileBtnMenu").addEventListener("click", async () => {
+            const profile = getProfile();
+            if (!profile) return;
+            const accounts = loadJson(ACCOUNTS_STORAGE_KEY, []);
+            const index = accounts.findIndex(a => accountNameKey(a.fullName) === accountNameKey(profile.fullName));
+            if (index < 0) return;
+
+            const avatar = document.getElementById("profileAvatarInputMenu").value;
+            const bio = document.getElementById("profileBioInputMenu").value.trim();
+            const combination = document.getElementById("profileSubjectInputMenu").value;
+            const subjects = combination ? [combination] : [];
+            const instagram = document.getElementById("profileInstagramInputMenu").value.trim();
+            const tiktok = document.getElementById("profileTikTokInputMenu").value.trim();
+
+            accounts[index] = {
+                ...accounts[index],
+                avatar,
+                bio,
+                subjects,
+                combination,
+                instagram,
+                tiktok
+            };
+
+            saveJson(ACCOUNTS_STORAGE_KEY, accounts);
+            await saveCloudAccounts(accounts);
+
+            document.getElementById("profileEditorMenu").style.display = "none";
+            document.getElementById("editProfileBtnMenu").style.display = "";
+            document.getElementById("resetProgressBtnMenu").style.display = "";
+            document.getElementById("logoutAccountBtnMenu").style.display = "";
+
+            renderMenuProfile();
+        });
+
+        document.getElementById("logoutAccountBtnMenu").addEventListener("click", () => {
+            saveAccountProgress(getProfile()).catch(() => {});
+            localStorage.removeItem(PROFILE_STORAGE_KEY);
+            localStorage.removeItem(SESSION_STORAGE_KEY);
+            document.getElementById("welcomeStep").style.display = "block";
+            document.getElementById("registrationStep").style.display = "none";
+            document.getElementById("welcomeOverlay").classList.add("visible");
+        });
+
+        document.getElementById("resetProgressBtnMenu").addEventListener("click", () => {
+            if (!window.confirm("Сбросить выученные вопросы и счётчик ошибок?")) return;
+            streaks = {};
+            learned = new Set();
+            errorCount = 0;
+            saveJson(STREAK_STORAGE_KEY, streaks);
+            saveJson(LEARNED_STORAGE_KEY, []);
+            saveJson(ERRORS_STORAGE_KEY, 0);
+            const profile = getProfile();
+            if (profile) {
+                const entries = loadJson(LEADERBOARD_STORAGE_KEY, []).filter(entry =>
+                    entry.key !== `${profile.fullName}||${profile.branch}`
+                );
+                saveJson(LEADERBOARD_STORAGE_KEY, entries);
+                const timeByProfile = loadJson(SITE_TIME_STORAGE_KEY, {});
+                timeByProfile[getProfileKey(profile)] = 0;
+                saveJson(SITE_TIME_STORAGE_KEY, timeByProfile);
+            }
+            updateProgress();
+            renderMenuProfile();
+            saveAccountProgress(getProfile()).catch(() => {});
         });
 
         // Public Profile Modal
