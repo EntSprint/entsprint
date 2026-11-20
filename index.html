@@ -61,6 +61,112 @@
         .unlock-row { display: grid; grid-template-columns: minmax(0, 1fr) 120px; align-items: center; gap: 8px; margin-top: 6px; font-size: 11px; }
         .unlock-bar { height: 7px; overflow: hidden; border-radius: 999px; background: var(--line); }
         .unlock-bar span { height: 100%; display: block; border-radius: 999px; background: var(--primary); }
+
+        /* ===== Custom Lesson Select ===== */
+        .lesson-select-wrapper {
+            position: relative;
+            min-width: 180px;
+            max-width: 280px;
+        }
+        .lesson-select-btn {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            padding: 10px 14px;
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            background: var(--surface);
+            color: var(--ink);
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            text-align: left;
+            transition: border-color 120ms ease, box-shadow 120ms ease;
+        }
+        .lesson-select-btn:hover { border-color: var(--primary); box-shadow: var(--shadow); }
+        .lesson-select-btn:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-soft, var(--success-soft)); }
+        .lesson-select-btn[aria-expanded="true"] { border-color: var(--primary); box-shadow: var(--shadow); }
+        .lesson-select-arrow {
+            font-size: 10px;
+            color: var(--muted);
+            transition: transform 120ms ease;
+            flex-shrink: 0;
+        }
+        .lesson-select-btn[aria-expanded="true"] .lesson-select-arrow { transform: rotate(180deg); }
+        .lesson-select-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; }
+
+        .lesson-select-dropdown {
+            position: absolute;
+            top: calc(100% + 6px);
+            left: 0;
+            right: 0;
+            background: var(--surface);
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            z-index: 50;
+            overflow: hidden;
+            max-height: 320px;
+            display: flex;
+            flex-direction: column;
+        }
+        .lesson-select-dropdown[hidden] { display: none; }
+        .lesson-select-search {
+            padding: 8px;
+            border-bottom: 1px solid var(--line);
+        }
+        .lesson-select-search input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            background: var(--background);
+            color: var(--ink);
+            font-size: 14px;
+        }
+        .lesson-select-search input:focus { outline: none; border-color: var(--primary); }
+        .lesson-select-options {
+            overflow-y: auto;
+            padding: 4px;
+            max-height: 260px;
+        }
+        .lesson-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--ink);
+            transition: background 100ms ease;
+        }
+        .lesson-option:hover { background: var(--background); }
+        .lesson-option.selected { background: var(--primary-soft, var(--success-soft)); color: var(--primary-dark); }
+        .lesson-option.disabled { opacity: 0.5; cursor: not-allowed; color: var(--muted); }
+        .lesson-option-icon {
+            width: 22px;
+            height: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            font-size: 12px;
+            flex-shrink: 0;
+        }
+        .lesson-option-icon.locked { background: var(--error-soft); color: var(--error); }
+        .lesson-option-icon.unlocked { background: var(--success-soft); color: var(--success); }
+        .lesson-option-icon.completed { background: var(--gold); color: var(--ink); }
+        .lesson-option-icon.all { background: var(--primary); color: #fff; }
+        .lesson-option-text { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .lesson-option-lock-info { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+        @media (max-width: 480px) {
+            .lesson-select-wrapper { max-width: 100%; }
+        }
         @keyframes mascot-jump {
             0%, 100% { transform: translateY(0); }
             45% { transform: translateY(-9px) scale(1.05); }
@@ -576,6 +682,48 @@
         .feedback-item span { color: var(--muted); font-size: 11px; }
         .feedback-item p { margin: 8px 0 4px; color: var(--ink); white-space: pre-wrap; }
         .feedback-stars-text { color: var(--gold) !important; letter-spacing: 1px; }
+
+        .feedback-reactions {
+            display: flex;
+            gap: 6px;
+            margin-top: 10px;
+            padding-top: 8px;
+            border-top: 1px solid var(--line);
+            flex-wrap: wrap;
+        }
+        .reaction-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 6px 10px;
+            border: 1px solid var(--line);
+            border-radius: 999px;
+            background: var(--surface);
+            color: var(--ink);
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 120ms ease;
+        }
+        .reaction-btn:hover:not(:disabled) {
+            border-color: var(--primary);
+            background: var(--primary-soft, var(--success-soft));
+            transform: scale(1.05);
+        }
+        .reaction-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .reaction-btn.active {
+            border-color: var(--primary);
+            background: var(--primary-soft, var(--success-soft));
+            font-weight: 700;
+        }
+        .reaction-count {
+            font-size: 11px;
+            color: var(--muted);
+            font-weight: 700;
+        }
+        .reaction-btn.active .reaction-count { color: var(--primary); }
         .anticheat-overlay {
             position: fixed;
             z-index: 150;
@@ -1495,7 +1643,18 @@
 
         <section class="card" id="card">
             <div class="card-head" id="cardHead">
-                <select id="lessonSelect" aria-label="Выбор урока"></select>
+                <div class="lesson-select-wrapper" id="lessonSelectWrapper">
+                    <button type="button" class="lesson-select-btn" id="lessonSelectBtn" aria-haspopup="listbox" aria-expanded="false" aria-label="Выбор урока">
+                        <span class="lesson-select-label" id="lessonSelectLabel">Все уроки</span>
+                        <span class="lesson-select-arrow" aria-hidden="true">▼</span>
+                    </button>
+                    <div class="lesson-select-dropdown" id="lessonSelectDropdown" role="listbox" aria-label="Список уроков" hidden>
+                        <div class="lesson-select-search" id="lessonSelectSearch" style="display:none">
+                            <input type="text" placeholder="Поиск урока..." aria-label="Поиск урока">
+                        </div>
+                        <div class="lesson-select-options" id="lessonSelectOptions"></div>
+                    </div>
+                </div>
                 <div class="meta">
                     <span id="progressText"></span>
                     <time class="timer" id="timer">60:00</time>
@@ -2164,51 +2323,125 @@
         }
 
         function rebuildLessonSelect(preferredLesson = null) {
-            const lessonSelect = document.getElementById("lessonSelect");
+            const btn = document.getElementById("lessonSelectBtn");
+            const optionsContainer = document.getElementById("lessonSelectOptions");
+            const dropdown = document.getElementById("lessonSelectDropdown");
             const lessons = getSubjectLessons(currentSubject);
-            const previousValue = preferredLesson || lessonSelect.value;
-            lessonSelect.innerHTML = "";
+            const currentValue = preferredLesson || btn.dataset.value || "all";
 
+            optionsContainer.innerHTML = "";
+
+            // Option: All lessons
             if (lessons.length > 1) {
-                const allOption = document.createElement("option");
-                allOption.value = "all";
-                allOption.textContent = "Все уроки";
-                lessonSelect.appendChild(allOption);
+                const allOption = document.createElement("button");
+                allOption.type = "button";
+                allOption.className = "lesson-option" + (currentValue === "all" ? " selected" : "");
+                allOption.dataset.value = "all";
+                allOption.innerHTML = `<span class="lesson-option-icon all">▤</span><span class="lesson-option-text">Все уроки</span>`;
+                allOption.addEventListener("click", () => selectLessonOption("all"));
+                optionsContainer.appendChild(allOption);
             }
+
             lessons.forEach(lesson => {
-                const option = document.createElement("option");
-                option.value = lesson;
-                option.disabled = !isLessonUnlocked(lesson);
-                option.textContent = option.disabled ? `🔒 ${lesson}` : lesson;
-                lessonSelect.appendChild(option);
+                const unlocked = isLessonUnlocked(lesson);
+                const learnedQuestions = questions.filter(q => subjectOf(q) === currentSubject && q.lesson === lesson);
+                const learnedCount = learnedQuestions.filter(q => learned.has(q.id)).length;
+                const isCompleted = learnedCount >= learnedQuestions.length && learnedQuestions.length > 0;
+
+                const option = document.createElement("button");
+                option.type = "button";
+                option.className = "lesson-option" + (currentValue === lesson ? " selected" : "") + (!unlocked ? " disabled" : "") + (isCompleted ? " completed" : "");
+                option.dataset.value = lesson;
+                option.disabled = !unlocked;
+
+                let iconHtml = "";
+                let lockInfo = "";
+                if (!unlocked) {
+                    iconHtml = '<span class="lesson-option-icon locked">🔒</span>';
+                    const prevLesson = lessons.find(l => lessonNumber(l) === lessonNumber(lesson) - 1);
+                    if (prevLesson) {
+                        const prevQuestions = questions.filter(q => subjectOf(q) === currentSubject && q.lesson === prevLesson);
+                        const prevLearned = prevQuestions.filter(q => learned.has(q.id)).length;
+                        const prevRequired = Math.ceil(UNLOCK_LEARNED_SHARE * prevQuestions.length);
+                        const prevResults = getProfileExamResults().filter(r => r.lesson === prevLesson);
+                        const prevBest = prevResults.reduce((b, r) => Math.max(b, Number(r.score || 0)), 0);
+                        lockInfo = `<div class="lesson-option-lock-info">Нужно: ${prevLearned}/${prevRequired} выучено + ${prevBest}% экзамен</div>`;
+                    }
+                } else if (isCompleted) {
+                    iconHtml = '<span class="lesson-option-icon completed">✓</span>';
+                } else {
+                    iconHtml = '<span class="lesson-option-icon unlocked">📖</span>';
+                }
+
+                option.innerHTML = `${iconHtml}<div><span class="lesson-option-text">${escapeHtml(lesson)}</span>${lockInfo}</div>`;
+                option.addEventListener("click", () => selectLessonOption(lesson));
+                optionsContainer.appendChild(option);
             });
-            if (previousValue && [...lessonSelect.options].some(option =>
-                option.value === previousValue && !option.disabled
-            )) {
-                lessonSelect.value = previousValue;
-            } else {
-                lessonSelect.value = lessons.find(lesson => isLessonUnlocked(lesson)) || "all";
-            }
+
+            // Update button label
+            const label = document.getElementById("lessonSelectLabel");
+            const selectedOpt = optionsContainer.querySelector(".lesson-option.selected");
+            label.textContent = selectedOpt ? selectedOpt.querySelector(".lesson-option-text").textContent : "Все уроки";
+            btn.dataset.value = currentValue;
+
+            // Close dropdown on outside click
+            document.addEventListener("click", closeLessonDropdown, { once: true });
         }
 
-        function changeLesson() {
+        function selectLessonOption(value) {
+            const btn = document.getElementById("lessonSelectBtn");
+            const dropdown = document.getElementById("lessonSelectDropdown");
+            const optionsContainer = document.getElementById("lessonSelectOptions");
+
+            // Update selection
+            optionsContainer.querySelectorAll(".lesson-option").forEach(opt => {
+                opt.classList.toggle("selected", opt.dataset.value === value);
+            });
+
+            // Update button
+            const selectedOpt = optionsContainer.querySelector(`[data-value="${value}"]`);
+            document.getElementById("lessonSelectLabel").textContent = selectedOpt ? selectedOpt.querySelector(".lesson-option-text").textContent : "Все уроки";
+            btn.dataset.value = value;
+            btn.setAttribute("aria-expanded", "false");
+            dropdown.hidden = true;
+
+            // Trigger lesson change
+            changeLessonCustom(value);
+        }
+
+        function toggleLessonDropdown() {
+            const btn = document.getElementById("lessonSelectBtn");
+            const dropdown = document.getElementById("lessonSelectDropdown");
+            const isOpen = !dropdown.hidden;
+            btn.setAttribute("aria-expanded", !isOpen);
+            dropdown.hidden = isOpen;
+        }
+
+        function closeLessonDropdown() {
+            const btn = document.getElementById("lessonSelectBtn");
+            const dropdown = document.getElementById("lessonSelectDropdown");
+            btn.setAttribute("aria-expanded", "false");
+            dropdown.hidden = true;
+        }
+
+        function changeLessonCustom(value) {
             if (!confirmExitExam()) return;
-            const lessonSelect = document.getElementById("lessonSelect");
-            const lesson = lessonSelect.value;
-            const selectedOption = lessonSelect.selectedOptions[0];
-            if (lesson !== "all" && selectedOption?.disabled) {
+            const lessons = getSubjectLessons(currentSubject);
+            const unlocked = value === "all" || isLessonUnlocked(value);
+
+            if (!unlocked) {
                 rebuildLessonSelect();
-                document.getElementById("questionText").textContent =
-                    "Этот урок пока закрыт";
+                document.getElementById("questionText").textContent = "Этот урок пока закрыт";
                 return;
             }
-            baseQuestions = lesson === "all"
+
+            baseQuestions = value === "all"
                 ? questions.filter(question =>
                     subjectOf(question) === currentSubject &&
                     isLessonUnlocked(question.lesson)
                 )
                 : questions.filter(question =>
-                    subjectOf(question) === currentSubject && question.lesson === lesson
+                    subjectOf(question) === currentSubject && question.lesson === value
                 );
             displayedQuestions = new Map();
             document.getElementById("empty").style.display = "none";
@@ -2222,6 +2455,10 @@
             } else if (mode === "leaderboard") {
                 updateLeaderboardFromCloud();
             }
+        }
+
+        function getLessonSelectValue() {
+            return document.getElementById("lessonSelectBtn")?.dataset.value || "all";
         }
 
         function showEmpty() {
@@ -2471,7 +2708,7 @@
                             }
                         }
                         updateProgress();
-                        rebuildLessonSelect(document.getElementById("lessonSelect").value);
+                        rebuildLessonSelect(getLessonSelectValue());
                         updateLessonUnlockPanel();
                         saveAccountProgress(profile).catch(() => {});
                     } else {
@@ -2495,25 +2732,17 @@
                     if (navigator.vibrate) navigator.vibrate(60);
                 }
             } else {
-                if (examSelections.has(currentQuestion.id)) return;
+                // Режим экзамена: разрешаем менять выбор до нажатия "Далее"
+                // Не блокируем кнопки, просто обновляем выделение
                 examSelections.set(currentQuestion.id, selectedIndex);
-                if (selectedIndex !== currentQuestion.answer) {
-                    setMascot("sad");
-                    errorCount++;
-                    saveJson(ERRORS_STORAGE_KEY, errorCount);
-                    updateProgress();
-                    saveAccountProgress(getProfile()).catch(() => {});
-                } else {
-                    setMascot("happy");
-                }
                 Array.from(document.getElementById("optionsList").children)
                     .forEach((optionButton, index) => {
                         optionButton.classList.remove("exam-selected");
-                        optionButton.disabled = true;
                         if (index === selectedIndex) {
                             optionButton.classList.add("exam-selected");
                         }
                     });
+            }
                 button.classList.add("exam-selected");
                 document.getElementById("nextBtn").classList.add("visible");
             }
@@ -2578,7 +2807,7 @@
                 ? Math.round((examCorrect / baseQuestions.length) * 100)
                 : 0;
             recordExamResult(percentage);
-            const finishedLesson = document.getElementById("lessonSelect").value;
+            const finishedLesson = getLessonSelectValue();
             const finishedNumber = lessonNumber(finishedLesson);
             rebuildLessonSelect(finishedLesson);
             updateLessonUnlockPanel();
@@ -2605,6 +2834,13 @@
             if (!mascot) return;
             clearTimeout(mascotResetTimer);
             mascot.classList.remove("happy", "sad");
+
+            // В режиме экзамена всегда показываем испуганного маскот и не меняем эмоции
+            if (mode === "exam") {
+                mascot.src = "./assets/mascot_scared.png";
+                return;
+            }
+
             if (state === "happy") {
                 const happyAssets = ["./assets/mascot_happy.png", "./assets/mascot_creator.png"];
                 mascot.src = happyAssets[happyMascotIndex % happyAssets.length];
@@ -2651,6 +2887,105 @@
                 }
             }
             return loadJson(FEEDBACK_STORAGE_KEY, []);
+        }
+
+        const REACTION_TYPES = ["❤️", "🔥", "👍", "😂", "😡"];
+
+        async function loadFeedback() {
+            if (cloudIsConfigured()) {
+                try {
+                    const endpoint = window.ENTSPRINT_CONFIG.endpoint.replace(/\/$/, "");
+                    const response = await fetch(
+                        `${endpoint}/feedback_v2?pageSize=100&key=${encodeURIComponent(window.ENTSPRINT_CONFIG.apiKey)}`
+                    );
+                    if (!response.ok) throw new Error(`Feedback request failed: ${response.status}`);
+                    const data = await response.json();
+                    return (data.documents || []).map(document => decodeFirestoreMap({
+                        fields: document.fields || {}
+                    })).filter(item => item && item.key);
+                } catch (error) {
+                    console.error("Не удалось загрузить отзывы", error);
+                }
+            }
+            return loadJson(FEEDBACK_STORAGE_KEY, []);
+        }
+
+        async function loadFeedbackReactions() {
+            if (cloudIsConfigured()) {
+                try {
+                    const endpoint = window.ENTSPRINT_CONFIG.endpoint.replace(/\/$/, "");
+                    const response = await fetch(
+                        `${endpoint}/feedback_reactions?pageSize=500&key=${encodeURIComponent(window.ENTSPRINT_CONFIG.apiKey)}`
+                    );
+                    if (!response.ok) throw new Error(`Reactions request failed: ${response.status}`);
+                    const data = await response.json();
+                    return (data.documents || []).map(document => decodeFirestoreMap({
+                        fields: document.fields || {}
+                    })).filter(item => item && item.feedbackKey);
+                } catch (error) {
+                    console.error("Не удалось загрузить реакции", error);
+                }
+            }
+            return loadJson("ent_feedback_reactions_v2", []);
+        }
+
+        async function saveFeedbackReaction(feedbackKey, reactionType, userKey) {
+            const reactionKey = `${feedbackKey}||${userKey}||${reactionType}`;
+            const reaction = {
+                key: reactionKey,
+                feedbackKey,
+                userKey,
+                reactionType,
+                date: new Date().toISOString()
+            };
+
+            if (cloudIsConfigured()) {
+                try {
+                    const endpoint = window.ENTSPRINT_CONFIG.endpoint.replace(/\/$/, "");
+                    await fetch(
+                        `${endpoint}/feedback_reactions?key=${encodeURIComponent(window.ENTSPRINT_CONFIG.apiKey)}&documentId=${encodeURIComponent(reactionKey)}`,
+                        {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({
+                                fields: {
+                                    key: { stringValue: reaction.key },
+                                    feedbackKey: { stringValue: reaction.feedbackKey },
+                                    userKey: { stringValue: reaction.userKey },
+                                    reactionType: { stringValue: reaction.reactionType },
+                                    date: { stringValue: reaction.date }
+                                }
+                            })
+                        }
+                    );
+                } catch (error) {
+                    console.error("Не удалось сохранить реакцию", error);
+                }
+            }
+
+            const localReactions = loadJson("ent_feedback_reactions_v2", []);
+            const existingIdx = localReactions.findIndex(r => r.key === reactionKey);
+            if (existingIdx >= 0) {
+                localReactions.splice(existingIdx, 1); // Toggle off
+            } else {
+                localReactions.push(reaction); // Toggle on
+            }
+            saveJson("ent_feedback_reactions_v2", localReactions);
+        }
+
+        function getReactionCounts(feedbackKey, reactions) {
+            const counts = {};
+            const userKey = getProfile() ? getProfileKey(getProfile()) : null;
+            let userReactions = new Set();
+
+            reactions.filter(r => r.feedbackKey === feedbackKey).forEach(r => {
+                counts[r.reactionType] = (counts[r.reactionType] || 0) + 1;
+                if (userKey && r.userKey === userKey) {
+                    userReactions.add(r.reactionType);
+                }
+            });
+
+            return { counts, userReactions };
         }
 
         async function submitFeedback() {
@@ -2747,6 +3082,7 @@
             const list = document.getElementById("feedbackList");
             list.innerHTML = "";
             const feedback = await loadFeedback();
+            const reactions = await loadFeedbackReactions();
             const own = profile ? feedback.find(item => item.key === getProfileKey(profile)) : null;
             if (own) {
                 blockFeedbackForm();
@@ -2755,10 +3091,12 @@
             } else {
                 unblockFeedbackForm();
             }
+            const userKey = profile ? getProfileKey(profile) : null;
             feedback.sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0)).forEach(item => {
                 const date = item.date
                     ? new Date(item.date).toLocaleDateString("ru-RU")
                     : "";
+                const { counts, userReactions } = getReactionCounts(item.key, reactions);
                 const row = document.createElement("div");
                 row.className = "feedback-item";
                 row.innerHTML =
@@ -2767,8 +3105,26 @@
                     `<span class="feedback-stars-text" style="display:block">` +
                     `${"★".repeat(Number(item.rating) || 0)}${"☆".repeat(Math.max(0, 5 - (Number(item.rating) || 0)))}</span>` +
                     `<p>${escapeHtml(item.text || "")}</p>` +
-                    `<span>${escapeHtml(date)}</span>`;
+                    `<span>${escapeHtml(date)}</span>` +
+                    `<div class="feedback-reactions" data-feedback-key="${escapeHtml(item.key)}">` +
+                    REACTION_TYPES.map(emoji => {
+                        const count = counts[emoji] || 0;
+                        const active = userReactions.has(emoji) ? "active" : "";
+                        return `<button type="button" class="reaction-btn ${active}" data-reaction="${escapeHtml(emoji)}" aria-label="${emoji}" ${userKey ? "" : "disabled"}>${emoji}<span class="reaction-count">${count}</span></button>`;
+                    }).join("") +
+                    `</div>`;
                 list.appendChild(row);
+            });
+
+            // Add event listeners for reaction buttons
+            list.querySelectorAll(".reaction-btn").forEach(btn => {
+                btn.addEventListener("click", async () => {
+                    if (!userKey) return;
+                    const feedbackKey = btn.closest(".feedback-reactions").dataset.feedbackKey;
+                    const reactionType = btn.dataset.reaction;
+                    await saveFeedbackReaction(feedbackKey, reactionType, userKey);
+                    await renderFeedbackList();
+                });
             });
         }
 
@@ -2868,7 +3224,7 @@
                 if (entry) {
                     entry.timeSeconds = Number(timeByProfile[key] || 0);
                     entry.lessonTimeStats = entry.lessonTimeStats || {};
-                    const lesson = document.getElementById("lessonSelect")?.value;
+                    const lesson = getLessonSelectValue();
                     if (lesson) {
                         entry.lessonTimeStats[lesson] =
                             Number(entry.lessonTimeStats[lesson] || 0) + 30;
@@ -2891,7 +3247,7 @@
             if (!entry) return;
             entry.examResults = Array.isArray(entry.examResults) ? entry.examResults : [];
             entry.examResults.push({
-                lesson: document.getElementById("lessonSelect").value,
+                lesson: getLessonSelectValue(),
                 score: Number(score)
             });
             saveJson(LEADERBOARD_STORAGE_KEY, entries);
@@ -2940,8 +3296,14 @@
                 panel.style.display = "none";
                 return;
             }
+            // На экзамене панель прогресса уроков не нужна
+            if (mode === "exam") {
+                panel.style.display = "none";
+                return;
+            }
             const nextLesson = lessons.find(lesson => !isLessonUnlocked(lesson));
             if (!nextLesson) {
+                // Все уроки открыты — показываем только если всё выучено на 100%
                 const totalQuestions = subjectQuestions.length;
                 const totalLearned = subjectQuestions.filter(q => learned.has(q.id)).length;
                 if (totalLearned >= totalQuestions && totalQuestions > 0) {
@@ -3161,7 +3523,7 @@
         document.getElementById("learnMode").addEventListener("click", () => startMode("learn"));
         document.getElementById("examMode").addEventListener("click", () => startMode("exam"));
         document.getElementById("progressMode").addEventListener("click", () => startMode("progress"));
-        document.getElementById("lessonSelect").addEventListener("change", changeLesson);
+        document.getElementById("lessonSelectBtn").addEventListener("click", toggleLessonDropdown);
         document.getElementById("nextBtn").addEventListener("click", nextQuestion);
         document.getElementById("backBtn").addEventListener("click", previousQuestion);
         document.getElementById("finishTestBtn").addEventListener("click", () => {
