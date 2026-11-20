@@ -457,6 +457,17 @@
         }
         .profile-editor-field input:focus,
         .profile-editor-field textarea:focus { outline: none; border-color: var(--primary); }
+        .profile-subject-select {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            background: var(--surface);
+            color: var(--ink);
+            font: inherit;
+            font-size: 15px;
+        }
+        .profile-subject-select:focus { outline: none; border-color: var(--primary); }
         .subject-checkboxes { display: flex; flex-wrap: wrap; gap: 8px; }
         .subject-checkbox {
             display: flex;
@@ -2721,6 +2732,9 @@
 
             document.querySelector(".subject-switch").style.display = "grid";
             document.querySelector(".mode-switch").style.display = "grid";
+            if (mode === "progress") {
+                document.querySelector(".subject-switch").style.display = "none";
+            }
             document.getElementById("leaderboardPage").classList.remove("visible");
             document.getElementById("creatorPage").classList.remove("visible");
             if (mode === "learn" || mode === "exam" || mode === "progress") {
@@ -4028,33 +4042,42 @@
             "./assets/mascot_angry.png",
             "./assets/mascot_sad.png"
         ];
-        const PROFILE_SUBJECTS = [
-            "История Казахстана",
-            "Мат. грамотность",
-            "Русский язык",
-            "Казахский язык",
-            "Английский язык",
-            "Физика",
-            "Химия",
-            "Биология",
-            "География",
-            "Всемирная история"
+const PROFILE_COMBINATIONS = [
+            "Математика + Физика",
+            "Математика + Информатика",
+            "Математика + География",
+            "Биология + Химия",
+            "Биология + География",
+            "Всемирная история + География",
+            "Всемирная история + Основы права",
+            "Иностранный язык + Всемирная история",
+            "География + Иностранный язык",
+            "Химия + Физика",
+            "Язык обучения + Литература",
+            "Творческий экзамен"
         ];
 
-        function renderAvatarOptions(selectedAvatar) {
-            const container = document.getElementById("avatarOptions");
+        function renderSubjectSelector(selectedCombination) {
+            const container = document.getElementById("subjectCheckboxes");
             container.innerHTML = "";
-            PROFILE_AVATARS.forEach(avatar => {
-                const div = document.createElement("div");
-                div.className = "avatar-option" + (avatar === selectedAvatar ? " selected" : "");
-                div.innerHTML = `<img src="${avatar}" alt="Аватар">`;
-                div.addEventListener("click", () => {
-                    document.querySelectorAll(".avatar-option").forEach(o => o.classList.remove("selected"));
-                    div.classList.add("selected");
-                    document.getElementById("profileAvatarInput").value = avatar;
-                });
-                container.appendChild(div);
+
+            const select = document.createElement("select");
+            select.id = "profileSubjectSelect";
+            select.className = "profile-subject-select";
+            select.innerHTML = '<option value="">Выберите профильную комбинацию</option>' +
+                PROFILE_COMBINATIONS.map(combo =>
+                    `<option value="${combo}" ${combo === selectedCombination ? "selected" : ""}>${combo}</option>`
+                ).join("");
+            select.addEventListener("change", () => {
+                document.getElementById("profileSubjectInput").value = select.value;
             });
+            container.appendChild(select);
+
+            const hiddenInput = document.createElement("input");
+            hiddenInput.type = "hidden";
+            hiddenInput.id = "profileSubjectInput";
+            hiddenInput.value = selectedCombination || "";
+            container.appendChild(hiddenInput);
         }
 
         function renderSubjectCheckboxes(selectedSubjects) {
@@ -4108,7 +4131,8 @@
 
             const avatar = document.getElementById("profileAvatarInput").value;
             const bio = document.getElementById("profileBioInput").value.trim();
-            const subjects = Array.from(document.querySelectorAll("#subjectCheckboxes input:checked")).map(cb => cb.value);
+            const combination = document.getElementById("profileSubjectInput").value;
+            const subjects = combination ? [combination] : [];
             const instagram = document.getElementById("profileInstagramInput").value.trim();
             const tiktok = document.getElementById("profileTikTokInput").value.trim();
 
@@ -4117,6 +4141,7 @@
                 avatar,
                 bio,
                 subjects,
+                combination,
                 instagram,
                 tiktok
             };
@@ -4155,12 +4180,13 @@
 
             const subjectsContainer = document.getElementById("publicProfileSubjects");
             subjectsContainer.innerHTML = "";
-            (account.subjects || []).forEach(subject => {
+            const displaySubject = account.combination || (account.subjects && account.subjects[0]) || "";
+            if (displaySubject) {
                 const span = document.createElement("span");
                 span.className = "public-profile-subject";
-                span.textContent = subject;
+                span.textContent = displaySubject;
                 subjectsContainer.appendChild(span);
-            });
+            }
 
             document.getElementById("publicProfileBio").textContent = account.bio || "Описание не добавлено";
 
