@@ -3083,6 +3083,7 @@
                     updateProgress();
                     saveAccountProgress(getProfile()).catch(() => {});
                     playTone("wrong");
+                    setMascot("sad");
                     if (navigator.vibrate) navigator.vibrate(60);
                 }
             } else {
@@ -3598,10 +3599,14 @@
         function updateProgress() {
             const profile = getProfile();
 
-            document.getElementById("progressStudent").textContent =
-                profile ? profile.fullName : "Ученик не зарегистрирован";
-            document.getElementById("progressBranch").textContent =
-                profile ? profile.branch : "";
+            const progressStudentEl = document.getElementById("progressStudent");
+            if (progressStudentEl) {
+                progressStudentEl.textContent = profile ? profile.fullName : "Ученик не зарегистрирован";
+            }
+            const progressBranchEl = document.getElementById("progressBranch");
+            if (progressBranchEl) {
+                progressBranchEl.textContent = profile ? profile.branch : "";
+            }
 
             // Render progress for each subject
             renderSubjectProgress("История Казахстана", "Hist");
