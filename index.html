@@ -884,7 +884,6 @@
             padding: 0;
         }
         .feedback-star.active { color: var(--gold); }
-        .feedback-star.hover { color: var(--gold); opacity: 0.7; }
         .feedback-star:hover { color: var(--gold); }
         .feedback-card textarea {
             width: 100%;
@@ -4604,17 +4603,6 @@ const PROFILE_COMBINATIONS = [
                     item.classList.toggle("active", Number(item.dataset.rating) <= rating);
                 });
             });
-            star.addEventListener("mouseenter", () => {
-                const rating = Number(star.dataset.rating);
-                document.querySelectorAll(".feedback-star").forEach(item => {
-                    item.classList.toggle("hover", Number(item.dataset.rating) <= rating);
-                });
-            });
-            star.addEventListener("mouseleave", () => {
-                document.querySelectorAll(".feedback-star").forEach(item => {
-                    item.classList.remove("hover");
-                });
-            });
         });
         document.getElementById("feedbackSubmit").addEventListener("click", submitFeedback);
         document.getElementById("anticheatCloseBtn").addEventListener("click", () => {
@@ -4848,7 +4836,21 @@ const PROFILE_COMBINATIONS = [
         });
         updateSoundButton();
         initializeProfile();
-        loadQuestions();
+
+        async function boot() {
+            await loadQuestions();
+            // If user was restored in practice mode, ensure first question renders
+            const profile = getProfile();
+            if (profile && mode === "learn" && baseQuestions.length > 0) {
+                if (learningQueue.length === 0) {
+                    learningQueue = shuffled(baseQuestions.filter(q => !learned.has(q.id)));
+                }
+                if (learningQueue.length > 0 && !document.getElementById("quiz").style.display) {
+                    showLearningQuestion();
+                }
+            }
+        }
+        boot();
     </script>
 </body>
 </html>
