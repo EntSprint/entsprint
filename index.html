@@ -1009,12 +1009,12 @@
             cursor: pointer;
             transition: all 120ms ease;
         }
-        .leaderboard-filter-btn:hover { border-color: var(--primary); color: var(--primary); }
-.leaderboard-filter-btn.active {
-    border-color: var(--primary);
-    background: var(--primary);
-    color: #fff !important;
-}
+.leaderboard-filter-btn:hover { border-color: var(--primary); color: var(--primary); }
+        .leaderboard-filter-btn.active {
+            border-color: var(--primary);
+            background: var(--primary);
+            color: #fff !important;
+        }
         .leaderboard-list-new {
             display: flex;
             flex-direction: column;
@@ -1450,7 +1450,7 @@
             display: none;
             flex-direction: column;
             gap: 16px;
-            width: 290px;
+            width: 300px;
             flex-shrink: 0;
         }
 
@@ -1584,17 +1584,40 @@
             line-height: 1.5;
         }
 
+        /* Hide duplicate mascot in card-head on mobile */
+        @media (max-width: 899px) {
+            #questionMascot { display: none; }
+        }
+
         @media (min-width: 1100px) {
-            .app {
-                grid-template-columns: 240px 1fr 300px;
+            .card {
+                display: grid;
+                grid-template-columns: minmax(0, 740px) 300px;
+                gap: 24px;
+                align-items: start;
+            }
+
+            .card > .quiz,
+            .card > .results,
+            .card > .empty {
+                grid-column: 1;
             }
 
             .practice-sidebar {
                 display: flex;
+                grid-column: 2;
+                position: sticky;
+                top: 100px;
+                max-height: calc(100vh - 140px);
+                overflow-y: auto;
             }
 
-            .card, .progress-page, .leaderboard-page, .creator-page {
-                grid-column: 2;
+            .card-head {
+                grid-column: 1 / -1;
+            }
+
+            .lesson-unlock-panel {
+                grid-column: 1 / -1;
             }
         }
 
@@ -2271,7 +2294,15 @@
 
             .mode-switch { grid-template-columns: repeat(3, 1fr); }
 
-            .card, .progress-page, .leaderboard-page, .creator-page {
+            .card {
+                grid-column: 2;
+                max-width: 1060px;
+                margin: 24px auto;
+                border-radius: 16px;
+                min-height: calc(100vh - 120px);
+            }
+
+            .progress-page, .leaderboard-page, .creator-page, .menu-page {
                 grid-column: 2;
                 max-width: 760px;
                 margin: 24px auto;
@@ -2364,8 +2395,8 @@
             .bottom-nav::before {
                 content: "";
                 display: block;
-                width: 48px;
-                height: 48px;
+                width: 120px;
+                height: 36px;
                 margin: 0 auto 24px;
                 background: url('./assets/logo.png') center/contain no-repeat;
             }
@@ -2441,14 +2472,6 @@
             .confirm-actions button { min-height: 52px; font-size: 15px; }
 
             .credit { display: none; }
-
-            .menu-page {
-                grid-column: 2;
-                max-width: 760px;
-                margin: 24px auto;
-                border-radius: 16px;
-                min-height: calc(100vh - 120px);
-            }
         }
 
         /* ===== MOBILE: @media (max-width: 899px) ===== */
@@ -2690,39 +2713,39 @@
             <div class="empty" id="empty" style="display:none">
                 <h2>Здесь скоро будут вопросы</h2>
             </div>
-</section>
 
-        <aside class="practice-sidebar" id="practiceSidebar" aria-label="Статистика ученика">
-            <div class="practice-sidebar-card" id="progressCard">
-                <h3 class="practice-sidebar-title">Твой прогресс</h3>
-                <div class="progress-ring-wrap">
-                    <svg class="progress-ring" viewBox="0 0 120 120" role="img" aria-labelledby="progressRingTitle">
-                        <title id="progressRingTitle">Прогресс выученных вопросов</title>
-                        <circle class="progress-ring-bg" cx="60" cy="60" r="54" fill="none" stroke="var(--card-border)" stroke-width="12"/>
-                        <circle class="progress-ring-fill" cx="60" cy="60" r="54" fill="none" stroke="var(--primary)" stroke-width="12" stroke-linecap="round" stroke-dasharray="339.3" stroke-dashoffset="339.3" transform="rotate(-90 60 60)"/>
-                    </svg>
-                    <div class="progress-ring-value" id="progressRingValue">0%</div>
+            <aside class="practice-sidebar" id="practiceSidebar" aria-label="Статистика ученика">
+                <div class="practice-sidebar-card" id="progressCard">
+                    <h3 class="practice-sidebar-title">Твой прогресс</h3>
+                    <div class="progress-ring-wrap">
+                        <svg class="progress-ring" viewBox="0 0 120 120" role="img" aria-labelledby="progressRingTitle">
+                            <title id="progressRingTitle">Прогресс выученных вопросов</title>
+                            <circle class="progress-ring-bg" cx="60" cy="60" r="54" fill="none" stroke="var(--card-border)" stroke-width="12"/>
+                            <circle class="progress-ring-fill" cx="60" cy="60" r="54" fill="none" stroke="var(--primary)" stroke-width="12" stroke-linecap="round" stroke-dasharray="339.3" stroke-dashoffset="339.3" transform="rotate(-90 60 60)"/>
+                        </svg>
+                        <div class="progress-ring-value" id="progressRingValue">0%</div>
+                    </div>
+                    <div class="progress-ring-stats">
+                        <div class="progress-ring-stat">
+                            <span class="progress-ring-stat-value" id="statLearned">0</span>
+                            <span class="progress-ring-stat-label">Выучено</span>
+                        </div>
+                        <div class="progress-ring-stat">
+                            <span class="progress-ring-stat-value" id="statBestExam">0%</span>
+                            <span class="progress-ring-stat-label">Результат тестов</span>
+                        </div>
+                        <div class="progress-ring-stat">
+                            <span class="progress-ring-stat-value" id="statStudyTime">0 мин</span>
+                            <span class="progress-ring-stat-label">Время обучения</span>
+                        </div>
+                    </div>
                 </div>
-                <div class="progress-ring-stats">
-                    <div class="progress-ring-stat">
-                        <span class="progress-ring-stat-value" id="statLearned">0</span>
-                        <span class="progress-ring-stat-label">Выучено</span>
-                    </div>
-                    <div class="progress-ring-stat">
-                        <span class="progress-ring-stat-value" id="statBestExam">0%</span>
-                        <span class="progress-ring-stat-label">Результат тестов</span>
-                    </div>
-                    <div class="progress-ring-stat">
-                        <span class="progress-ring-stat-value" id="statStudyTime">0 мин</span>
-                        <span class="progress-ring-stat-label">Время обучения</span>
-                    </div>
+                <div class="practice-sidebar-card" id="weakTopicsCard">
+                    <h3 class="practice-sidebar-title">Слабые темы</h3>
+                    <div class="weak-topics-list" id="weakTopicsList"></div>
                 </div>
-            </div>
-            <div class="practice-sidebar-card" id="weakTopicsCard">
-                <h3 class="practice-sidebar-title">Слабые темы</h3>
-                <div class="weak-topics-list" id="weakTopicsList"></div>
-            </div>
-        </aside>
+            </aside>
+        </section>
 
         <section class="creator-page" id="creatorPage">
             <div class="creator-header">
@@ -2888,9 +2911,6 @@
     </main>
 
     <nav class="bottom-nav" aria-label="Основная навигация">
-        <div class="sidebar-header" style="display:none;">
-            <img src="./assets/logo.png" alt="GradeUp" style="width:48px;height:48px;margin:0 auto 24px;">
-        </div>
         <button class="nav-btn active" id="practiceNav" type="button" data-nav="practice"><span class="nav-icon" aria-hidden="true">✓</span><span class="nav-label">Закрепление</span></button>
         <button class="nav-btn" id="leadersNav" type="button" data-nav="leaders"><span class="nav-icon" aria-hidden="true">♛</span><span class="nav-label">Лидеры</span></button>
         <button class="nav-btn" id="creatorNav" type="button" data-nav="creator"><span class="nav-icon" aria-hidden="true">★</span><span class="nav-label">Creator</span></button>
@@ -3712,8 +3732,10 @@
             if (!baseQuestions.length) return;
             displayedQuestions = new Map();
             document.getElementById("timer").classList.toggle("visible", mode === "exam");
-            document.getElementById("streak").style.display = mode === "learn" ? "grid" : "none";
-            document.getElementById("learningStatus").style.display = mode === "learn" ? "block" : "none";
+            const streakEl = document.getElementById("streak");
+            if (streakEl) streakEl.style.display = mode === "learn" ? "grid" : "none";
+            const learningStatusEl = document.getElementById("learningStatus");
+            if (learningStatusEl) learningStatusEl.style.display = mode === "learn" ? "block" : "none";
             document.getElementById("finishTestBtn").classList.toggle("visible", mode === "exam");
             document.getElementById("cardHead").style.display = "grid";
             document.getElementById("quiz").style.display = "block";
