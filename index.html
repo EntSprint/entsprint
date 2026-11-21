@@ -3838,7 +3838,7 @@
             currentQuestion = question;
             document.getElementById("progressText").textContent =
                 mode === "learn"
-                    ? `Вопросов: ${learningQueue.length + 1}`
+                    ? `Вопросов: ${baseQuestions.length}`
                     : `Вопрос ${examIndex + 1} из ${baseQuestions.length}`;
             
             // Update progress bar
@@ -5942,6 +5942,10 @@ const PROFILE_COMBINATIONS = [
         async function boot() {
             await loadQuestions();
             initializeProfile();
+            // Ensure sidebar profile is rendered on load if user is logged in
+            if (getProfile()) {
+                renderMenuProfile();
+            }
             // If user was restored in practice mode, ensure first question renders
             const profile = getProfile();
             if (profile && mode === "learn" && baseQuestions.length > 0) {
