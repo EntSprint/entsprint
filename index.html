@@ -52,8 +52,10 @@
             background: transparent;
             transition: border-color 180ms ease, transform 180ms ease;
         }
-        .question-mascot.happy { border-color: var(--success); animation: mascot-jump 500ms ease; }
-        .question-mascot.sad { border-color: var(--error); animation: mascot-shake 500ms ease; }
+        .question-mascot.happy,
+        .question-mascot-large.happy { border-color: var(--success); animation: mascot-jump 500ms ease; }
+        .question-mascot.sad,
+        .question-mascot-large.sad { border-color: var(--error); animation: mascot-shake 500ms ease; }
         .lesson-unlock-panel {
             margin: 10px 14px 0;
             border: 1px solid var(--card-border);
@@ -1584,15 +1586,10 @@
             line-height: 1.5;
         }
 
-        /* Hide duplicate mascot in card-head on mobile */
-        @media (max-width: 899px) {
-            #questionMascot { display: none; }
-        }
-
         @media (min-width: 1100px) {
             .card {
                 display: grid;
-                grid-template-columns: minmax(0, 740px) 300px;
+                grid-template-columns: minmax(0, 1fr) 300px;
                 gap: 24px;
                 align-items: start;
             }
@@ -2426,6 +2423,14 @@
                 margin-top: auto;
                 padding-top: 16px;
                 border-top: 1px solid var(--card-border);
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+            }
+            .sidebar-profile-top {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
             }
             .sidebar-profile-avatar {
                 width: 36px;
@@ -2457,6 +2462,22 @@
                 overflow: hidden;
                 text-overflow: ellipsis;
             }
+            .sidebar-sound-btn {
+                width: 40px;
+                height: 40px;
+                border: 1px solid var(--card-border);
+                border-radius: 12px;
+                background: var(--card);
+                color: var(--primary);
+                cursor: pointer;
+                font-weight: 700;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: background 120ms ease, border-color 120ms ease, color 120ms ease;
+            }
+            .sidebar-sound-btn:hover { border-color: var(--primary); color: var(--primary); }
+            .sidebar-sound-btn svg { width: 20px; height: 20px; }
 
             .welcome-overlay { padding: 40px; }
             .welcome-dialog { width: 480px; padding: 32px; }
@@ -2478,6 +2499,8 @@
         @media (max-width: 899px) {
             html, body { overflow-x: hidden; }
             .app { padding-bottom: calc(90px + env(safe-area-inset-bottom)); }
+
+            .sidebar-profile { display: none; }
 
             .options { grid-template-columns: 1fr; }
 
@@ -2670,7 +2693,6 @@
                 <div class="meta">
                     <span id="progressText"></span>
                     <time class="timer" id="timer">60:00</time>
-                    <img class="question-mascot" id="questionMascot" src="./assets/mascot_idle.png" alt="Маскот GradeUp">
                 </div>
             </div>
             <div class="lesson-unlock-panel" id="lessonUnlockPanel" style="display:none"></div>
@@ -2915,11 +2937,18 @@
         <button class="nav-btn" id="leadersNav" type="button" data-nav="leaders"><span class="nav-icon" aria-hidden="true">♛</span><span class="nav-label">Лидеры</span></button>
         <button class="nav-btn" id="creatorNav" type="button" data-nav="creator"><span class="nav-icon" aria-hidden="true">★</span><span class="nav-label">Creator</span></button>
         <button class="nav-btn" id="menuNav" type="button" data-nav="profile"><span class="nav-icon" aria-hidden="true">☰</span><span class="nav-label">Профиль</span></button>
-        <div class="sidebar-profile" style="display:none;">
-            <img class="sidebar-profile-avatar" id="sidebarProfileAvatar" src="./assets/mascot_idle.png" alt="" aria-hidden="true">
-            <div class="sidebar-profile-info">
-                <span class="sidebar-profile-name" id="sidebarProfileName">Ученик</span>
-                <span class="sidebar-profile-branch" id="sidebarProfileBranch"></span>
+        <div class="sidebar-profile">
+            <div class="sidebar-profile-top">
+                <div>
+                    <img class="sidebar-profile-avatar" id="sidebarProfileAvatar" src="./assets/mascot_idle.png" alt="" aria-hidden="true">
+                    <div class="sidebar-profile-info">
+                        <span class="sidebar-profile-name" id="sidebarProfileName">Ученик</span>
+                        <span class="sidebar-profile-branch" id="sidebarProfileBranch"></span>
+                    </div>
+                </div>
+                <button class="sidebar-sound-btn" id="sidebarSoundBtn" type="button" aria-label="Звук">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 010 7"/><path d="M18 6a8 8 0 010 12"/></svg>
+                </button>
             </div>
         </div>
     </nav>
@@ -4070,7 +4099,7 @@
         }
 
         function setMascot(state) {
-            const mascot = document.getElementById("questionMascot");
+            const mascot = document.getElementById("questionMascotLarge");
             if (!mascot) return;
             clearTimeout(mascotResetTimer);
             mascot.classList.remove("happy", "sad");
@@ -4403,13 +4432,15 @@
         }
 
         function updateSoundButton() {
-            const button = document.getElementById("soundBtn");
+            const buttons = document.querySelectorAll("#soundBtn, #sidebarSoundBtn");
             const label = soundEnabled ? "Выключить звук" : "Включить звук";
-            button.title = label;
-            button.setAttribute("aria-label", label);
-            button.innerHTML = soundEnabled
-                ? '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 010 7"/><path d="M18 6a8 8 0 010 12"/></svg>'
-                : '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M16 9l5 6M21 9l-5 6"/></svg>';
+            buttons.forEach(button => {
+                button.title = label;
+                button.setAttribute("aria-label", label);
+                button.innerHTML = soundEnabled
+                    ? '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 010 7"/><path d="M18 6a8 8 0 010 12"/></svg>'
+                    : '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M16 9l5 6M21 9l-5 6"/></svg>';
+            });
         }
 
         function getProfile() {
@@ -5648,6 +5679,13 @@ const PROFILE_COMBINATIONS = [
         });
         
         document.getElementById("soundBtn").addEventListener("click", () => {
+            soundEnabled = !soundEnabled;
+            localStorage.setItem(SOUND_STORAGE_KEY, String(soundEnabled));
+            updateSoundButton();
+            if (soundEnabled) playTone("correct");
+        });
+
+        document.getElementById("sidebarSoundBtn")?.addEventListener("click", () => {
             soundEnabled = !soundEnabled;
             localStorage.setItem(SOUND_STORAGE_KEY, String(soundEnabled));
             updateSoundButton();
