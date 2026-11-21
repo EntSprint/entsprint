@@ -275,6 +275,7 @@
             justify-content: center;
             transition: background 120ms ease, border-color 120ms ease, color 120ms ease;
         }
+        #cardSoundBtn { display: none; }
         .nav-icon {
             width: 20px;
             height: 20px;
@@ -2293,7 +2294,7 @@
 
             .card {
                 grid-column: 2;
-                max-width: 1060px;
+                max-width: 1120px;
                 margin: 24px auto;
                 border-radius: 16px;
                 min-height: calc(100vh - 120px);
@@ -2361,6 +2362,8 @@
             .leaderboard-branch { font-size: 13px; }
             .leaderboard-score-large { font-size: 20px; }
             .leaderboard-filters-new { max-width: 760px; margin: 16px auto 0; }
+
+            #cardSoundBtn { display: flex; }
 
             .creator-page { padding: 40px 48px; text-align: left; }
             .creator-mascot-new { width: 160px; height: 160px; margin: 0 0 24px; }
@@ -2694,6 +2697,9 @@
                     <span id="progressText"></span>
                     <time class="timer" id="timer">60:00</time>
                 </div>
+                <button class="sound-btn" id="cardSoundBtn" type="button" aria-label="Звук">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 010 7"/><path d="M18 6a8 8 0 010 12"/></svg>
+                </button>
             </div>
             <div class="lesson-unlock-panel" id="lessonUnlockPanel" style="display:none"></div>
 
@@ -5680,13 +5686,20 @@ const PROFILE_COMBINATIONS = [
             if (soundEnabled) playTone("correct");
         });
 
-        document.getElementById("sidebarSoundBtn")?.addEventListener("click", () => {
+document.getElementById("sidebarSoundBtn")?.addEventListener("click", () => {
             soundEnabled = !soundEnabled;
             localStorage.setItem(SOUND_STORAGE_KEY, String(soundEnabled));
             updateSoundButton();
             if (soundEnabled) playTone("correct");
         });
-        
+
+        document.getElementById("cardSoundBtn")?.addEventListener("click", () => {
+            soundEnabled = !soundEnabled;
+            localStorage.setItem(SOUND_STORAGE_KEY, String(soundEnabled));
+            updateSoundButton();
+            if (soundEnabled) playTone("correct");
+        });
+
         // New feedback stars
         document.querySelectorAll(".feedback-star-new").forEach(star => {
             star.addEventListener("click", () => {
