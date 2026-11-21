@@ -2699,7 +2699,6 @@
 
             <div class="quiz" id="quiz">
                 <div class="question-header">
-                    <div class="lesson-tag" id="lessonTag">Урок 1</div>
                     <div class="progress-bar-compact" id="questionProgressBar" aria-label="Прогресс вопроса">
                         <div class="progress-bar-fill" id="questionProgressFill"></div>
                     </div>
@@ -3841,10 +3840,6 @@
                 mode === "learn"
                     ? `Вопросов: ${learningQueue.length + 1}`
                     : `Вопрос ${examIndex + 1} из ${baseQuestions.length}`;
-            
-            // Update lesson tag
-            const lessonTag = document.getElementById("lessonTag");
-            if (lessonTag) lessonTag.textContent = question.lesson ? `Урок ${question.lesson}` : "Урок 1";
             
             // Update progress bar
             const progressFill = document.getElementById("questionProgressFill");
