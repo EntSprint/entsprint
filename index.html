@@ -350,55 +350,6 @@
             color: #fff;
         }
 
-        /* Practice area - common container for subject/mode/card */
-        .practice-area {
-            display: none;
-        }
-        .practice-area.visible {
-            display: block;
-        }
-        .practice-header {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin-bottom: 12px;
-        }
-
-        @media (min-width: 900px) {
-            .practice-header {
-                flex-direction: row;
-                align-items: center;
-                justify-content: space-between;
-                gap: 16px;
-                margin-bottom: 16px;
-            }
-            .subject-switch {
-                flex: 1;
-                max-width: none;
-            }
-            .mode-switch {
-                flex: 1;
-                max-width: 480px;
-                margin-bottom: 0;
-            }
-            .sound-btn-desktop {
-                display: flex;
-                flex-shrink: 0;
-            }
-            .header .sound-btn {
-                display: none;
-            }
-        }
-
-        @media (max-width: 899px) {
-            .sound-btn-desktop {
-                display: none;
-            }
-            .header .sound-btn {
-                display: flex;
-            }
-        }
-
         .progress-page {
             display: none;
             min-height: 520px;
@@ -683,31 +634,6 @@
         }
         .public-profile-social:hover { border-color: var(--primary); color: var(--primary); transform: translateY(-1px); }
         .public-profile-social svg { width: 18px; height: 18px; }
-        .public-profile-stats {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-            margin-top: 16px;
-            padding-top: 16px;
-            border-top: 1px solid var(--card-border);
-        }
-        .public-profile-stat {
-            text-align: center;
-            padding: 12px;
-            border-radius: 12px;
-            background: var(--bg);
-        }
-        .public-profile-stat-value {
-            display: block;
-            font-size: 20px;
-            font-weight: 800;
-            color: var(--primary);
-        }
-        .public-profile-stat-label {
-            font-size: 11px;
-            color: var(--text-muted);
-            margin-top: 2px;
-        }
         .public-profile-close {
             margin-top: 20px;
             padding: 10px 20px;
@@ -1161,28 +1087,6 @@
             font-weight: 800;
             color: var(--primary);
             white-space: nowrap;
-        }
-        .leaderboard-profile-btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 36px;
-            height: 36px;
-            border: 1px solid var(--card-border);
-            border-radius: 10px;
-            background: var(--card);
-            color: var(--text-muted);
-            cursor: pointer;
-            transition: all 120ms ease;
-            flex-shrink: 0;
-        }
-        .leaderboard-profile-btn:hover {
-            border-color: var(--primary);
-            background: var(--primary-soft);
-            color: var(--primary);
-        }
-        .leaderboard-card:hover .leaderboard-name-row strong {
-            text-decoration: underline;
         }
         @media (min-width: 900px) {
             .leaderboard-page .leaderboard { max-width: 820px; margin: 0 auto; }
@@ -2472,37 +2376,23 @@
 
             .brand-logo { height: 40px; max-width: 220px; }
 
-            .practice-area {
-                grid-column: 2;
-                max-width: 760px;
-                margin: 0 auto;
-                padding: 16px 24px 24px;
-            }
-
             .subject-switch,
             .mode-switch {
-                max-width: none;
-                margin: 0;
-                padding: 0;
-            }
-
-            .subject-switch {
-                flex: 1;
-            }
-
-            .mode-switch {
-                flex: 1;
-                max-width: 480px;
-                margin-bottom: 0;
+                grid-column: 2;
+                max-width: 760px;
+                margin-left: auto;
+                margin-right: auto;
+                padding: 12px 24px 0;
             }
 
             .mode-switch { grid-template-columns: repeat(3, 1fr); }
 
             .card {
-                max-width: none;
-                margin: 0;
+                grid-column: 2;
+                max-width: 1120px;
+                margin: 24px auto;
                 border-radius: 16px;
-                min-height: calc(100vh - 180px);
+                min-height: calc(100vh - 120px);
             }
 
             .progress-page, .leaderboard-page, .creator-page, .menu-page {
@@ -2866,23 +2756,18 @@
             </button>
         </header>
 
-        <div class="practice-area" id="practiceArea">
-            <div class="practice-header">
-                <div class="subject-switch">
-                    <button class="subject-btn active" type="button" data-subject="История Казахстана">История Казахстана</button>
-                    <button class="subject-btn" type="button" data-subject="Мат. грамотность">Мат. грамотность<span class="subject-badge">Скоро</span></button>
-                </div>
-                <div class="mode-switch">
-                    <button class="mode-btn active" id="learnMode" type="button">Заучивание</button>
-                    <button class="mode-btn" id="examMode" type="button">Тест</button>
-                    <button class="mode-btn" id="progressMode" type="button">Прогресс</button>
-                </div>
-                <button class="sound-btn sound-btn-desktop" id="soundBtnDesktop" type="button" aria-label="Звук">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 010 7"/><path d="M18 6a8 8 0 010 12"/></svg>
-                </button>
-            </div>
+        <div class="subject-switch">
+            <button class="subject-btn active" type="button" data-subject="История Казахстана">История Казахстана</button>
+            <button class="subject-btn" type="button" data-subject="Мат. грамотность">Мат. грамотность<span class="subject-badge">Скоро</span></button>
+        </div>
 
-            <section class="progress-page" id="progressPage">
+        <div class="mode-switch">
+            <button class="mode-btn active" id="learnMode" type="button">Заучивание</button>
+            <button class="mode-btn" id="examMode" type="button">Тест</button>
+            <button class="mode-btn" id="progressMode" type="button">Прогресс</button>
+        </div>
+
+        <section class="progress-page" id="progressPage">
             <h2 class="progress-heading">Прогресс</h2>
             <div class="progress-profile">
                 <strong id="progressStudent">Ученик</strong>
@@ -3029,7 +2914,6 @@
                 </div>
             </aside>
         </section>
-        </div>
 
         <section class="creator-page" id="creatorPage">
             <div class="creator-header">
@@ -3337,7 +3221,6 @@
             <div class="public-profile-subjects" id="publicProfileSubjects"></div>
             <div class="public-profile-bio" id="publicProfileBio"></div>
             <div class="public-profile-socials" id="publicProfileSocials"></div>
-            <div class="public-profile-stats" id="publicProfileStats"></div>
             <button class="public-profile-close" id="publicProfileCloseBtn" type="button">Закрыть</button>
         </div>
     </div>
@@ -4133,7 +4016,7 @@
             });
         }
 
-async function startMode(nextMode) {
+        async function startMode(nextMode) {
             const canExit = await confirmExitExam();
             if (!canExit) return;
             mode = nextMode;
@@ -4145,72 +4028,67 @@ async function startMode(nextMode) {
             document.getElementById("progressMode").classList.toggle("active", mode === "progress");
             document.querySelectorAll(".nav-btn").forEach(button => button.classList.remove("active"));
 
-            const practiceArea = document.getElementById("practiceArea");
-            const isPracticeMode = mode === "learn" || mode === "exam" || mode === "progress";
-
-            // Hide ALL root sections first (tab isolation)
-            document.getElementById("card").style.display = "none";
-            document.getElementById("progressPage").classList.remove("visible");
-            document.getElementById("leaderboardPage").classList.remove("visible");
-            document.getElementById("creatorPage").classList.remove("visible");
-            document.getElementById("menuPage").classList.remove("visible");
-            practiceArea.classList.toggle("visible", isPracticeMode);
-            clearInterval(timerId);
-
             if (mode === "creator") {
+                clearInterval(timerId);
+                document.querySelector(".subject-switch").style.display = "none";
+                document.querySelector(".mode-switch").style.display = "none";
+                document.getElementById("card").style.display = "none";
+                document.getElementById("progressPage").classList.remove("visible");
+                document.getElementById("leaderboardPage").classList.remove("visible");
+                document.getElementById("menuPage").classList.remove("visible");
                 document.getElementById("creatorPage").classList.add("visible");
                 document.getElementById("creatorNav").classList.add("active");
                 window.__feedbackPage = 0;
                 renderFeedbackList().catch(() => {});
-                scrollToTop();
                 return;
             }
 
             if (mode === "leaderboard") {
+                clearInterval(timerId);
+                document.querySelector(".subject-switch").style.display = "none";
+                document.querySelector(".mode-switch").style.display = "none";
+                document.getElementById("card").style.display = "none";
+                document.getElementById("progressPage").classList.remove("visible");
+                document.getElementById("creatorPage").classList.remove("visible");
+                document.getElementById("menuPage").classList.remove("visible");
                 document.getElementById("leaderboardPage").classList.add("visible");
                 document.getElementById("leadersNav").classList.add("active");
                 updateLeaderboardFromCloud();
-                scrollToTop();
                 return;
             }
 
             if (mode === "profile") {
+                clearInterval(timerId);
+                document.querySelector(".subject-switch").style.display = "none";
+                document.querySelector(".mode-switch").style.display = "none";
+                document.getElementById("card").style.display = "none";
+                document.getElementById("progressPage").classList.remove("visible");
+                document.getElementById("creatorPage").classList.remove("visible");
+                document.getElementById("leaderboardPage").classList.remove("visible");
                 document.getElementById("menuPage").classList.add("visible");
                 document.getElementById("menuNav").classList.add("active");
                 renderMenuProfile();
-                scrollToTop();
                 return;
             }
 
-            if (mode === "progress") {
-                document.querySelector(".subject-switch").style.display = "none";
-            } else {
-                document.querySelector(".subject-switch").style.display = "grid";
-            }
+            document.querySelector(".subject-switch").style.display = "grid";
             document.querySelector(".mode-switch").style.display = "grid";
-            document.getElementById("practiceNav").classList.add("active");
-
             if (mode === "progress") {
-                document.getElementById("progressPage").classList.add("visible");
-                document.getElementById("timer").classList.remove("visible");
-                updateProgress();
-                scrollToTop();
-                return;
-            }
-
-            document.getElementById("card").style.display = "block";
-            document.getElementById("progressPage").classList.remove("visible");
-            if (!baseQuestions.length) return;
-            displayedQuestions = new Map();
                 document.querySelector(".subject-switch").style.display = "none";
             }
-            document.getElementById("practiceNav").classList.add("active");
+            document.getElementById("leaderboardPage").classList.remove("visible");
+            document.getElementById("creatorPage").classList.remove("visible");
+            document.getElementById("menuPage").classList.remove("visible");
+            if (mode === "learn" || mode === "exam" || mode === "progress") {
+                document.getElementById("practiceNav").classList.add("active");
+            }
 
             if (mode === "progress") {
+                clearInterval(timerId);
+                document.getElementById("card").style.display = "none";
                 document.getElementById("progressPage").classList.add("visible");
                 document.getElementById("timer").classList.remove("visible");
                 updateProgress();
-                scrollToTop();
                 return;
             }
 
@@ -4806,7 +4684,7 @@ async function startMode(nextMode) {
             const pageFeedback = feedback.slice(startIdx, endIdx);
             
             if (pageFeedback.length === 0) {
-                list.innerHTML = '<div class="reviews-empty" style="text-align:center;padding:20px;color:var(--text-muted);">Пока нет отзывов - будь первым</div>';
+                list.innerHTML = '<div class="reviews-empty" style="text-align:center;padding:20px;color:var(--text-muted);">Пока нет отзывов — будь первым</div>';
             } else {
                 pageFeedback.forEach(item => {
                     const date = item.date
@@ -4913,16 +4791,14 @@ async function startMode(nextMode) {
         }
 
         function updateSoundButton() {
-            const buttons = document.querySelectorAll("#soundBtn, #soundBtnDesktop");
+            const button = document.getElementById("soundBtn");
+            if (!button) return;
             const label = soundEnabled ? "Выключить звук" : "Включить звук";
-            buttons.forEach(button => {
-                if (!button) return;
-                button.title = label;
-                button.setAttribute("aria-label", label);
-                button.innerHTML = soundEnabled
-                    ? '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 010 7"/><path d="M18 6a8 8 0 010 12"/></svg>'
-                    : '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M16 9l5 6M21 9l-5 6"/></svg>';
-            });
+            button.title = label;
+            button.setAttribute("aria-label", label);
+            button.innerHTML = soundEnabled
+                ? '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 010 7"/><path d="M18 6a8 8 0 010 12"/></svg>'
+                : '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M16 9l5 6M21 9l-5 6"/></svg>';
         }
 
         function getProfile() {
@@ -5017,10 +4893,6 @@ async function startMode(nextMode) {
             setTimeout(() => {
                 toast.classList.remove("show");
             }, 1500);
-        }
-
-        function scrollToTop() {
-            window.scrollTo({ top: 0, behavior: "instant" });
         }
 
         function updateProgress() {
@@ -5425,14 +5297,8 @@ async function startMode(nextMode) {
                     `<div class="leaderboard-name-row"><strong>${escapeHtml(entry.fullName)}</strong></div>` +
                     `<span class="leaderboard-branch">${escapeHtml(entry.branch)}</span>` +
                     `</div>` +
-                    `<span class="leaderboard-score-large">${scoreText}</span>` +
-                    `<button class="leaderboard-profile-btn" type="button" aria-label="Открыть профиль ученика" title="Открыть профиль ученика">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                    </button>`;
-                row.addEventListener("click", (e) => {
-                    if (e.target.closest('.leaderboard-profile-btn')) return;
-                    showPublicProfile(entry.key);
-                });
+                    `<span class="leaderboard-score-large">${scoreText}</span>`;
+                row.addEventListener("click", () => showPublicProfile(entry.key));
                 list.appendChild(row);
             });
         }
@@ -6188,31 +6054,6 @@ const PROFILE_COMBINATIONS = [
                 socialsContainer.appendChild(a);
             }
 
-            // Stats
-            const statsContainer = document.getElementById("publicProfileStats");
-            statsContainer.innerHTML = "";
-            const learnedIds = new Set(Array.isArray(account.learned) ? account.learned : []);
-            const totalQuestions = questions.length;
-            const learnedCount = [...learnedIds].filter(id => questions.some(q => q.id === id)).length;
-            const errors = Number(account.errors || 0);
-            const timeSeconds = Number(account.timeSeconds || 0);
-            const examResults = Array.isArray(account.examResults) ? account.examResults : [];
-            const bestExam = examResults.length ? Math.max(...examResults.map(r => Number(r.score || 0))) : 0;
-
-            const stats = [
-                { value: learnedCount, label: "Выучено" },
-                { value: `${bestExam}%`, label: "Лучший тест" },
-                { value: formatSiteTime(timeSeconds), label: "Время" },
-                { value: errors, label: "Ошибки" }
-            ];
-
-            stats.forEach(stat => {
-                const div = document.createElement("div");
-                div.className = "public-profile-stat";
-                div.innerHTML = `<span class="public-profile-stat-value">${stat.value}</span><span class="public-profile-stat-label">${stat.label}</span>`;
-                statsContainer.appendChild(div);
-            });
-
             document.getElementById("publicProfileOverlay").classList.add("visible");
         }
         
@@ -6230,13 +6071,6 @@ const PROFILE_COMBINATIONS = [
         });
         
         document.getElementById("soundBtn").addEventListener("click", () => {
-            soundEnabled = !soundEnabled;
-            localStorage.setItem(SOUND_STORAGE_KEY, String(soundEnabled));
-            updateSoundButton();
-            if (soundEnabled) playTone("correct");
-        });
-
-        document.getElementById("soundBtnDesktop").addEventListener("click", () => {
             soundEnabled = !soundEnabled;
             localStorage.setItem(SOUND_STORAGE_KEY, String(soundEnabled));
             updateSoundButton();
