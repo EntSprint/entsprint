@@ -1612,7 +1612,7 @@
 
         .progress-ring-stats {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(2, 1fr);
             gap: 8px;
         }
 
@@ -1765,13 +1765,15 @@
             .stats-grid { grid-template-columns: repeat(3, 1fr); }
         }
 
-        @media (min-width: 1200px) {
-            .practice-grid { grid-template-columns: 1fr; }
-            .practice-side { position: static; }
+        @media (min-width: 900px) {
+            .practice-grid {
+                grid-template-columns: minmax(0, 1fr) 320px;
+            }
+            .practice-side { position: sticky; top: 24px; }
             .options { grid-template-columns: 1fr 1fr; gap: 14px; }
         }
 
-        @media (max-width: 768px) {
+        @media (max-width: 899px) {
             .practice-grid { grid-template-columns: 1fr; }
             .practice-side { position: static; }
         }
@@ -2406,14 +2408,22 @@
 
             .card {
                 grid-column: 2;
+                max-width: 1120px;
                 margin: 24px auto;
                 border-radius: 16px;
                 min-height: calc(100vh - 120px);
             }
 
+            .practice-main .card {
+                grid-column: auto;
+                max-width: none;
+                margin: 0;
+                min-height: auto;
+            }
+
             .progress-page, .leaderboard-page, .creator-page, .menu-page {
                 grid-column: 2;
-                max-width: 760px;
+                max-width: 1200px;
                 margin: 24px auto;
                 border-radius: 16px;
                 min-height: calc(100vh - 120px);
@@ -2460,14 +2470,14 @@
             .progress-stat { min-height: 60px; padding: 14px 18px; font-size: 15px; }
             .progress-actions button { min-height: 56px; font-size: 15px; }
 
-            .leaderboard-page .leaderboard { max-width: 820px; margin: 0 auto; }
+            .leaderboard-page .leaderboard { max-width: 1000px; margin: 0 auto; }
             .leaderboard-card { padding: 16px 20px; }
             .leaderboard-place-large { width: 52px; height: 52px; font-size: 20px; }
             .leaderboard-avatar { width: 56px; height: 56px; }
             .leaderboard-name-row strong { font-size: 16px; }
             .leaderboard-branch { font-size: 13px; }
             .leaderboard-score-large { font-size: 20px; }
-            .leaderboard-filters-new { max-width: 760px; margin: 16px auto 0; }
+            .leaderboard-filters-new { max-width: 1000px; margin: 16px auto 0; }
 
             .creator-page { padding: 40px 48px; text-align: left; }
             .creator-mascot-new { width: 160px; height: 160px; margin: 0 0 24px; }
@@ -2872,10 +2882,6 @@
                         <div class="progress-ring-stat">
                             <span class="progress-ring-stat-value" id="statBestExam">0%</span>
                             <span class="progress-ring-stat-label">Результат тестов</span>
-                        </div>
-                        <div class="progress-ring-stat">
-                            <span class="progress-ring-stat-value" id="statStudyTime">0 мин</span>
-                            <span class="progress-ring-stat-label">Время обучения</span>
                         </div>
                     </div>
                 </div>
@@ -5004,10 +5010,6 @@
                 }
             }
             document.getElementById("statBestExam").textContent = `${bestExam}%`;
-
-            // Study time
-            const studySeconds = getSiteTimeForProfile(profile);
-            document.getElementById("statStudyTime").textContent = formatSiteTime(studySeconds);
         }
 
         function renderMenuProfile() {
