@@ -275,7 +275,6 @@
             justify-content: center;
             transition: background 120ms ease, border-color 120ms ease, color 120ms ease;
         }
-        #cardSoundBtn { display: none; }
         .nav-icon {
             width: 20px;
             height: 20px;
@@ -544,6 +543,13 @@
         }
         .profile-editor-field input:focus,
         .profile-editor-field textarea:focus { outline: none; border-color: var(--primary); }
+        .profile-editor-field select { color-scheme: dark; }
+        .profile-editor-field input[autocomplete="off"],
+        .profile-editor-field textarea[autocomplete="off"] { color-scheme: dark; }
+
+        .profile-editor-section { margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid var(--card-border); }
+        .profile-editor-section:last-of-type { border-bottom: none; margin-bottom: 8px; padding-bottom: 0; }
+        .profile-editor-section-title { margin: 0 0 12px; font-size: 14px; font-weight: 700; color: var(--text); opacity: 0.8; }
         .profile-subject-select {
             width: 100%;
             padding: 12px 14px;
@@ -1453,8 +1459,15 @@
             display: none;
             flex-direction: column;
             gap: 16px;
-            width: 300px;
+            width: 320px;
             flex-shrink: 0;
+        }
+
+        .practice-side {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            width: 100%;
         }
 
         .practice-sidebar-card {
@@ -1590,7 +1603,7 @@
         @media (min-width: 1100px) {
             .card {
                 display: grid;
-                grid-template-columns: minmax(0, 1fr) 300px;
+                grid-template-columns: minmax(0, 1fr) 320px;
                 gap: 24px;
                 align-items: start;
             }
@@ -1605,9 +1618,10 @@
                 display: flex;
                 grid-column: 2;
                 position: sticky;
-                top: 100px;
+                top: 24px;
                 max-height: calc(100vh - 140px);
                 overflow-y: auto;
+                align-self: start;
             }
 
             .card-head {
@@ -1616,6 +1630,81 @@
 
             .lesson-unlock-panel {
                 grid-column: 1 / -1;
+            }
+        }
+
+        @media (min-width: 1200px) {
+            .app {
+                max-width: 1400px;
+                margin-left: 240px;
+            }
+
+            .subject-switch,
+            .mode-switch {
+                max-width: none;
+                margin-left: 0;
+                margin-right: 0;
+                padding-left: 24px;
+                padding-right: 24px;
+            }
+
+            .card {
+                max-width: none;
+                margin-left: 0;
+                margin-right: 0;
+            }
+
+            .progress-page, .leaderboard-page, .creator-page, .menu-page {
+                max-width: 1100px;
+                margin-left: auto;
+                margin-right: auto;
+            }
+
+            .leaderboard-page {
+                max-width: 1100px;
+            }
+
+            .leaderboard-page .leaderboard {
+                max-width: none;
+            }
+
+            .leaderboard-card {
+                padding: 16px 20px;
+            }
+
+            .creator-page {
+                display: grid;
+                grid-template-columns: 360px 1fr;
+                gap: 24px;
+                align-items: start;
+                padding: 40px 48px;
+                text-align: left;
+            }
+
+            .creator-author-card {
+                margin-bottom: 0;
+                position: sticky;
+                top: 24px;
+                align-self: start;
+            }
+
+            .feedback-section {
+                margin-top: 0;
+            }
+
+            .reviews-section {
+                margin-top: 20px;
+            }
+
+            .menu-page {
+                max-width: 1000px;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(4, 1fr);
+                max-width: none;
+                margin-left: 0;
+                margin-right: 0;
             }
         }
 
@@ -1922,6 +2011,8 @@
         }
         .confirm-cancel { border: 1px solid var(--card-border); background: var(--card); color: var(--text); }
         .confirm-submit { border: 0; background: var(--error); color: #fff; }
+        .confirm-danger { background: var(--error); color: #fff; }
+        .confirm-danger:hover { background: var(--error-hover, #DC2626); }
 
         .results {
             display: none;
@@ -2363,8 +2454,6 @@
             .leaderboard-score-large { font-size: 20px; }
             .leaderboard-filters-new { max-width: 760px; margin: 16px auto 0; }
 
-            #cardSoundBtn { display: flex; }
-
             .creator-page { padding: 40px 48px; text-align: left; }
             .creator-mascot-new { width: 160px; height: 160px; margin: 0 0 24px; }
             .creator-page h2 { font-size: 28px; }
@@ -2501,7 +2590,7 @@
         /* ===== MOBILE: @media (max-width: 899px) ===== */
         @media (max-width: 899px) {
             html, body { overflow-x: hidden; }
-            .app { padding-bottom: calc(90px + env(safe-area-inset-bottom)); }
+            .app { padding-bottom: calc(106px + env(safe-area-inset-bottom)); }
 
             .sidebar-profile { display: none; }
 
@@ -2512,12 +2601,37 @@
             .admin-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
             .feedback-list { overflow-x: hidden; }
 
-            .leaderboard-card { padding: 12px 14px; gap: 10px; }
+            .leaderboard-card {
+                padding: 12px 14px;
+                gap: 10px;
+                flex-direction: column;
+                align-items: flex-start;
+            }
             .leaderboard-place-large { width: 40px; height: 40px; font-size: 16px; }
             .leaderboard-avatar { width: 44px; height: 44px; }
-            .leaderboard-name-row strong { font-size: 14px; }
-            .leaderboard-branch { font-size: 11px; }
-            .leaderboard-score-large { font-size: 16px; }
+            .leaderboard-name-row {
+                width: 100%;
+                display: flex;
+                flex-direction: column;
+                gap: 2px;
+            }
+            .leaderboard-name-row strong {
+                font-size: 14px;
+                white-space: normal;
+                overflow: visible;
+                text-overflow: clip;
+            }
+            .leaderboard-branch {
+                font-size: 11px;
+                white-space: normal;
+                overflow: visible;
+                text-overflow: clip;
+            }
+            .leaderboard-score-large {
+                font-size: 16px;
+                align-self: flex-end;
+                margin-top: 4px;
+            }
             .leaderboard-filters-new { gap: 6px; }
             .leaderboard-filter-btn { min-height: 32px; padding: 0 12px; font-size: 12px; }
 
@@ -2550,6 +2664,30 @@
             .profile-action-btn { min-height: 44px; font-size: 13px; }
 
             .nav-btn { width: 25%; min-width: 0; }
+
+            /* Question and options readability */
+            .question {
+                font-size: clamp(22px, 6vw, 28px);
+                line-height: 1.3;
+            }
+            .option {
+                min-height: 56px;
+                padding: 12px 14px;
+                font-size: 17px;
+            }
+            .options { gap: 12px; }
+            .card { padding-bottom: 18px; }
+            .quiz { padding: 20px 16px 24px; }
+        }
+
+        @media (max-width: 480px) {
+            .subject-btn { min-height: 44px; font-size: 13px; }
+            .mode-btn { min-height: 40px; font-size: 13px; }
+            .mode-switch { gap: 3px; padding: 3px; }
+            .question { font-size: clamp(20px, 5.5vw, 26px); }
+            .option { min-height: 52px; padding: 10px 12px; font-size: 16px; }
+            .options { gap: 10px; }
+            .quiz { padding: 16px 14px 20px; }
         }
 
         /* ===== HOVER EFFECTS FOR ALL INTERACTIVE ELEMENTS ===== */
@@ -2697,9 +2835,6 @@
                     <span id="progressText"></span>
                     <time class="timer" id="timer">60:00</time>
                 </div>
-                <button class="sound-btn" id="cardSoundBtn" type="button" aria-label="Звук">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 010 7"/><path d="M18 6a8 8 0 010 12"/></svg>
-                </button>
             </div>
             <div class="lesson-unlock-panel" id="lessonUnlockPanel" style="display:none"></div>
 
@@ -2742,34 +2877,36 @@
             </div>
 
             <aside class="practice-sidebar" id="practiceSidebar" aria-label="Статистика ученика">
-                <div class="practice-sidebar-card" id="progressCard">
-                    <h3 class="practice-sidebar-title">Твой прогресс</h3>
-                    <div class="progress-ring-wrap">
-                        <svg class="progress-ring" viewBox="0 0 120 120" role="img" aria-labelledby="progressRingTitle">
-                            <title id="progressRingTitle">Прогресс выученных вопросов</title>
-                            <circle class="progress-ring-bg" cx="60" cy="60" r="54" fill="none" stroke="var(--card-border)" stroke-width="12"/>
-                            <circle class="progress-ring-fill" cx="60" cy="60" r="54" fill="none" stroke="var(--primary)" stroke-width="12" stroke-linecap="round" stroke-dasharray="339.3" stroke-dashoffset="339.3" transform="rotate(-90 60 60)"/>
-                        </svg>
-                        <div class="progress-ring-value" id="progressRingValue">0%</div>
+                <div class="practice-side">
+                    <div class="practice-sidebar-card" id="progressCard">
+                        <h3 class="practice-sidebar-title">Твой прогресс</h3>
+                        <div class="progress-ring-wrap">
+                            <svg class="progress-ring" viewBox="0 0 120 120" role="img" aria-labelledby="progressRingTitle">
+                                <title id="progressRingTitle">Прогресс выученных вопросов</title>
+                                <circle class="progress-ring-bg" cx="60" cy="60" r="54" fill="none" stroke="var(--card-border)" stroke-width="12"/>
+                                <circle class="progress-ring-fill" cx="60" cy="60" r="54" fill="none" stroke="var(--primary)" stroke-width="12" stroke-linecap="round" stroke-dasharray="339.3" stroke-dashoffset="339.3" transform="rotate(-90 60 60)"/>
+                            </svg>
+                            <div class="progress-ring-value" id="progressRingValue">0%</div>
+                        </div>
+                        <div class="progress-ring-stats">
+                            <div class="progress-ring-stat">
+                                <span class="progress-ring-stat-value" id="statLearned">0</span>
+                                <span class="progress-ring-stat-label">Выучено</span>
+                            </div>
+                            <div class="progress-ring-stat">
+                                <span class="progress-ring-stat-value" id="statBestExam">0%</span>
+                                <span class="progress-ring-stat-label">Результат тестов</span>
+                            </div>
+                            <div class="progress-ring-stat">
+                                <span class="progress-ring-stat-value" id="statStudyTime">0 мин</span>
+                                <span class="progress-ring-stat-label">Время обучения</span>
+                            </div>
+                        </div>
                     </div>
-                    <div class="progress-ring-stats">
-                        <div class="progress-ring-stat">
-                            <span class="progress-ring-stat-value" id="statLearned">0</span>
-                            <span class="progress-ring-stat-label">Выучено</span>
-                        </div>
-                        <div class="progress-ring-stat">
-                            <span class="progress-ring-stat-value" id="statBestExam">0%</span>
-                            <span class="progress-ring-stat-label">Результат тестов</span>
-                        </div>
-                        <div class="progress-ring-stat">
-                            <span class="progress-ring-stat-value" id="statStudyTime">0 мин</span>
-                            <span class="progress-ring-stat-label">Время обучения</span>
-                        </div>
+                    <div class="practice-sidebar-card" id="weakTopicsCard">
+                        <h3 class="practice-sidebar-title">Слабые темы</h3>
+                        <div class="weak-topics-list" id="weakTopicsList"></div>
                     </div>
-                </div>
-                <div class="practice-sidebar-card" id="weakTopicsCard">
-                    <h3 class="practice-sidebar-title">Слабые темы</h3>
-                    <div class="weak-topics-list" id="weakTopicsList"></div>
                 </div>
             </aside>
         </section>
@@ -2865,27 +3002,43 @@
 
             <div class="profile-editor" id="profileEditorMenu" style="display:none; margin-top: 24px;">
                 <h3 class="progress-heading">Редактировать профиль</h3>
-                <div class="profile-editor-avatar">
-                    <label>Аватарка</label>
-                    <div class="avatar-options" id="avatarOptionsMenu"></div>
-                    <input type="hidden" id="profileAvatarInputMenu" value="">
+                
+                <!-- Блок 1: Аватар -->
+                <div class="profile-editor-section">
+                    <h4 class="profile-editor-section-title">Аватар</h4>
+                    <div class="profile-editor-avatar">
+                        <label>Аватарка</label>
+                        <div class="avatar-options" id="avatarOptionsMenu"></div>
+                        <input type="hidden" id="profileAvatarInputMenu" value="">
+                    </div>
                 </div>
-                <div class="profile-editor-field">
-                    <label for="profileBioInputMenu">О себе</label>
-                    <textarea id="profileBioInputMenu" maxlength="500" placeholder="Расскажите о себе..."></textarea>
+                
+                <!-- Блок 2: Профильные предметы -->
+                <div class="profile-editor-section">
+                    <h4 class="profile-editor-section-title">Профильные предметы</h4>
+                    <div class="profile-editor-field">
+                        <label>Профильная комбинация</label>
+                        <div class="subject-checkboxes" id="subjectCheckboxesMenu"></div>
+                    </div>
                 </div>
-                <div class="profile-editor-field">
-                    <label>Профильные предметы</label>
-                    <div class="subject-checkboxes" id="subjectCheckboxesMenu"></div>
+                
+                <!-- Блок 3: О себе и соцсети -->
+                <div class="profile-editor-section">
+                    <h4 class="profile-editor-section-title">О себе и соцсети</h4>
+                    <div class="profile-editor-field">
+                        <label for="profileBioInputMenu">О себе</label>
+                        <textarea id="profileBioInputMenu" maxlength="500" placeholder="Расскажите о себе..." autocomplete="off" style="color-scheme: dark;"></textarea>
+                    </div>
+                    <div class="profile-editor-field">
+                        <label for="profileInstagramInputMenu">Instagram</label>
+                        <input type="text" id="profileInstagramInputMenu" placeholder="@username или ссылка на профиль" autocomplete="off" style="color-scheme: dark;">
+                    </div>
+                    <div class="profile-editor-field">
+                        <label for="profileTikTokInputMenu">TikTok</label>
+                        <input type="text" id="profileTikTokInputMenu" placeholder="@username или ссылка на профиль" autocomplete="off" style="color-scheme: dark;">
+                    </div>
                 </div>
-                <div class="profile-editor-field">
-                    <label for="profileInstagramInputMenu">Instagram</label>
-                    <input type="text" id="profileInstagramInputMenu" placeholder="@username или ссылка на профиль">
-                </div>
-                <div class="profile-editor-field">
-                    <label for="profileTikTokInputMenu">TikTok</label>
-                    <input type="text" id="profileTikTokInputMenu" placeholder="@username или ссылка на профиль">
-                </div>
+                
                 <div class="profile-editor-actions">
                     <button class="save-profile" id="saveProfileBtnMenu" type="button">Сохранить</button>
                     <button class="cancel-profile" id="cancelProfileBtnMenu" type="button">Отмена</button>
@@ -2900,6 +3053,15 @@
         <div class="confirm-actions">
             <button class="confirm-cancel" id="cancelFinishBtn" type="button">Отмена</button>
             <button class="confirm-submit" id="confirmFinishBtn" type="button">Подтвердить</button>
+        </div>
+    </dialog>
+
+    <dialog class="confirm-dialog" id="genericConfirmDialog">
+        <h2 id="genericConfirmTitle">Подтверждение</h2>
+        <p id="genericConfirmText">Вы уверены?</p>
+        <div class="confirm-actions">
+            <button class="confirm-cancel" id="genericCancelBtn" type="button">Отмена</button>
+            <button class="confirm-submit confirm-danger" id="genericConfirmBtn" type="button">Подтвердить</button>
         </div>
     </dialog>
 
@@ -2951,9 +3113,6 @@
                         <span class="sidebar-profile-branch" id="sidebarProfileBranch"></span>
                     </div>
                 </div>
-                <button class="sidebar-sound-btn" id="sidebarSoundBtn" type="button" aria-label="Звук">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 010 7"/><path d="M18 6a8 8 0 010 12"/></svg>
-                </button>
             </div>
         </div>
     </nav>
@@ -3063,6 +3222,8 @@
     </div>
 
     <script src="./config.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
     <script>
         const TELEGRAM_GROUP_URL = "https://t.me/+KF7vF9u7-HUyN2Vi";
         const STREAK_STORAGE_KEY = "ent_streaks_v2";
@@ -3076,6 +3237,7 @@
         const SESSION_STORAGE_KEY = "ent_session_v2";
         const SITE_TIME_STORAGE_KEY = "ent_site_time_v2";
         const FEEDBACK_STORAGE_KEY = "ent_feedback_v2";
+        const ACTIVE_DAYS_STORAGE_KEY = "ent_active_days_v2";
         const NAV_STORAGE_KEY = "gradeup_active_nav";
         const MODE_STORAGE_KEY = "gradeup_active_mode";
         const UNLOCK_LEARNED_SHARE = 0.8;
@@ -3144,6 +3306,123 @@
                 window.ENTSPRINT_CONFIG.provider === "firebase_firestore" &&
                 window.ENTSPRINT_CONFIG.endpoint
             );
+        }
+
+        function initFirebase() {
+            if (window.__firebaseInitialized) return;
+            if (!cloudIsConfigured()) return;
+            try {
+                firebase.initializeApp({
+                    apiKey: window.ENTSPRINT_CONFIG.apiKey,
+                    projectId: "entsprint-1ad47"
+                });
+                window.__firebaseInitialized = true;
+            } catch (e) {
+                if (e.code !== "app/duplicate-app") console.warn("Firebase init:", e);
+            }
+        }
+
+        function startLeadersRealtime() {
+            if (window.__leadersUnsub) return;
+            initFirebase();
+            if (!window.__firebaseInitialized || !firebase.apps.length) {
+                startLeadersPollFallback();
+                return;
+            }
+            const db = firebase.firestore();
+            const docRef = db.collection("entsprint").doc("accounts_v2");
+            window.__leadersUnsub = docRef.onSnapshot(snapshot => {
+                if (!snapshot.exists) {
+                    startLeadersPollFallback();
+                    return;
+                }
+                const data = snapshot.data();
+                const accountsField = data?.accounts;
+                let accounts = [];
+                if (typeof accountsField === "string") {
+                    try { accounts = JSON.parse(accountsField); } catch { accounts = []; }
+                } else if (Array.isArray(accountsField)) {
+                    accounts = accountsField;
+                }
+                const mergedEntries = buildLeaderboardEntries(accounts);
+                saveJson(LEADERBOARD_STORAGE_KEY, mergedEntries);
+                if (document.getElementById("leaderboardPage").classList.contains("visible")) {
+                    updateLeaderboardFilters(mergedEntries);
+                }
+            }, err => {
+                console.warn("Leaders realtime error:", err);
+                window.__leadersUnsub = null;
+                startLeadersPollFallback();
+            });
+        }
+
+        function startLeadersPollFallback() {
+            if (window.__leadersPoll) clearInterval(window.__leadersPoll);
+            window.__leadersPoll = setInterval(async () => {
+                try {
+                    const accounts = await getAvailableAccounts();
+                    const mergedEntries = buildLeaderboardEntries(accounts);
+                    saveJson(LEADERBOARD_STORAGE_KEY, mergedEntries);
+                    if (document.getElementById("leaderboardPage").classList.contains("visible")) {
+                        updateLeaderboardFilters(mergedEntries);
+                    }
+                } catch (e) {
+                    console.warn("Leaders poll error:", e);
+                }
+            }, 30000);
+        }
+
+        function buildLeaderboardEntries(accounts) {
+            const entriesByKey = new Map();
+            const activeDaysMap = loadJson(ACTIVE_DAYS_STORAGE_KEY, {});
+            (Array.isArray(accounts) ? accounts : []).forEach(account => {
+                const fullName = normalizeName(account.fullName || "");
+                const branch = normalizeName(account.branch || "");
+                if (!fullName || !branch) return;
+                const key = `${fullName}||${branch}`;
+                const learnedIds = new Set(Array.isArray(account.learned) ? account.learned : []);
+                const learnedCount = [...learnedIds].filter(id =>
+                    questions.some(q => q.id === id && subjectOf(q) === currentSubject)
+                ).length;
+                const profileActiveDays = activeDaysMap[key] || [];
+                entriesByKey.set(key, {
+                    key,
+                    fullName,
+                    branch,
+                    learned: learnedCount,
+                    errors: Number(account.errors || 0),
+                    timeSeconds: Number(account.timeSeconds || 0),
+                    activeDays: profileActiveDays.length,
+                    lessonStats: account.lessonStats || {},
+                    examResults: Array.isArray(account.examResults) ? account.examResults : [],
+                    avatar: account.avatar || "./assets/mascot_idle.png"
+                });
+            });
+            const localEntries = loadJson(LEADERBOARD_STORAGE_KEY, []);
+            (Array.isArray(localEntries) ? localEntries : []).forEach(entry => {
+                if (!entriesByKey.has(entry.key)) entriesByKey.set(entry.key, entry);
+            });
+            const profile = getProfile();
+            if (profile) {
+                const key = getProfileKey(profile);
+                const existing = entriesByKey.get(key);
+                const profileActiveDays = activeDaysMap[key] || [];
+                entriesByKey.set(key, {
+                    key,
+                    fullName: profile.fullName,
+                    branch: profile.branch,
+                    learned: [...learned].filter(id =>
+                        questions.some(q => q.id === id && subjectOf(q) === currentSubject)
+                    ).length,
+                    errors: errorCount,
+                    timeSeconds: getSiteTimeForProfile(profile),
+                    activeDays: profileActiveDays.length,
+                    lessonStats: existing?.lessonStats || {},
+                    examResults: existing?.examResults || [],
+                    avatar: profile.avatar || "./assets/mascot_idle.png"
+                });
+            }
+            return [...entriesByKey.values()];
         }
 
         async function loadCloudAccounts() {
@@ -3476,7 +3755,7 @@
 
             // Select first unlocked lesson by default (Урок 1)
             const firstUnlocked = lessons.find(l => isLessonUnlocked(l));
-            changeLessonCustom(firstUnlocked || "all");
+            changeLessonCustom(firstUnlocked || lessons[0] || "");
 
             if (mode === "progress") {
                 updateProgress();
@@ -3538,21 +3817,10 @@
             
             // Find first unlocked lesson as default
             const firstUnlocked = lessons.find(l => isLessonUnlocked(l));
-            const defaultLesson = firstUnlocked || "all";
+            const defaultLesson = firstUnlocked || (lessons[0] || "");
             const currentValue = preferredLesson || btn.dataset.value || defaultLesson;
 
             optionsContainer.innerHTML = "";
-
-            // Option: All lessons
-            if (lessons.length > 1) {
-                const allOption = document.createElement("button");
-                allOption.type = "button";
-                allOption.className = "lesson-option" + (currentValue === "all" ? " selected" : "");
-                allOption.dataset.value = "all";
-                allOption.innerHTML = `<span class="lesson-option-icon all">▤</span><span class="lesson-option-text">Все уроки</span>`;
-                allOption.addEventListener("click", () => selectLessonOption("all"));
-                optionsContainer.appendChild(allOption);
-            }
 
             lessons.forEach(lesson => {
                 const unlocked = isLessonUnlocked(lesson);
@@ -3593,7 +3861,7 @@
             // Update button label
             const label = document.getElementById("lessonSelectLabel");
             const selectedOpt = optionsContainer.querySelector(".lesson-option.selected");
-            label.textContent = selectedOpt ? selectedOpt.querySelector(".lesson-option-text").textContent : "Все уроки";
+            label.textContent = selectedOpt ? selectedOpt.querySelector(".lesson-option-text").textContent : (firstUnlocked || lessons[0] || "Уроки");
             btn.dataset.value = currentValue;
 
             // Close dropdown on outside click
@@ -3636,25 +3904,33 @@
             dropdown.hidden = true;
         }
 
+        // Close dropdown on Escape key
+        document.addEventListener("keydown", (e) => {
+            if (e.key === "Escape") {
+                closeLessonDropdown();
+            }
+        });
+
         function changeLessonCustom(value) {
             if (!confirmExitExam()) return;
             const lessons = getSubjectLessons(currentSubject);
-            const unlocked = value === "all" || isLessonUnlocked(value);
-
-            if (!unlocked) {
+            const firstUnlocked = lessons.find(l => isLessonUnlocked(l));
+            
+            // If value is locked or invalid, fall back to first unlocked lesson
+            let targetLesson = value;
+            if (!isLessonUnlocked(targetLesson)) {
+                targetLesson = firstUnlocked || lessons[0] || "";
+            }
+            
+            if (!targetLesson) {
                 rebuildLessonSelect();
-                document.getElementById("questionText").textContent = "Этот урок пока закрыт";
+                document.getElementById("questionText").textContent = "Нет доступных уроков";
                 return;
             }
 
-            baseQuestions = value === "all"
-                ? questions.filter(question =>
-                    subjectOf(question) === currentSubject &&
-                    isLessonUnlocked(question.lesson)
-                )
-                : questions.filter(question =>
-                    subjectOf(question) === currentSubject && question.lesson === value
-                );
+            baseQuestions = questions.filter(question =>
+                subjectOf(question) === currentSubject && question.lesson === targetLesson
+            );
             displayedQuestions = new Map();
             document.getElementById("empty").style.display = "none";
             document.getElementById("cardHead").style.display = "grid";
@@ -3670,7 +3946,7 @@
         }
 
         function getLessonSelectValue() {
-            return document.getElementById("lessonSelectBtn")?.dataset.value || "all";
+            return document.getElementById("lessonSelectBtn")?.dataset.value || "";
         }
 
         function showEmpty() {
@@ -3682,13 +3958,63 @@
 
         function confirmExitExam() {
             if (mode === "exam" && timerId && !examTerminated) {
-                return confirm("Экзамен ещё идёт. Выйти и сбросить текущий результат?");
+                const result = await showGenericConfirm(
+                    "Экзамен ещё идёт",
+                    "Выйти и сбросить текущий результат?",
+                    "Отмена",
+                    "Выйти и сбросить",
+                    true
+                );
+                return result;
             }
             return true;
         }
 
-        function startMode(nextMode) {
-            if (!confirmExitExam()) return;
+        let confirmExitExamCallback = null;
+
+        function showGenericConfirm(title, text, cancelText, confirmText, isDanger) {
+            return new Promise((resolve) => {
+                document.getElementById("genericConfirmTitle").textContent = title;
+                document.getElementById("genericConfirmText").textContent = text;
+                document.getElementById("genericCancelBtn").textContent = cancelText;
+                document.getElementById("genericConfirmBtn").textContent = confirmText;
+                document.getElementById("genericConfirmBtn").classList.toggle("confirm-danger", isDanger);
+
+                const dialog = document.getElementById("genericConfirmDialog");
+                const confirmBtn = document.getElementById("genericConfirmBtn");
+                const cancelBtn = document.getElementById("genericCancelBtn");
+
+                const cleanup = () => {
+                    dialog.close();
+                    confirmBtn.removeEventListener("click", onConfirm);
+                    cancelBtn.removeEventListener("click", onCancel);
+                    dialog.removeEventListener("close", onClose);
+                };
+
+                const onConfirm = () => {
+                    cleanup();
+                    resolve(true);
+                };
+                const onCancel = () => {
+                    cleanup();
+                    resolve(false);
+                };
+                const onClose = () => {
+                    cleanup();
+                    resolve(false);
+                };
+
+                confirmBtn.addEventListener("click", onConfirm, { once: true });
+                cancelBtn.addEventListener("click", onCancel, { once: true });
+                dialog.addEventListener("close", onClose, { once: true });
+
+                dialog.showModal();
+            });
+        }
+
+        async function startMode(nextMode) {
+            const canExit = await confirmExitExam();
+            if (!canExit) return;
             mode = nextMode;
             if (mode === "learn" || mode === "exam" || mode === "progress") {
                 sessionStorage.setItem(MODE_STORAGE_KEY, mode);
@@ -3708,6 +4034,7 @@
                 document.getElementById("menuPage").classList.remove("visible");
                 document.getElementById("creatorPage").classList.add("visible");
                 document.getElementById("creatorNav").classList.add("active");
+                window.__feedbackPage = 0;
                 renderFeedbackList().catch(() => {});
                 return;
             }
@@ -4332,7 +4659,7 @@
             }
             const list = document.getElementById("reviewsList");
             list.innerHTML = "";
-            const feedback = await loadFeedback();
+            let feedback = await loadFeedback();
             const reactions = await loadFeedbackReactions();
             const own = profile ? feedback.find(item => item.key === getProfileKey(profile)) : null;
             if (own) {
@@ -4343,32 +4670,59 @@
                 unblockFeedbackForm();
             }
             const userKey = profile ? getProfileKey(profile) : null;
-            feedback.sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0)).forEach(item => {
-                const date = item.date
-                    ? new Date(item.date).toLocaleDateString("ru-RU")
-                    : "";
-                const { counts, userReactions } = getReactionCounts(item.key, reactions);
-                const row = document.createElement("div");
-                row.className = "review-card";
-                row.innerHTML =
-                    `<div class="review-header">` +
-                    `<img class="review-avatar" src="./assets/mascot_idle.png" alt="" aria-hidden="true">` +
-                    `<div class="review-meta">` +
-                    `<div class="review-name-row"><strong>${escapeHtml(item.name || "Ученик")}</strong><span class="review-date">${escapeHtml(date)}</span></div>` +
-                    `<span class="review-branch">${escapeHtml(item.branch || "")}</span>` +
-                    `</div>` +
-                    `</div>` +
-                    `<div class="review-rating">${"★".repeat(Number(item.rating) || 0)}${"☆".repeat(Math.max(0, 5 - (Number(item.rating) || 0)))}</div>` +
-                    `<p class="review-text">${escapeHtml(item.text || "")}</p>` +
-                    `<div class="review-reactions" data-feedback-key="${escapeHtml(item.key)}">` +
-                    REACTION_TYPES.map(emoji => {
-                        const count = counts[emoji] || 0;
-                        const active = userReactions.has(emoji) ? "active" : "";
-                        return `<button type="button" class="review-reaction-btn ${active}" data-reaction="${escapeHtml(emoji)}" aria-label="${emoji}" ${userKey ? "" : "disabled"}>${emoji}<span class="review-reaction-count">${count}</span></button>`;
-                    }).join("") +
-                    `</div>`;
-                list.appendChild(row);
-            });
+            
+            // Pagination state
+            window.__feedbackPage = window.__feedbackPage || 0;
+            const pageSize = 10;
+            const totalFeedback = feedback.length;
+            const startIdx = window.__feedbackPage * pageSize;
+            const endIdx = startIdx + pageSize;
+            const pageFeedback = feedback.slice(startIdx, endIdx);
+            
+            if (pageFeedback.length === 0) {
+                list.innerHTML = '<div class="reviews-empty" style="text-align:center;padding:20px;color:var(--text-muted);">Пока нет отзывов — будь первым</div>';
+            } else {
+                pageFeedback.forEach(item => {
+                    const date = item.date
+                        ? new Date(item.date).toLocaleDateString("ru-RU")
+                        : "";
+                    const { counts, userReactions } = getReactionCounts(item.key, reactions);
+                    const row = document.createElement("div");
+                    row.className = "review-card";
+                    row.innerHTML =
+                        `<div class="review-header">` +
+                        `<img class="review-avatar" src="./assets/mascot_idle.png" alt="" aria-hidden="true">` +
+                        `<div class="review-meta">` +
+                        `<div class="review-name-row"><strong>${escapeHtml(item.name || "Ученик")}</strong><span class="review-date">${escapeHtml(date)}</span></div>` +
+                        `<span class="review-branch">${escapeHtml(item.branch || "")}</span>` +
+                        `</div>` +
+                        `</div>` +
+                        `<div class="review-rating">${"★".repeat(Number(item.rating) || 0)}${"☆".repeat(Math.max(0, 5 - (Number(item.rating) || 0)))}</div>` +
+                        `<p class="review-text">${escapeHtml(item.text || "")}</p>` +
+                        `<div class="review-reactions" data-feedback-key="${escapeHtml(item.key)}">` +
+                        REACTION_TYPES.map(emoji => {
+                            const count = counts[emoji] || 0;
+                            const active = userReactions.has(emoji) ? "active" : "";
+                            return `<button type="button" class="review-reaction-btn ${active}" data-reaction="${escapeHtml(emoji)}" aria-label="${emoji}" ${userKey ? "" : "disabled"}>${emoji}<span class="review-reaction-count">${count}</span></button>`;
+                        }).join("") +
+                        `</div>`;
+                    list.appendChild(row);
+                });
+            }
+
+            // Show more button
+            if (endIdx < totalFeedback) {
+                const showMoreBtn = document.createElement("button");
+                showMoreBtn.type = "button";
+                showMoreBtn.className = "show-more-feedback";
+                showMoreBtn.style.cssText = "width:100%;margin-top:12px;padding:10px;border:1px solid var(--card-border);border-radius:12px;background:var(--card);color:var(--primary);font-weight:700;cursor:pointer;";
+                showMoreBtn.textContent = `Показать ещё ${Math.min(pageSize, totalFeedback - endIdx)} из ${totalFeedback - endIdx}`;
+                showMoreBtn.addEventListener("click", () => {
+                    window.__feedbackPage++;
+                    renderFeedbackList();
+                });
+                list.appendChild(showMoreBtn);
+            }
 
             // Add event listeners for reaction buttons
             list.querySelectorAll(".review-reaction-btn").forEach(btn => {
@@ -4433,15 +4787,14 @@
         }
 
         function updateSoundButton() {
-            const buttons = document.querySelectorAll("#soundBtn, #sidebarSoundBtn");
+            const button = document.getElementById("soundBtn");
+            if (!button) return;
             const label = soundEnabled ? "Выключить звук" : "Включить звук";
-            buttons.forEach(button => {
-                button.title = label;
-                button.setAttribute("aria-label", label);
-                button.innerHTML = soundEnabled
-                    ? '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 010 7"/><path d="M18 6a8 8 0 010 12"/></svg>'
-                    : '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M16 9l5 6M21 9l-5 6"/></svg>';
-            });
+            button.title = label;
+            button.setAttribute("aria-label", label);
+            button.innerHTML = soundEnabled
+                ? '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 010 7"/><path d="M18 6a8 8 0 010 12"/></svg>'
+                : '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M16 9l5 6M21 9l-5 6"/></svg>';
         }
 
         function getProfile() {
@@ -4456,6 +4809,14 @@
             if (!profile) return 0;
             const timeByProfile = loadJson(SITE_TIME_STORAGE_KEY, {});
             return Number(timeByProfile[getProfileKey(profile)] || 0);
+        }
+
+        function getActiveDaysForProfile(profile) {
+            if (!profile) return 0;
+            const activeDaysMap = loadJson(ACTIVE_DAYS_STORAGE_KEY, {});
+            const key = getProfileKey(profile);
+            const days = activeDaysMap[key] || [];
+            return days.length;
         }
 
         function formatSiteTime(seconds) {
@@ -4474,11 +4835,22 @@
             timeByProfile[key] = Number(timeByProfile[key] || 0) + 30;
             saveJson(SITE_TIME_STORAGE_KEY, timeByProfile);
 
+            // Track active days
+            const dayKey = new Date().toISOString().split("T")[0];
+            const activeDaysMap = loadJson(ACTIVE_DAYS_STORAGE_KEY, {});
+            const profileActiveDays = activeDaysMap[key] || [];
+            if (!profileActiveDays.includes(dayKey)) {
+                profileActiveDays.push(dayKey);
+                activeDaysMap[key] = profileActiveDays;
+                saveJson(ACTIVE_DAYS_STORAGE_KEY, activeDaysMap);
+            }
+
             const entries = loadJson(LEADERBOARD_STORAGE_KEY, []);
             if (Array.isArray(entries)) {
                 const entry = entries.find(item => item.key === key);
                 if (entry) {
                     entry.timeSeconds = Number(timeByProfile[key] || 0);
+                    entry.activeDays = profileActiveDays.length;
                     entry.lessonTimeStats = entry.lessonTimeStats || {};
                     const lesson = getLessonSelectValue();
                     if (lesson) {
@@ -4767,8 +5139,7 @@
             const studySeconds = getSiteTimeForProfile(profile);
 
             // Active days (unique days with activity)
-            const streaksData = loadJson(STREAK_STORAGE_KEY, {});
-            const activeDays = Object.keys(streaksData).length;
+            const activeDays = getActiveDaysForProfile(profile);
 
             document.getElementById("statQuestionsLearned").textContent = learnedInSubject;
             document.getElementById("statBestExam").textContent = `${bestExam}%`;
@@ -4937,56 +5308,7 @@
                     accounts = loadJson(ACCOUNTS_STORAGE_KEY, []);
                 }
             }
-            const entriesByKey = new Map();
-            (Array.isArray(accounts) ? accounts : []).forEach(account => {
-                const fullName = normalizeName(account.fullName || "");
-                const branch = normalizeName(account.branch || "");
-                if (!fullName || !branch) return;
-                const key = `${fullName}||${branch}`;
-                const learnedIds = new Set(Array.isArray(account.learned) ? account.learned : []);
-                const learnedCount = [...learnedIds].filter(id =>
-                    questions.some(question =>
-                        question.id === id && subjectOf(question) === currentSubject
-                    )
-                ).length;
-                entriesByKey.set(key, {
-                    key,
-                    fullName,
-                    branch,
-                    learned: learnedCount,
-                    errors: Number(account.errors || 0),
-                    timeSeconds: Number(account.timeSeconds || 0),
-                    lessonStats: account.lessonStats || {},
-                    examResults: Array.isArray(account.examResults) ? account.examResults : [],
-                    avatar: account.avatar || "./assets/mascot_idle.png"
-                });
-            });
-            const localEntries = loadJson(LEADERBOARD_STORAGE_KEY, []);
-            (Array.isArray(localEntries) ? localEntries : []).forEach(entry => {
-                if (!entriesByKey.has(entry.key)) entriesByKey.set(entry.key, entry);
-            });
-            const profile = getProfile();
-            if (profile) {
-                const key = getProfileKey(profile);
-                const existing = entriesByKey.get(key);
-                const profileEntry = {
-                    key,
-                    fullName: profile.fullName,
-                    branch: profile.branch,
-                    learned: [...learned].filter(id =>
-                        questions.some(question =>
-                            question.id === id && subjectOf(question) === currentSubject
-                        )
-                    ).length,
-                    errors: errorCount,
-                    timeSeconds: getSiteTimeForProfile(profile),
-                    lessonStats: existing?.lessonStats || {},
-                    examResults: existing?.examResults || [],
-                    avatar: profile.avatar || "./assets/mascot_idle.png"
-                };
-                entriesByKey.set(key, profileEntry);
-            }
-            const mergedEntries = [...entriesByKey.values()];
+            const mergedEntries = buildLeaderboardEntries(accounts);
             saveJson(LEADERBOARD_STORAGE_KEY, mergedEntries);
             updateLeaderboardFilters(mergedEntries);
         }
@@ -5046,11 +5368,23 @@
         }
 
         document.querySelectorAll(".subject-btn").forEach(button => {
-            button.addEventListener("click", () => updateSubject(button.dataset.subject));
+            button.addEventListener("click", () => {
+                closeLessonDropdown();
+                updateSubject(button.dataset.subject);
+            });
         });
-        document.getElementById("learnMode").addEventListener("click", () => startMode("learn"));
-        document.getElementById("examMode").addEventListener("click", () => startMode("exam"));
-        document.getElementById("progressMode").addEventListener("click", () => startMode("progress"));
+        document.getElementById("learnMode").addEventListener("click", () => {
+            closeLessonDropdown();
+            startMode("learn");
+        });
+        document.getElementById("examMode").addEventListener("click", () => {
+            closeLessonDropdown();
+            startMode("exam");
+        });
+        document.getElementById("progressMode").addEventListener("click", () => {
+            closeLessonDropdown();
+            startMode("progress");
+        });
         document.getElementById("lessonSelectBtn").addEventListener("click", toggleLessonDropdown);
         document.getElementById("nextBtn").addEventListener("click", nextQuestion);
         document.getElementById("backBtn").addEventListener("click", previousQuestion);
@@ -5069,21 +5403,32 @@
         document.getElementById("confirmFinishBtn").addEventListener("click", () => {
             finishExam(false);
         });
-        document.getElementById("restartBtn").addEventListener("click", () => startMode(mode));
+        document.getElementById("restartBtn").addEventListener("click", () => {
+            closeLessonDropdown();
+            startMode(mode);
+        });
         document.getElementById("practiceNav").addEventListener("click", () => {
+            closeLessonDropdown();
             startMode("learn");
             document.getElementById("practiceNav").classList.add("active");
             sessionStorage.setItem(NAV_STORAGE_KEY, "practice");
         });
         document.getElementById("leadersNav").addEventListener("click", () => {
+            closeLessonDropdown();
             startMode("leaderboard");
             sessionStorage.setItem(NAV_STORAGE_KEY, "leaderboard");
+            // One off-cycle request if using fallback polling
+            if (window.__leadersPoll && !window.__leadersUnsub) {
+                updateLeaderboardFromCloud();
+            }
         });
         document.getElementById("creatorNav").addEventListener("click", () => {
+            closeLessonDropdown();
             startMode("creator");
             sessionStorage.setItem(NAV_STORAGE_KEY, "creator");
         });
         document.getElementById("menuNav").addEventListener("click", () => {
+            closeLessonDropdown();
             startMode("profile");
             sessionStorage.setItem(NAV_STORAGE_KEY, "profile");
         });
@@ -5187,6 +5532,30 @@
             saveJson(SESSION_STORAGE_KEY, fullName);
             document.getElementById("welcomeOverlay").classList.remove("visible");
             updateProgress();
+            
+            // Optimistically add new student to leaderboard state
+            const newProfile = getProfile();
+            if (newProfile) {
+                const entries = loadJson(LEADERBOARD_STORAGE_KEY, []);
+                const key = getProfileKey(newProfile);
+                if (!entries.find(e => e.key === key)) {
+                    entries.push({
+                        key,
+                        fullName: newProfile.fullName,
+                        branch: newProfile.branch,
+                        learned: 0,
+                        errors: 0,
+                        timeSeconds: 0,
+                        lessonStats: {},
+                        examResults: [],
+                        avatar: "./assets/mascot_idle.png"
+                    });
+                    saveJson(LEADERBOARD_STORAGE_KEY, entries);
+                    if (document.getElementById("leaderboardPage").classList.contains("visible")) {
+                        updateLeaderboardFilters(entries);
+                    }
+                }
+            }
 
             saveCloudAccounts(updatedAccounts).catch(error => {
                 console.warn("saveCloudAccounts: background sync failed", error);
@@ -5312,8 +5681,15 @@
         }
         const resetProgressBtn = document.getElementById("resetProgressBtn");
         if (resetProgressBtn) {
-            resetProgressBtn.addEventListener("click", () => {
-                if (!window.confirm("Сбросить выученные вопросы и счётчик ошибок?")) return;
+            resetProgressBtn.addEventListener("click", async () => {
+                const confirmed = await showGenericConfirm(
+                    "Сброс статистики",
+                    "Сбросить выученные вопросы и счётчик ошибок?",
+                    "Отмена",
+                    "Сбросить",
+                    true
+                );
+                if (!confirmed) return;
                 streaks = {};
                 learned = new Set();
                 errorCount = 0;
@@ -5365,6 +5741,8 @@ const PROFILE_COMBINATIONS = [
             const select = document.createElement("select");
             select.id = "profileSubjectSelect";
             select.className = "profile-subject-select";
+            select.autocomplete = "off";
+            select.style.colorScheme = "dark";
             select.innerHTML = '<option value="">Выберите профильную комбинацию</option>' +
                 PROFILE_COMBINATIONS.map(combo =>
                     `<option value="${combo}" ${combo === selectedCombination ? "selected" : ""}>${combo}</option>`
@@ -5500,6 +5878,8 @@ const PROFILE_COMBINATIONS = [
             const select = document.createElement("select");
             select.id = "profileSubjectSelectMenu";
             select.className = "profile-subject-select";
+            select.autocomplete = "off";
+            select.style.colorScheme = "dark";
             select.innerHTML = '<option value="">Выберите профильную комбинацию</option>' +
                 PROFILE_COMBINATIONS.map(combo =>
                     `<option value="${combo}" ${combo === selectedCombination ? "selected" : ""}>${combo}</option>`
@@ -5586,8 +5966,15 @@ const PROFILE_COMBINATIONS = [
             document.getElementById("welcomeOverlay").classList.add("visible");
         });
 
-        document.getElementById("resetProgressBtnMenu").addEventListener("click", () => {
-            if (!window.confirm("Сбросить выученные вопросы и счётчик ошибок?")) return;
+        document.getElementById("resetProgressBtnMenu").addEventListener("click", async () => {
+            const confirmed = await showGenericConfirm(
+                "Сброс статистики",
+                "Сбросить выученные вопросы и счётчик ошибок?",
+                "Отмена",
+                "Сбросить",
+                true
+            );
+            if (!confirmed) return;
             streaks = {};
             learned = new Set();
             errorCount = 0;
@@ -5680,20 +6067,6 @@ const PROFILE_COMBINATIONS = [
         });
         
         document.getElementById("soundBtn").addEventListener("click", () => {
-            soundEnabled = !soundEnabled;
-            localStorage.setItem(SOUND_STORAGE_KEY, String(soundEnabled));
-            updateSoundButton();
-            if (soundEnabled) playTone("correct");
-        });
-
-document.getElementById("sidebarSoundBtn")?.addEventListener("click", () => {
-            soundEnabled = !soundEnabled;
-            localStorage.setItem(SOUND_STORAGE_KEY, String(soundEnabled));
-            updateSoundButton();
-            if (soundEnabled) playTone("correct");
-        });
-
-        document.getElementById("cardSoundBtn")?.addEventListener("click", () => {
             soundEnabled = !soundEnabled;
             localStorage.setItem(SOUND_STORAGE_KEY, String(soundEnabled));
             updateSoundButton();
@@ -5955,6 +6328,7 @@ document.getElementById("sidebarSoundBtn")?.addEventListener("click", () => {
         async function boot() {
             await loadQuestions();
             initializeProfile();
+            startLeadersRealtime();
             // Ensure sidebar profile is rendered on load if user is logged in
             if (getProfile()) {
                 renderMenuProfile();
