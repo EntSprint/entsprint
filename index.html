@@ -56,17 +56,6 @@
         .question-mascot-large.happy { border-color: var(--success); animation: mascot-jump 500ms ease; }
         .question-mascot.sad,
         .question-mascot-large.sad { border-color: var(--error); animation: mascot-shake 500ms ease; }
-        .lesson-unlock-panel {
-            margin: 10px 14px 0;
-            border: 1px solid var(--card-border);
-            border-radius: 12px;
-            background: var(--card);
-            padding: 10px 12px;
-        }
-        .lesson-unlock-panel strong { display: block; margin-bottom: 8px; font-size: 12px; }
-        .unlock-row { display: grid; grid-template-columns: minmax(0, 1fr) 120px; align-items: center; gap: 8px; margin-top: 6px; font-size: 11px; }
-        .unlock-bar { height: 7px; overflow: hidden; border-radius: 999px; background: var(--card-border); }
-        .unlock-bar span { height: 100%; display: block; border-radius: 999px; background: var(--primary); }
 
         /* ===== Custom Lesson Select ===== */
         .lesson-select-wrapper {
@@ -352,37 +341,24 @@
 
         .practice-header {
             display: flex;
-            align-items: center;
-            justify-content: space-between;
+            flex-direction: column;
             gap: 12px;
-            margin-bottom: 12px;
-            flex-wrap: wrap;
+            width: 100%;
         }
         .practice-header .subject-switch {
-            flex: 1;
-            min-width: 0;
+            width: 100%;
         }
         .practice-header .mode-switch {
-            flex: 1;
-            min-width: 0;
+            width: 100%;
             margin-bottom: 0;
         }
         .sound-btn-header {
-            flex-shrink: 0;
+            display: none;
         }
 
         @media (max-width: 899px) {
-            .practice-header {
-                flex-direction: column;
-                align-items: stretch;
-            }
-            .practice-header .subject-switch,
-            .practice-header .mode-switch {
-                min-width: 0;
-                max-width: none;
-            }
             .sound-btn-header {
-                align-self: flex-end;
+                display: none;
             }
             .header .sound-btn {
                 display: flex;
@@ -511,6 +487,9 @@
             display: block !important;
         }
         body[data-tab="practice"][data-mode="progress"] .card {
+            display: none !important;
+        }
+        body[data-tab="practice"][data-mode="progress"] .practice-side {
             display: none !important;
         }
 
@@ -717,7 +696,7 @@
             text-align: center;
             padding: 12px;
             border-radius: 12px;
-            background: var(--bg);
+            background: var(--card);
         }
         .public-profile-stat-value {
             display: block;
@@ -968,7 +947,6 @@
             padding: 24px 18px 28px;
             text-align: center;
         }
-        .creator-page.visible { display: block; }
         .creator-mascot {
             width: 130px;
             height: 130px;
@@ -1134,7 +1112,7 @@
             border-radius: 16px;
             background: var(--card);
             cursor: pointer;
-            transition: all 120ms ease;
+            transition: border-color 120ms ease, background 120ms ease;
         }
         .leaderboard-card:hover { border-color: var(--primary); background: var(--card-hover); transform: translateX(2px); }
         .leaderboard-place-large {
@@ -1496,12 +1474,12 @@
 
         .stats-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: repeat(3, 1fr);
             gap: 12px;
             margin-bottom: 20px;
         }
         @media (min-width: 900px) {
-            .stats-grid { grid-template-columns: repeat(4, 1fr); max-width: 780px; margin-left: auto; margin-right: auto; }
+            .stats-grid { grid-template-columns: repeat(3, 1fr); max-width: 780px; margin-left: auto; margin-right: auto; }
         }
         .stat-card {
             display: flex;
@@ -1705,7 +1683,6 @@
             border-radius: 16px;
             background: var(--card);
             box-shadow: var(--shadow);
-            overflow: hidden;
         }
 
         .card-head {
@@ -1766,7 +1743,7 @@
 
         .creator-grid {
             display: grid;
-            grid-template-columns: 360px minmax(0, 1fr);
+            grid-template-columns: 1fr;
             gap: 24px;
             align-items: start;
             width: 100%;
@@ -1774,24 +1751,28 @@
             margin: 0 auto;
         }
 
+        @media (min-width: 1200px) {
+            .creator-grid {
+                grid-template-columns: 360px minmax(0, 1fr);
+            }
+        }
+
         .profile-container { width: 100%; max-width: 1000px; margin: 0 auto; }
 
-        .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
 
         @media (min-width: 900px) {
-            .options { grid-template-columns: 1fr 1fr; gap: 14px; }
-            .stats-grid { grid-template-columns: repeat(4, 1fr); }
+            .stats-grid { grid-template-columns: repeat(3, 1fr); }
         }
 
         @media (min-width: 1200px) {
-            .practice-grid,
-            .creator-grid { grid-template-columns: 1fr; }
+            .practice-grid { grid-template-columns: 1fr; }
             .practice-side { position: static; }
+            .options { grid-template-columns: 1fr 1fr; gap: 14px; }
         }
 
         @media (max-width: 768px) {
-            .practice-grid,
-            .creator-grid { grid-template-columns: 1fr; }
+            .practice-grid { grid-template-columns: 1fr; }
             .practice-side { position: static; }
         }
 
@@ -2409,20 +2390,22 @@
 
             .brand-logo { height: 40px; max-width: 220px; }
 
+            .practice-header {
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+                width: 100%;
+            }
+
             .subject-switch,
             .mode-switch {
-                grid-column: 2;
-                max-width: 760px;
-                margin-left: auto;
-                margin-right: auto;
-                padding: 12px 24px 0;
+                width: 100%;
             }
 
             .mode-switch { grid-template-columns: repeat(3, 1fr); }
 
             .card {
                 grid-column: 2;
-                max-width: 1120px;
                 margin: 24px auto;
                 border-radius: 16px;
                 min-height: calc(100vh - 120px);
@@ -2437,11 +2420,6 @@
             }
 
             .quiz { padding: 32px 40px 40px; }
-
-            .options {
-                grid-template-columns: 1fr 1fr;
-                gap: 14px;
-            }
 
             .option {
                 min-height: 64px;
@@ -2641,18 +2619,20 @@
             .feedback-list { overflow-x: hidden; }
 
             .leaderboard-card {
-                padding: 12px 14px;
+                display: grid;
+                grid-template-columns: 40px 44px minmax(0, 1fr) 32px;
+                align-items: center;
                 gap: 10px;
-                flex-direction: column;
-                align-items: flex-start;
+                padding: 12px 14px;
+                min-height: 72px;
             }
-            .leaderboard-place-large { width: 40px; height: 40px; font-size: 16px; }
+            .leaderboard-place-large { width: 40px; height: 40px; font-size: 16px; justify-self: center; }
             .leaderboard-avatar { width: 44px; height: 44px; }
             .leaderboard-name-row {
-                width: 100%;
                 display: flex;
                 flex-direction: column;
                 gap: 2px;
+                min-width: 0;
             }
             .leaderboard-name-row strong {
                 font-size: 14px;
@@ -2668,8 +2648,12 @@
             }
             .leaderboard-score-large {
                 font-size: 16px;
-                align-self: flex-end;
-                margin-top: 4px;
+                justify-self: center;
+            }
+            .leaderboard-profile-btn {
+                width: 32px;
+                height: 32px;
+                justify-self: end;
             }
             .leaderboard-filters-new { gap: 6px; }
             .leaderboard-filter-btn { min-height: 32px; padding: 0 12px; font-size: 12px; }
@@ -2683,6 +2667,7 @@
             .feedback-star-new { font-size: 26px; }
             .feedback-textarea { min-height: 90px; }
             .feedback-submit-new { min-height: 44px; font-size: 13px; }
+            .reviews-section { margin-top: 16px; }
             .review-card { padding: 14px; }
             .review-avatar { width: 36px; height: 36px; }
             .review-name-row strong { font-size: 13px; }
@@ -2792,21 +2777,22 @@
         </header>
 
         <section class="practice-page" id="practicePage" data-page="practice">
-            <div class="practice-header">
-                <div class="subject-switch">
-                    <button class="subject-btn active" type="button" data-subject="История Казахстана">История Казахстана</button>
-                    <button class="subject-btn" type="button" data-subject="Мат. грамотность">Мат. грамотность<span class="subject-badge">Скоро</span></button>
-                </div>
-
-                <div class="mode-switch">
-                    <button class="mode-btn active" id="learnMode" type="button">Заучивание</button>
-                    <button class="mode-btn" id="examMode" type="button">Тест</button>
-                    <button class="mode-btn" id="progressMode" type="button">Прогресс</button>
-                </div>
-            </div>
 
             <div class="practice-grid">
                 <div class="practice-main">
+                    <div class="practice-header">
+                        <div class="subject-switch">
+                            <button class="subject-btn active" type="button" data-subject="История Казахстана">История Казахстана</button>
+                            <button class="subject-btn" type="button" data-subject="Мат. грамотность">Мат. грамотность<span class="subject-badge">Скоро</span></button>
+                        </div>
+
+                        <div class="mode-switch">
+                            <button class="mode-btn active" id="learnMode" type="button">Заучивание</button>
+                            <button class="mode-btn" id="examMode" type="button">Тест</button>
+                            <button class="mode-btn" id="progressMode" type="button">Прогресс</button>
+                        </div>
+                    </div>
+
                     <div class="card" id="card">
                         <div class="card-head" id="cardHead">
                             <div class="lesson-select-wrapper" id="lessonSelectWrapper">
@@ -2826,7 +2812,6 @@
                     <time class="timer" id="timer">60:00</time>
                 </div>
             </div>
-            <div class="lesson-unlock-panel" id="lessonUnlockPanel" style="display:none"></div>
 
             <div class="quiz" id="quiz">
                 <div class="question-header">
@@ -2971,10 +2956,9 @@
                             </div>
                             <textarea id="feedbackTextNew" maxlength="1000" placeholder="Напиши, чего не хватает или что улучшить..." class="feedback-textarea"></textarea>
                             <button class="feedback-submit-new" id="feedbackSubmitNew" type="button">Отправить отзыв</button>
-                            <p class="feedback-message-new" id="feedbackMessageNew" role="status"></p>
-</div>
-            </div>
-        </section>
+<p class="feedback-message-new" id="feedbackMessageNew" role="status"></p>
+                        </div>
+                    </section>
 
                     <section class="reviews-section" aria-labelledby="reviewsTitle">
                         <div class="reviews-list" id="reviewsList"></div>
@@ -3026,22 +3010,15 @@
                     <div class="stat-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
                     </div>
-                    <div class="stat-value" id="statBestExam">0%</div>
+                    <div class="stat-value" id="statBestExamProfile">0%</div>
                     <div class="stat-label">Лучший результат</div>
                 </article>
                 <article class="stat-card">
                     <div class="stat-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                     </div>
-                    <div class="stat-value" id="statStudyTime">0 мин</div>
+                    <div class="stat-value" id="statStudyTimeProfile">0 мин</div>
                     <div class="stat-label">Время обучения</div>
-                </article>
-                <article class="stat-card">
-                    <div class="stat-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                    </div>
-                    <div class="stat-value" id="statActiveDays">0</div>
-                    <div class="stat-label" id="statActiveDaysLabel">Дней активности</div>
                 </article>
             </div>
 
@@ -4336,7 +4313,6 @@
                         }
                         updateProgress();
                         rebuildLessonSelect(getLessonSelectValue());
-                        updateLessonUnlockPanel();
                         saveAccountProgress(profile).catch(() => {});
                     } else {
                         requeueLearningQuestion();
@@ -4435,7 +4411,6 @@
             const finishedLesson = getLessonSelectValue();
             const finishedNumber = lessonNumber(finishedLesson);
             rebuildLessonSelect(finishedLesson);
-            updateLessonUnlockPanel();
             const nextLesson = getSubjectLessons(currentSubject).find(lesson =>
                 lessonNumber(lesson) === finishedNumber + 1
             );
@@ -4948,7 +4923,6 @@
             renderSubjectProgress("История Казахстана", "Hist");
             renderSubjectProgress("Мат. грамотность", "Math");
 
-            updateLessonUnlockPanel();
             updateLeaderboard(profile, null);
             renderPracticeSidebar();
         }
@@ -5115,77 +5089,8 @@
             const activeDays = getActiveDaysForProfile(profile);
 
             document.getElementById("statQuestionsLearned").textContent = learnedInSubject;
-            document.getElementById("statBestExam").textContent = `${bestExam}%`;
-            document.getElementById("statStudyTime").textContent = formatSiteTime(studySeconds);
-            document.getElementById("statActiveDays").textContent = activeDays;
-            document.getElementById("statActiveDaysLabel").textContent = `${activeDays} ${ruPlural(activeDays, ["день активности", "дня активности", "дней активности"])}`;
-        }
-
-        function updateLessonUnlockPanel() {
-            const panel = document.getElementById("lessonUnlockPanel");
-            if (!panel) return;
-            const lessons = getSubjectLessons(currentSubject);
-            const subjectQuestions = questions.filter(question => subjectOf(question) === currentSubject);
-            if (!subjectQuestions.length) {
-                panel.style.display = "none";
-                return;
-            }
-            // На экзамене панель прогресса уроков не нужна
-            if (mode === "exam") {
-                panel.style.display = "none";
-                return;
-            }
-            const nextLesson = lessons.find(lesson => !isLessonUnlocked(lesson));
-            if (!nextLesson) {
-                // Все уроки открыты - показываем только если всё выучено на 100%
-                const totalQuestions = subjectQuestions.length;
-                const totalLearned = subjectQuestions.filter(q => learned.has(q.id)).length;
-                if (totalLearned >= totalQuestions && totalQuestions > 0) {
-                    panel.style.display = "block";
-                    panel.innerHTML =
-                        '<strong>Все уроки открыты</strong>' +
-                        '<div class="unlock-row"><span>Прогресс завершён</span><div class="unlock-bar"><span style="width:100%"></span></div></div>';
-                } else {
-                    panel.style.display = "none";
-                }
-                return;
-            }
-            const number = lessonNumber(nextLesson);
-            const previousLesson = lessons.find(lesson => lessonNumber(lesson) === number - 1);
-            if (!previousLesson) {
-                const currentLessonQuestions = subjectQuestions.filter(q => q.lesson === nextLesson);
-                const currentLearned = currentLessonQuestions.filter(q => learned.has(q.id)).length;
-                const currentTotal = currentLessonQuestions.length;
-                if (currentTotal > 0) {
-                    const percent = Math.min(100, Math.round((currentLearned / currentTotal) * 100));
-                    panel.style.display = "block";
-                    panel.innerHTML =
-                        `<strong>${escapeHtml(nextLesson)}: выучено ${currentLearned}/${currentTotal}</strong>` +
-                        `<div class="unlock-row"><span>Выучено ${currentLearned}/${currentTotal}</span><div class="unlock-bar"><span style="width:${percent}%"></span></div></div>`;
-                } else {
-                    panel.style.display = "none";
-                }
-                return;
-            }
-            const previousQuestions = questions.filter(question =>
-                subjectOf(question) === currentSubject && question.lesson === previousLesson
-            );
-            const learnedCount = previousQuestions.filter(question => learned.has(question.id)).length;
-            const required = Math.ceil(UNLOCK_LEARNED_SHARE * previousQuestions.length);
-            const results = getProfileExamResults().filter(result =>
-                result.lesson === previousLesson
-            );
-            const bestScore = results.reduce((best, result) =>
-                Math.max(best, Number(result.score || 0)), 0);
-            const learnedPercent = required
-                ? Math.min(100, Math.round((learnedCount / required) * 100))
-                : 100;
-            const examPercent = Math.min(100, Math.round((bestScore / UNLOCK_EXAM_SCORE) * 100));
-            panel.style.display = "block";
-            panel.innerHTML =
-                `<strong>${escapeHtml(nextLesson)}: выучено ${learnedCount}/${required} · экзамен ${bestScore}%/${UNLOCK_EXAM_SCORE}%</strong>` +
-                `<div class="unlock-row"><span>Выучено ${learnedCount}/${required}</span><div class="unlock-bar"><span style="width:${learnedPercent}%"></span></div></div>` +
-                `<div class="unlock-row"><span>Экзамен ${bestScore}%/${UNLOCK_EXAM_SCORE}%</span><div class="unlock-bar"><span style="width:${examPercent}%"></span></div></div>`;
+            document.getElementById("statBestExamProfile").textContent = `${bestExam}%`;
+            document.getElementById("statStudyTimeProfile").textContent = formatSiteTime(studySeconds);
         }
 
         function updateLeaderboard(profile, learnedInSubject, entriesOverride = null) {
