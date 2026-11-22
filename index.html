@@ -1137,6 +1137,8 @@
             font-size: 20px;
             font-weight: 700;
             color: var(--text);
+            word-break: normal;
+            overflow-wrap: normal;
         }
         .creator-badge {
             display: inline-flex;
@@ -1155,6 +1157,8 @@
             font-size: 14px;
             line-height: 1.5;
             max-width: 480px;
+            word-break: normal;
+            overflow-wrap: normal;
         }
         .creator-telegram-btn-new {
             display: inline-flex;
@@ -1655,7 +1659,7 @@
             }
 
             .progress-page, .leaderboard-page, .creator-page, .menu-page {
-                max-width: 1100px;
+                max-width: 1000px;
                 margin-left: auto;
                 margin-right: auto;
             }
@@ -2821,7 +2825,7 @@
             <div class="card-head" id="cardHead">
                 <div class="lesson-select-wrapper" id="lessonSelectWrapper">
                     <button type="button" class="lesson-select-btn" id="lessonSelectBtn" aria-haspopup="listbox" aria-expanded="false" aria-label="Выбор урока">
-                        <span class="lesson-select-label" id="lessonSelectLabel">Все уроки</span>
+                        <span class="lesson-select-label" id="lessonSelectLabel">Уроки</span>
                         <span class="lesson-select-arrow" aria-hidden="true">▼</span>
                     </button>
                     <div class="lesson-select-dropdown" id="lessonSelectDropdown" role="listbox" aria-label="Список уроков" hidden>
@@ -3735,8 +3739,8 @@
             return question.subject || "История Казахстана";
         }
 
-        function updateSubject(subject) {
-            if (!confirmExitExam()) return;
+        async function updateSubject(subject) {
+            if (!await confirmExitExam()) return;
             currentSubject = subject;
             document.querySelectorAll(".subject-btn").forEach(button => {
                 button.classList.toggle("active", button.dataset.subject === subject);
@@ -3880,7 +3884,7 @@
 
             // Update button
             const selectedOpt = optionsContainer.querySelector(`[data-value="${value}"]`);
-            document.getElementById("lessonSelectLabel").textContent = selectedOpt ? selectedOpt.querySelector(".lesson-option-text").textContent : "Все уроки";
+            document.getElementById("lessonSelectLabel").textContent = selectedOpt ? selectedOpt.querySelector(".lesson-option-text").textContent : "Уроки";
             btn.dataset.value = value;
             btn.setAttribute("aria-expanded", "false");
             dropdown.hidden = true;
@@ -3911,8 +3915,8 @@
             }
         });
 
-        function changeLessonCustom(value) {
-            if (!confirmExitExam()) return;
+        async function changeLessonCustom(value) {
+            if (!await confirmExitExam()) return;
             const lessons = getSubjectLessons(currentSubject);
             const firstUnlocked = lessons.find(l => isLessonUnlocked(l));
             
@@ -3956,7 +3960,7 @@
             document.getElementById("empty").style.display = "grid";
         }
 
-        function confirmExitExam() {
+        async function confirmExitExam() {
             if (mode === "exam" && timerId && !examTerminated) {
                 const result = await showGenericConfirm(
                     "Экзамен ещё идёт",

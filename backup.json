@@ -1,0 +1,10 @@
+{
+  "name": "projects/entsprint-1ad47/databases/(default)/documents/entsprint/accounts_v2",
+  "fields": {
+    "accounts": {
+      "stringValue": "[{\"fullName\":\"Merey Ualikhanova\",\"branch\":\"Проспект Мангилик Ел, 17\",\"salt\":\"a5e9fc48437f3366c0baecff94b8511b\",\"hash\":\"eb201fd03ee951fea4a8f823ead304c3328e9c79b66d646fbcfd88cd117283cd\",\"streaks\":{},\"learned\":[],\"errors\":0,\"timeSeconds\":120,\"lessonStats\":{},\"examResults\":[]},{\"fullName\":\"Даниал Елубай\",\"branch\":\"Проспект Мангилик Ел, 17\",\"salt\":\"8ce52086d37b721990b5f3a6dab64d03\",\"hash\":\"0a6354af3811695ef6ec46cc14bbda808de26ab47806c0b8be5846468db982ec\",\"streaks\":{},\"learned\":[],\"errors\":0,\"timeSeconds\":240,\"lessonStats\":{},\"examResults\":[]},{\"fullName\":\"Булембеков Ансар\",\"branch\":\"Проспект Мангилик Ел, 17\",\"salt\":\"5f389c7f220941a9790225590c20ce86\",\"hash\":\"2117dc82690fd885f4205f0357d200eb5d847f4cbfde998baf11e7e4f2e3650d\",\"streaks\":{},\"learned\":[],\"errors\":0,\"timeSeconds\":150,\"lessonStats\":{},\"examResults\":[]},{\"fullName\":\"Мустафа Оразалы\",\"branch\":\"Проспект Мангилик Ел, 17\",\"salt\":\"45ea2f6814d504cc8d215bc8c5e142d4\",\"hash\":\"73bd67f77c4ca6f6098aeef141bbf35902b64a40b34a8891d77e80127f8e4bf3\",\"streaks\":{\"u1-34\":0},\"learned\":[],\"errors\":2,\"timeSeconds\":1740,\"lessonStats\":{},\"examResults\":[],\"avatar\":\"./assets/mascot_angry.png\",\"bio\":\"\",\"subjects\":[],\"combination\":\"\",\"instagram\":\"\",\"tiktok\":\"\"}]"
+    }
+  },
+  "createTime": "2026-11-19T14:28:46.691776Z",
+  "updateTime": "2026-11-22T03:42:28.748430Z"
+}
