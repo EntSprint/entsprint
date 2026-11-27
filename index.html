@@ -473,6 +473,7 @@
         body[data-tab="practice"] [data-page="practice"],
         body[data-tab="leaders"] [data-page="leaders"],
         body[data-tab="creator"] [data-page="creator"],
+        body[data-tab="avatar"] [data-page="avatar"],
         body[data-tab="profile"] [data-page="profile"] {
             display: block !important;
         }
@@ -2100,7 +2101,7 @@
         }
 
 .nav-btn {
-            width: 25%;
+            width: 20%;
             min-width: 0;
             min-height: 52px;
             display: flex;
@@ -2653,7 +2654,7 @@
             .stat-label { font-size: 10px; }
             .profile-action-btn { min-height: 44px; font-size: 13px; }
 
-            .nav-btn { width: 25%; min-width: 0; }
+            .nav-btn { width: 20%; min-width: 0; }
 
             /* Question and options readability */
             .question {
@@ -2792,6 +2793,49 @@
             .practice-grid { grid-template-columns: 1fr; }
             .practice-side { position: static; }
         }
+
+        .avatar-page {
+            grid-column: 2;
+            width: min(100%, 960px);
+            min-width: 0;
+            box-sizing: border-box;
+            margin: 24px auto;
+            padding: 0 16px 88px;
+            color: #F1F5F9;
+            font-family: Inter, sans-serif;
+        }
+        .avatar-page h2 { margin: 0 0 16px; }
+        .avatar-stage, .avatar-picker {
+            background: #0B0F19;
+            border: 1px solid #273650;
+            border-radius: 20px;
+            padding: clamp(12px, 3vw, 24px);
+        }
+        .avatar-stage { display: grid; justify-items: center; gap: 16px; }
+        .avatar-preview { display: block; width: min(100%, 240px); height: auto; border-radius: 50%; }
+        .avatar-picker { margin-top: 16px; }
+        .avatar-controls { display: flex; flex-wrap: wrap; gap: 8px; }
+        .avatar-stage .avatar-controls { justify-content: center; }
+        .avatar-controls button, .avatar-item, .avatar-save {
+            min-height: 44px;
+            border: 1px solid #364967;
+            border-radius: 12px;
+            padding: 8px 12px;
+            background: #151D2B;
+            color: inherit;
+            font: inherit;
+            cursor: pointer;
+        }
+        .avatar-controls button[aria-pressed="true"], .avatar-save { background: #2563EB; border-color: #2563EB; color: #fff; }
+        .avatar-items { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 135px), 1fr)); gap: 10px; margin: 16px 0; }
+        .avatar-item { display: grid; justify-items: center; align-content: start; gap: 6px; text-align: center; font-size: 13px; }
+        .avatar-item img { display: block; width: min(100%, 72px); border-radius: 50%; }
+        .avatar-item[aria-pressed="true"] { border-color: #60A5FA; box-shadow: inset 0 0 0 1px #60A5FA; }
+        .avatar-item:disabled { cursor: not-allowed; color: #AABAD2; }
+        .avatar-item small, .avatar-status { color: #AABAD2; }
+        .avatar-page button:focus-visible { outline: 2px solid #93C5FD; outline-offset: 2px; }
+        .avatar-save:disabled { opacity: .65; cursor: not-allowed; }
+        .avatar-status { margin: 8px 0 0; font-size: 13px; }
     </style>
 </head>
 <body data-tab="practice">
@@ -2991,6 +3035,30 @@
             </div>
         </section>
 
+        <section class="avatar-page" id="avatarPage" data-page="avatar" aria-labelledby="avatarTitle">
+            <h2 id="avatarTitle">Аватар</h2>
+            <div class="avatar-stage">
+                <img class="avatar-preview" id="avatarPreview" alt="Предпросмотр маскота" width="240" height="240">
+                <div class="avatar-controls" id="avatarMoods" role="group" aria-label="Эмоция маскота">
+                    <button type="button" data-mood="idle" aria-pressed="true">Обычный</button>
+                    <button type="button" data-mood="happy" aria-pressed="false">Верно</button>
+                    <button type="button" data-mood="sad" aria-pressed="false">Ошибка</button>
+                    <button type="button" data-mood="scared" aria-pressed="false">Тест</button>
+                </div>
+            </div>
+            <div class="avatar-picker">
+                <div class="avatar-controls" id="avatarCategories" role="group" aria-label="Категория">
+                    <button type="button" data-category="animal" aria-pressed="true">Животное</button>
+                    <button type="button" data-category="outfit" aria-pressed="false">Одежда</button>
+                    <button type="button" data-category="accessory" aria-pressed="false">Аксессуары</button>
+                    <button type="button" data-category="bg" aria-pressed="false">Фон</button>
+                </div>
+                <div class="avatar-items" id="avatarItems"></div>
+                <button class="avatar-save" id="saveAvatarBtn" type="button">Сохранить образ</button>
+                <p class="avatar-status" id="avatarStatus" role="status"></p>
+            </div>
+        </section>
+
         <section class="leaderboard-page" id="leaderboardPage" data-page="leaders">
             <div class="leaderboard-header">
                 <h2>Лидеры</h2>
@@ -3052,8 +3120,9 @@
                 <div class="profile-editor-section">
                     <h4 class="profile-editor-section-title">Аватар</h4>
                     <div class="profile-editor-avatar">
-                        <label>Аватарка</label>
-                        <div class="avatar-options" id="avatarOptionsMenu"></div>
+                        <div class="avatar-options" id="avatarOptionsMenu">
+                            <button class="profile-edit-btn" id="editAvatarFromProfile" type="button">Настроить маскота</button>
+                        </div>
                         <input type="hidden" id="profileAvatarInputMenu" value="">
                     </div>
                 </div>
@@ -3146,6 +3215,7 @@
         <button class="nav-btn active" id="practiceNav" type="button" data-nav="practice"><span class="nav-icon" aria-hidden="true">✓</span><span class="nav-label">Закрепление</span></button>
         <button class="nav-btn" id="leadersNav" type="button" data-nav="leaders"><span class="nav-icon" aria-hidden="true">♛</span><span class="nav-label">Лидеры</span></button>
         <button class="nav-btn" id="creatorNav" type="button" data-nav="creator"><span class="nav-icon" aria-hidden="true">★</span><span class="nav-label">Creator</span></button>
+        <button class="nav-btn" id="avatarNav" type="button" data-nav="avatar"><span class="nav-icon" aria-hidden="true">◎</span><span class="nav-label">Аватар</span></button>
         <button class="nav-btn" id="menuNav" type="button" data-nav="profile"><span class="nav-icon" aria-hidden="true">☰</span><span class="nav-label">Профиль</span></button>
         <div class="sidebar-profile">
             <div class="sidebar-profile-top">
@@ -3332,8 +3402,95 @@
         let examTerminated = false;
         let lastExamViolationAt = 0;
         let mascotResetTimer = null;
-        let happyMascotIndex = 0;
-        let sadMascotIndex = 0;
+
+        const AVATAR_ITEMS = {
+            animal: {
+                monkey: ["Обезьянка", "#875337", "#F1BA8A",
+                    '<circle cx="32" cy="61" r="17"/><circle cx="96" cy="61" r="17"/>'],
+                leopard: ["Снежный барс", "#C5D7E6", "#F2F8FC",
+                    '<circle cx="38" cy="40" r="15"/><circle cx="90" cy="40" r="15"/>',
+                    '<path d="M39 58h1m15-15h1m15 0h1m15 15h1M38 77h1m49 0h1" stroke="#62748A" stroke-width="5" stroke-linecap="round"/>'],
+                fox: ["Лиса", "#E97C38", "#FFE3C3",
+                    '<path d="M32 64 22 21Q22 15 28 18L58 39M70 39l30-21q6-3 6 3L96 64Z"/>'],
+                wolf: ["Волк", "#7B91AA", "#DBE7F0",
+                    '<path d="M34 65 30 19q0-6 6-2l24 24m8 0 24-24q6-4 6 2l-4 46Z"/>',
+                    '<path d="m35 72-10 7 12 2-7 7 15 1m48-17 10 7-12 2 7 7-15 1" fill="#7B91AA"/>'],
+                owl: ["Сова", "#A96948", "#F3D2A8",
+                    '<path d="m31 59-2-36 26 16m18 0 26-16-2 36Z"/>']
+            },
+            outfit: {
+                hoodie_blue: ["Синее худи", "#2563EB", '<path d="M40 96q24 24 48 0M55 109l-2 13m20-13 2 13" fill="none" stroke="#BFDBFE" stroke-width="3"/>'],
+                sweatshirt_black: ["Чёрный свитшот", "#171D29", '<path d="M44 97q20 16 40 0m-46 17-5 12m57-12 5 12" fill="none" stroke="#52617A" stroke-width="4"/>'],
+                tshirt_white: ["Белая футболка", "#F1F5F9", '<path d="M45 97q19 15 38 0m-47 15-4 14m60-14 4 14" fill="none" stroke="#A8BEDA" stroke-width="4"/>'],
+                jacket_sport: ["Спортивная олимпийка", "#166A83", '<path d="M64 101v29M32 105l17 7m47-7-17 7" stroke="#A5F3FC" stroke-width="4"/>'],
+                mantle_gold: ["Золотая мантия", "#D89626", '<path d="m40 97 24 18 24-18-14 33H54Z" fill="#FFE7A1"/><circle cx="64" cy="115" r="5" fill="#874510"/>']
+            },
+            accessory: {
+                none: ["Нет", ""],
+                glasses: ["Очки", '<g fill="none" stroke="#182842" stroke-width="3"><rect x="34" y="55" width="26" height="19" rx="7"/><rect x="68" y="55" width="26" height="19" rx="7"/><path d="M60 62h8"/></g>'],
+                sunglasses: ["Солнечные очки", '<path d="M33 54h62v5l-4 12q-11 8-21 0l-4-9h-4l-4 9q-10 8-21 0l-4-12Z" fill="#0B0F19"/><path d="m40 61 8-4m29 4 8-4" stroke="#91A8CD" stroke-width="2"/>'],
+                cap: ["Кепка", '<path d="M31 45q5-27 32-27 26 0 34 26Z" fill="#2563EB" stroke="#0B0F19" stroke-width="3"/><path d="M52 45q19-9 45-2 18 5 10 9-22 2-55-7Z" fill="#183F9A"/>'],
+                headphones: ["Наушники", '<path d="M28 64V51a36 36 0 0 1 72 0v13" fill="none" stroke="#223A68" stroke-width="6"/><rect x="21" y="55" width="14" height="25" rx="6" fill="#2563EB"/><rect x="93" y="55" width="14" height="25" rx="6" fill="#2563EB"/>'],
+                crown: ["Корона", '<path d="m40 39-6-23 17 10L64 9l13 17 17-10-6 23Z" fill="#FFD76C" stroke="#925815" stroke-width="2"/><path d="M43 35h42" stroke="#E5A327" stroke-width="3"/><circle cx="64" cy="28" r="3" fill="#2563EB"/>']
+            },
+            bg: {
+                navy: ["Тёмно-синий", "#0B0F19", "#2563EB"],
+                electric: ["Электрик", "#173C92", "#60A5FA"],
+                aurora: ["Северное сияние", "#164148", "#4CD6BB"],
+                sunset: ["Закат", "#502B54", "#FA9A77"]
+            }
+        };
+        const DEFAULT_AVATAR = { animal: "monkey", outfit: "hoodie_blue", accessory: "none", bg: "navy" };
+        const AVATAR_MOODS = {
+            idle: { eyes: '<ellipse cx="48" cy="65" rx="4" ry="5"/><ellipse cx="80" cy="65" rx="4" ry="5"/>', brows: "M42 54l11-1m22 0 11 1", mouth: "M57 83q7 6 14 0" },
+            happy: { eyes: '<path d="M42 67q6-9 12 0m20 0q6-9 12 0" fill="none" stroke="#182437" stroke-width="3" stroke-linecap="round"/>', brows: "M42 52q5-4 11-1m22 0q6-3 11 1", mouth: "M53 81q11 18 22 0Z" },
+            sad: { eyes: '<ellipse cx="48" cy="67" rx="4" ry="5"/><ellipse cx="80" cy="67" rx="4" ry="5"/>', brows: "m42 56 12-5m20 0 12 5", mouth: "M55 88q9-10 18 0" },
+            scared: { eyes: '<g fill="#fff"><circle cx="48" cy="64" r="9"/><circle cx="80" cy="64" r="9"/></g><circle cx="48" cy="65" r="3"/><circle cx="80" cy="65" r="3"/>', brows: "M42 50q6-6 12-2m20 0q6-4 12 2", mouth: "M59 86a5 7 0 1 0 10 0 5 7 0 1 0-10 0Z" }
+        };
+
+        function normalizeAvatar(config) {
+            const safe = { ...DEFAULT_AVATAR };
+            for (const field of Object.keys(safe)) {
+                const value = config?.[field];
+                if (typeof value === "string" && Object.hasOwn(AVATAR_ITEMS[field], value)) safe[field] = value;
+            }
+            return safe;
+        }
+
+        function renderMascotSVG(avatarConfig, mood = "idle") {
+            const { animal, outfit, accessory, bg } = normalizeAvatar(avatarConfig);
+            const [, fur, face, ears, markings = ""] = AVATAR_ITEMS.animal[animal];
+            const [, fabric, trim] = AVATAR_ITEMS.outfit[outfit];
+            const [, background, accent] = AVATAR_ITEMS.bg[bg];
+            const expression = Object.hasOwn(AVATAR_MOODS, mood) ? AVATAR_MOODS[mood] : AVATAR_MOODS.idle;
+            const mask = animal === "monkey"
+                ? "M64 53C49 42 35 54 37 70 32 85 44 96 64 96s32-11 27-26C93 54 79 42 64 53Z"
+                : "M33 65Q46 51 64 64Q82 51 95 65 92 93 64 96 36 93 33 65Z";
+            const nose = animal === "owl"
+                ? '<path d="m57 73 7-4 7 4-7 8Z" fill="#DD8C28"/>'
+                : '<path d="M58 74q6-4 12 0-2 5-6 5t-6-5Z" fill="#273248"/>';
+            return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+                <rect width="128" height="128" fill="${background}"/>
+                <circle cx="64" cy="64" r="49" fill="${accent}" opacity=".17"/>
+                <circle cx="64" cy="64" r="54" fill="none" stroke="${accent}" opacity=".45"/>
+                <path d="M22 38h8m-4-4v8m75 49h8m-4-4v8" stroke="${accent}" stroke-width="2" stroke-linecap="round"/>
+                <path d="M16 133q2-34 37-39h22q35 5 37 39Z" fill="${fabric}" stroke="#101C31" stroke-width="3"/>
+                ${trim}
+                <g fill="${fur}" stroke="#17243B" stroke-width="3" stroke-linejoin="round">${ears}</g>
+                <path d="M31 64q0-29 33-29t33 29q0 33-33 36-33-3-33-36Z" fill="${fur}" stroke="#17243B" stroke-width="3"/>
+                <path d="${mask}" fill="${face}"/>
+                ${markings}
+                <path d="${expression.brows}" fill="none" stroke="#182437" stroke-width="2.5" stroke-linecap="round"/>
+                <g fill="#182437">${expression.eyes}</g>
+                ${nose}
+                <path d="${expression.mouth}" fill="${mood === "happy" || mood === "scared" ? "#713B45" : "none"}" stroke="#182437" stroke-width="2.5" stroke-linecap="round"/>
+                ${AVATAR_ITEMS.accessory[accessory][1]}
+            </svg>`;
+        }
+
+        function mascotImageSource(config, mood) {
+            return "data:image/svg+xml," + encodeURIComponent(renderMascotSVG(config, mood));
+        }
 
         function loadJson(key, fallback) {
             try { return JSON.parse(localStorage.getItem(key)) ?? fallback; }
@@ -3375,23 +3532,17 @@
             }
             const db = firebase.firestore();
             const docRef = db.collection("entsprint").doc("accounts_v2");
-            window.__leadersUnsub = docRef.onSnapshot(snapshot => {
+            window.__leadersUnsub = docRef.onSnapshot({ includeMetadataChanges: true }, snapshot => {
+                if (snapshot.metadata?.fromCache) return;
                 if (!snapshot.exists) {
                     startLeadersPollFallback();
                     return;
                 }
                 const data = snapshot.data();
-                const accountsField = data?.accounts;
-                let accounts = [];
-                if (typeof accountsField === "string") {
-                    try { accounts = JSON.parse(accountsField); } catch { accounts = []; }
-                } else if (Array.isArray(accountsField)) {
-                    accounts = accountsField;
-                }
-                const mergedEntries = buildLeaderboardEntries(accounts);
-                saveJson(LEADERBOARD_STORAGE_KEY, mergedEntries);
-                if (document.getElementById("leaderboardPage").classList.contains("visible")) {
-                    updateLeaderboardFilters(mergedEntries);
+                try {
+                    publishLeaderboard(parseAccounts(data?.accounts));
+                } catch (error) {
+                    console.warn("Leaders snapshot:", error);
                 }
             }, err => {
                 console.warn("Leaders realtime error:", err);
@@ -3403,31 +3554,23 @@
         function startLeadersPollFallback() {
             if (window.__leadersPoll) clearInterval(window.__leadersPoll);
             window.__leadersPoll = setInterval(async () => {
-                try {
-                    const accounts = await getAvailableAccounts();
-                    const mergedEntries = buildLeaderboardEntries(accounts);
-                    saveJson(LEADERBOARD_STORAGE_KEY, mergedEntries);
-                    if (document.getElementById("leaderboardPage").classList.contains("visible")) {
-                        updateLeaderboardFilters(mergedEntries);
-                    }
-                } catch (e) {
-                    console.warn("Leaders poll error:", e);
-                }
+                if (document.body.dataset.tab === "leaders") await updateLeaderboardFromCloud();
             }, 30000);
         }
 
-        function buildLeaderboardEntries(accounts) {
+        function buildLeaderboardEntries(accounts, keepCached = false) {
             const entriesByKey = new Map();
             const activeDaysMap = loadJson(ACTIVE_DAYS_STORAGE_KEY, {});
-            (Array.isArray(accounts) ? accounts : []).forEach(account => {
+            const localEntries = loadJson(LEADERBOARD_STORAGE_KEY, []);
+            if (keepCached) localEntries.forEach(entry => entriesByKey.set(entry.key, entry));
+            const subjectIds = new Set(questions.filter(q => subjectOf(q) === currentSubject).map(q => q.id));
+            accounts.forEach(account => {
                 const fullName = normalizeName(account.fullName || "");
-                const branch = normalizeName(account.branch || "");
-                if (!fullName || !branch) return;
+                const branch = typeof account.branch === "string" ? normalizeName(account.branch) : "";
+                if (!fullName) return;
                 const key = `${fullName}||${branch}`;
                 const learnedIds = new Set(Array.isArray(account.learned) ? account.learned : []);
-                const learnedCount = [...learnedIds].filter(id =>
-                    questions.some(q => q.id === id && subjectOf(q) === currentSubject)
-                ).length;
+                const learnedCount = [...learnedIds].filter(id => subjectIds.has(id)).length;
                 const profileActiveDays = activeDaysMap[key] || [];
                 entriesByKey.set(key, {
                     key,
@@ -3439,73 +3582,59 @@
                     activeDays: profileActiveDays.length,
                     lessonStats: account.lessonStats || {},
                     examResults: Array.isArray(account.examResults) ? account.examResults : [],
-                    avatar: account.avatar || "./assets/mascot_idle.png"
+                    avatarConfig: account.avatarConfig
                 });
-            });
-            const localEntries = loadJson(LEADERBOARD_STORAGE_KEY, []);
-            (Array.isArray(localEntries) ? localEntries : []).forEach(entry => {
-                if (!entriesByKey.has(entry.key)) entriesByKey.set(entry.key, entry);
             });
             const profile = getProfile();
             if (profile) {
                 const key = getProfileKey(profile);
                 const existing = entriesByKey.get(key);
+                const cached = localEntries.find(entry => entry.key === key);
                 const profileActiveDays = activeDaysMap[key] || [];
                 entriesByKey.set(key, {
                     key,
                     fullName: profile.fullName,
                     branch: profile.branch,
-                    learned: [...learned].filter(id =>
-                        questions.some(q => q.id === id && subjectOf(q) === currentSubject)
-                    ).length,
+                    learned: [...learned].filter(id => subjectIds.has(id)).length,
                     errors: errorCount,
                     timeSeconds: getSiteTimeForProfile(profile),
                     activeDays: profileActiveDays.length,
-                    lessonStats: existing?.lessonStats || {},
-                    examResults: existing?.examResults || [],
-                    avatar: profile.avatar || "./assets/mascot_idle.png"
+                    lessonStats: cached?.lessonStats || existing?.lessonStats || {},
+                    examResults: (cached?.examResults?.length || 0) >= (existing?.examResults?.length || 0)
+                        ? cached?.examResults || [] : existing.examResults,
+                    avatarConfig: existing?.avatarConfig
                 });
             }
             return [...entriesByKey.values()];
         }
 
+        function parseAccounts(payload) {
+            if (payload == null) return [];
+            const accounts = typeof payload === "string" ? JSON.parse(payload) : payload;
+            if (!Array.isArray(accounts)) throw new Error("Invalid cloud accounts payload");
+            return accounts.filter(account => typeof account?.fullName === "string" && account.fullName.trim());
+        }
+
+        function cloudAccountsUrl() {
+            const { endpoint, apiKey } = window.ENTSPRINT_CONFIG;
+            return `${endpoint.replace(/\/$/, "")}/entsprint/accounts_v2?key=${encodeURIComponent(apiKey)}`;
+        }
+
+        async function readCloudAccounts() {
+            const response = await fetch(cloudAccountsUrl(), { cache: "no-store", signal: AbortSignal.timeout(5000) });
+            if (response.status === 404) return { accounts: [], updateTime: null };
+            if (!response.ok) throw new Error(`Cloud accounts request failed: ${response.status}`);
+            const data = await response.json();
+            const field = data.fields?.accounts;
+            const payload = field?.stringValue ?? field?.arrayValue?.values?.map(item =>
+                item.mapValue ? decodeFirestoreMap(item.mapValue) : item.stringValue
+            );
+            return { accounts: parseAccounts(payload), updateTime: data.updateTime };
+        }
+
         async function loadCloudAccounts() {
-            if (!cloudIsConfigured()) return null;
-            try {
-                const endpoint = window.ENTSPRINT_CONFIG.endpoint.replace(/\/$/, "");
-                const apiKey = window.ENTSPRINT_CONFIG.apiKey;
-                const response = await fetch(
-                    `${endpoint}/entsprint/accounts_v2?key=${encodeURIComponent(apiKey)}`
-                );
-                if (!response.ok) throw new Error(`Cloud accounts request failed: ${response.status}`);
-                const data = await response.json();
-                const payloadField = data.fields?.accounts;
-                const payload = payloadField?.stringValue ??
-                    payloadField?.arrayValue?.values?.map(item =>
-                        item.mapValue ? decodeFirestoreMap(item.mapValue) : item.stringValue
-                    );
-                if (!payload) return [];
-                let accounts = payload;
-                if (typeof payload === "string") {
-                    try { accounts = JSON.parse(payload); }
-                    catch (_) { accounts = []; }
-                }
-                const uniqueAccounts = [];
-                const names = new Set();
-                (Array.isArray(accounts) ? accounts : []).forEach(account => {
-                    const key = accountNameKey(account.fullName || "");
-                    if (!key || names.has(key)) return;
-                    names.add(key);
-                    uniqueAccounts.push(account);
-                });
-                if (uniqueAccounts.length !== accounts.length) {
-                    saveCloudAccounts(uniqueAccounts).catch(() => {});
-                }
-                return uniqueAccounts;
-            } catch (error) {
-                console.error("Не удалось загрузить облачные аккаунты GradeUp", error);
-                throw error;
-            }
+            if (!cloudIsConfigured()) return [];
+            return (await readCloudAccounts()).accounts;
         }
 
         function decodeFirestoreMap(mapValue) {
@@ -3525,35 +3654,59 @@
             return result;
         }
 
-        async function saveCloudAccounts(accounts) {
+        function accountIdentity(account) {
+            return getProfileKey({
+                fullName: accountNameKey(account.fullName),
+                branch: typeof account.branch === "string" ? accountNameKey(account.branch) : ""
+            });
+        }
+
+        function latestAvatar(first, second) {
+            if (!second?.avatarConfig) return first;
+            if (!first?.avatarConfig) return second;
+            return Number(second.avatarUpdatedAt || 0) > Number(first.avatarUpdatedAt || 0) ? second : first;
+        }
+
+        function mergeAccounts(cloudAccounts, localAccounts, avatarOnly = false) {
+            const merged = new Map(cloudAccounts.map(account => [accountIdentity(account), account]));
+            for (const local of localAccounts) {
+                const key = accountIdentity(local);
+                const cloud = merged.get(key);
+                const avatar = latestAvatar(cloud, local);
+                const account = !cloud ? { ...local } : avatarOnly ? { ...cloud } : { ...cloud, ...local };
+                if (avatar?.avatarConfig) {
+                    account.avatarConfig = normalizeAvatar(avatar.avatarConfig);
+                    account.avatarUpdatedAt = avatar.avatarUpdatedAt || 0;
+                }
+                merged.set(key, account);
+            }
+            return [...merged.values()];
+        }
+
+        async function saveCloudAccounts(accounts, { deleteName, avatarOnly = false } = {}) {
             if (!cloudIsConfigured()) return false;
             try {
-                const uniqueAccounts = [];
-                const names = new Set();
-                (Array.isArray(accounts) ? accounts : []).forEach(account => {
-                    const key = normalizeName(account.fullName || "")
-                        .toLocaleLowerCase("ru-RU")
-                        .replace(/\s+/g, " ");
-                    if (!key || names.has(key)) return;
-                    names.add(key);
-                    uniqueAccounts.push(account);
-                });
-                const endpoint = window.ENTSPRINT_CONFIG.endpoint.replace(/\/$/, "");
-                const apiKey = window.ENTSPRINT_CONFIG.apiKey;
-                const response = await fetch(
-                    `${endpoint}/entsprint/accounts_v2?key=${encodeURIComponent(apiKey)}&updateMask.fieldPaths=accounts`,
-                    {
+                for (let attempt = 0; attempt < 3; attempt++) {
+                    const { accounts: cloud, updateTime } = await readCloudAccounts();
+                    const merged = mergeAccounts(cloud, accounts, avatarOnly)
+                        .filter(account => !deleteName || accountNameKey(account.fullName) !== deleteName);
+                    if (avatarOnly && JSON.stringify(merged) === JSON.stringify(cloud)) return true;
+                    const condition = updateTime
+                        ? `currentDocument.updateTime=${encodeURIComponent(updateTime)}`
+                        : "currentDocument.exists=false";
+                    const response = await fetch(`${cloudAccountsUrl()}&updateMask.fieldPaths=accounts&${condition}`, {
                         method: "PATCH",
+                        signal: AbortSignal.timeout(5000),
                         headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({
-                            fields: {
-                                accounts: { stringValue: JSON.stringify(uniqueAccounts) }
-                            }
-                        })
+                        body: JSON.stringify({ fields: { accounts: { stringValue: JSON.stringify(merged) } } })
+                    });
+                    if (response.ok) return true;
+                    const status = (await response.json()).error?.status;
+                    if (!["ABORTED", "FAILED_PRECONDITION", "ALREADY_EXISTS", "NOT_FOUND"].includes(status)) {
+                        throw new Error(`Cloud accounts request failed: ${response.status}`);
                     }
-                );
-                if (!response.ok) throw new Error(`Cloud accounts request failed: ${response.status}`);
-                return true;
+                }
+                return false;
             } catch (error) {
                 console.warn("saveCloudAccounts: cloud request failed", error);
                 return false;
@@ -3564,16 +3717,7 @@
             const localAccounts = loadJson(ACCOUNTS_STORAGE_KEY, []);
             if (!cloudIsConfigured()) return localAccounts;
             try {
-                const cloudAccounts = await loadCloudAccounts();
-                const merged = [...cloudAccounts];
-                localAccounts.forEach(localAccount => {
-                    const index = merged.findIndex(account =>
-                        accountNameKey(account.fullName) === accountNameKey(localAccount.fullName)
-                    );
-                    if (index >= 0) merged[index] = localAccount;
-                    else merged.push(localAccount);
-                });
-                return merged;
+                return mergeAccounts(await loadCloudAccounts(), localAccounts);
             } catch (error) {
                 console.warn("getAvailableAccounts: cloud request failed, using local accounts", error);
                 return localAccounts;
@@ -3581,24 +3725,8 @@
         }
 
         async function syncLocalAccountsToCloud() {
-            if (!cloudIsConfigured()) return;
-            const localAccounts = loadJson(ACCOUNTS_STORAGE_KEY, []);
-            let cloudAccounts;
-            try {
-                cloudAccounts = await loadCloudAccounts();
-            } catch (_) {
-                return;
-            }
-            const merged = [...cloudAccounts];
-            localAccounts.forEach(localAccount => {
-                const index = merged.findIndex(account =>
-                    normalizeName(account.fullName).toLowerCase() ===
-                    normalizeName(localAccount.fullName).toLowerCase()
-                );
-                if (index >= 0) merged[index] = localAccount;
-                else merged.push(localAccount);
-            });
-            await saveCloudAccounts(merged);
+            const account = getCurrentAccount();
+            if (account) await saveCloudAccounts([account], { avatarOnly: true });
         }
 
         function normalizeName(value) {
@@ -3662,7 +3790,8 @@
                 errors: errorCount,
                 timeSeconds: Number(account.timeSeconds || 0),
                 lessonStats: account.lessonStats || {},
-                examResults: Array.isArray(account.examResults) ? account.examResults : []
+                examResults: Array.isArray(account.examResults) ? account.examResults : [],
+                avatarConfig: account.avatarConfig
             };
             const nextEntries = Array.isArray(entries) ? [...entries] : [];
             if (existing >= 0) nextEntries[existing] = leaderboardEntry;
@@ -3680,7 +3809,7 @@
                 : null;
             const timeByProfile = loadJson(SITE_TIME_STORAGE_KEY, {});
 
-            const accounts = await getAvailableAccounts();
+            const accounts = loadJson(ACCOUNTS_STORAGE_KEY, []);
             if (!Array.isArray(accounts)) return;
             const index = accounts.findIndex(item =>
                 accountNameKey(item.fullName) === accountNameKey(profile.fullName)
@@ -3696,7 +3825,7 @@
                 examResults: leaderboardEntry?.examResults || []
             };
             saveJson(ACCOUNTS_STORAGE_KEY, accounts);
-            await saveCloudAccounts(accounts);
+            await saveCloudAccounts([accounts[index]]);
         }
 
         function shuffled(items) {
@@ -4069,9 +4198,18 @@
             document.getElementById("progressMode").classList.toggle("active", mode === "progress");
             document.querySelectorAll(".nav-btn").forEach(button => button.classList.remove("active"));
 
-            const tabMap = { learn: "practice", exam: "practice", progress: "practice", creator: "creator", leaderboard: "leaders", profile: "profile" };
+            const tabMap = { learn: "practice", exam: "practice", progress: "practice", creator: "creator", leaderboard: "leaders", profile: "profile", avatar: "avatar" };
             document.body.dataset.tab = tabMap[mode] || "practice";
             document.body.dataset.mode = mode === "progress" ? "progress" : "";
+
+            if (mode === "avatar") {
+                clearInterval(timerId);
+                sessionStorage.setItem(NAV_STORAGE_KEY, "avatar");
+                document.getElementById("avatarNav").classList.add("active");
+                openAvatarEditor();
+                scrollToTop();
+                return;
+            }
 
             if (mode === "creator") {
                 clearInterval(timerId);
@@ -4362,6 +4500,7 @@
                             optionButton.classList.add("exam-selected");
                         }
                     });
+                setMascot(selectedIndex === currentQuestion.answer ? "happy" : "sad");
             }
         }
 
@@ -4451,24 +4590,9 @@
             clearTimeout(mascotResetTimer);
             mascot.classList.remove("happy", "sad");
 
-            // В режиме экзамена всегда показываем испуганного маскот и не меняем эмоции
-            if (mode === "exam") {
-                mascot.src = "./assets/mascot_scared.png";
-                return;
-            }
-
-            if (state === "happy") {
-                const happyAssets = ["./assets/mascot_happy.png", "./assets/mascot_creator.png"];
-                mascot.src = happyAssets[happyMascotIndex % happyAssets.length];
-                happyMascotIndex++;
-            } else if (state === "sad") {
-                const sadAssets = ["./assets/mascot_angry.png", "./assets/mascot_sad.png"];
-                mascot.src = sadAssets[sadMascotIndex % sadAssets.length];
-                sadMascotIndex++;
-            } else {
-                mascot.src = "./assets/mascot_idle.png";
-            }
-            if (state !== "idle") {
+            const mood = state === "idle" && mode === "exam" ? "scared" : state;
+            mascot.src = mascotImageSource(getCurrentAccount()?.avatarConfig, mood);
+            if (state === "happy" || state === "sad") {
                 mascot.classList.add(state);
                 mascotResetTimer = setTimeout(() => setMascot("idle"), 1500);
             }
@@ -4825,6 +4949,12 @@
             return profile ? `${profile.fullName}||${profile.branch}` : "";
         }
 
+        function getCurrentAccount() {
+            const profile = getProfile();
+            if (!profile) return null;
+            return loadJson(ACCOUNTS_STORAGE_KEY, []).find(account => accountIdentity(account) === accountIdentity(profile));
+        }
+
         function getSiteTimeForProfile(profile) {
             if (!profile) return 0;
             const timeByProfile = loadJson(SITE_TIME_STORAGE_KEY, {});
@@ -5024,15 +5154,14 @@
 
         function renderMenuProfile() {
             const profile = getProfile();
-            if (!profile) return;
-            const accounts = loadJson(ACCOUNTS_STORAGE_KEY, []);
-            const account = accounts.find(a => accountNameKey(a.fullName) === accountNameKey(profile.fullName));
+            const account = getCurrentAccount();
             if (!account) return;
 
-            // Profile main card
-            document.getElementById("menuProfileAvatar").innerHTML = account.avatar
-                ? `<img src="${account.avatar}" alt="Аватар">`
-                : `<img src="./assets/mascot_idle.png" alt="Аватар">`;
+            const avatarSource = mascotImageSource(account.avatarConfig);
+            const profileAvatar = document.createElement("img");
+            profileAvatar.src = avatarSource;
+            profileAvatar.alt = "Аватар";
+            document.getElementById("menuProfileAvatar").replaceChildren(profileAvatar);
             document.getElementById("menuProfileName").textContent = account.fullName;
             document.getElementById("menuProfileBranch").textContent = account.branch || "";
 
@@ -5040,7 +5169,7 @@
             const sidebarAvatar = document.getElementById("sidebarProfileAvatar");
             const sidebarName = document.getElementById("sidebarProfileName");
             const sidebarBranch = document.getElementById("sidebarProfileBranch");
-            if (sidebarAvatar) sidebarAvatar.src = account.avatar || "./assets/mascot_idle.png";
+            if (sidebarAvatar) sidebarAvatar.src = avatarSource;
             if (sidebarName) sidebarName.textContent = account.fullName;
             if (sidebarBranch) sidebarBranch.textContent = account.branch || "";
 
@@ -5094,15 +5223,8 @@
                     Math.max(best, Number(result.score || 0)), 0);
             }
 
-            // Study time
-            const studySeconds = getSiteTimeForProfile(profile);
-
-            // Active days (unique days with activity)
-            const activeDays = getActiveDaysForProfile(profile);
-
             document.getElementById("statQuestionsLearned").textContent = learnedInSubject;
             document.getElementById("statBestExamProfile").textContent = `${bestExam}%`;
-            document.getElementById("statStudyTimeProfile").textContent = formatSiteTime(studySeconds);
         }
 
         function updateLeaderboard(profile, learnedInSubject, entriesOverride = null) {
@@ -5131,7 +5253,7 @@
                         timeSeconds: currentTime,
                         lessonStats: {},
                         examResults: [],
-                        avatar: profile.avatar || "./assets/mascot_idle.png"
+                        avatarConfig: getCurrentAccount()?.avatarConfig
                     });
                 }
             }
@@ -5182,12 +5304,13 @@
 
                 row.innerHTML =
                     `<span class="leaderboard-place-large ${placeClass}">${placeContent}</span>` +
-                    `<img class="leaderboard-avatar" src="${escapeHtml(entry.avatar || './assets/mascot_idle.png')}" alt="" aria-hidden="true">` +
+                    `<img class="leaderboard-avatar" alt="" aria-hidden="true">` +
                     `<div class="leaderboard-info">` +
                     `<div class="leaderboard-name-row"><strong>${escapeHtml(entry.fullName)}</strong></div>` +
                     `<span class="leaderboard-branch">${escapeHtml(entry.branch)}</span>` +
                     `</div>` +
                     `<span class="leaderboard-score-large">${scoreText}</span>`;
+                row.querySelector(".leaderboard-avatar").src = mascotImageSource(entry.avatarConfig);
                 row.addEventListener("click", () => {
                     showPublicProfile(entry.key);
                 });
@@ -5195,18 +5318,37 @@
             });
         }
 
-        async function updateLeaderboardFromCloud() {
-            let accounts = loadJson(ACCOUNTS_STORAGE_KEY, []);
-            if (cloudIsConfigured()) {
-                try {
-                    accounts = await getAvailableAccounts();
-                } catch (_) {
-                    accounts = loadJson(ACCOUNTS_STORAGE_KEY, []);
+        let knownLeaderboardAccounts = [];
+
+        function publishLeaderboard(cloudAccounts) {
+            const local = loadJson(ACCOUNTS_STORAGE_KEY, []);
+            const profile = getProfile();
+            if (profile && cloudAccounts) {
+                const key = accountIdentity(profile);
+                const account = local.find(item => accountIdentity(item) === key);
+                const cloud = cloudAccounts.find(item => accountIdentity(item) === key);
+                if (account && cloud?.avatarConfig && latestAvatar(account, cloud) === cloud) {
+                    account.avatarConfig = normalizeAvatar(cloud.avatarConfig);
+                    account.avatarUpdatedAt = cloud.avatarUpdatedAt || 0;
+                    saveJson(ACCOUNTS_STORAGE_KEY, local);
+                    renderMenuProfile();
+                    setMascot("idle");
                 }
             }
-            const mergedEntries = buildLeaderboardEntries(accounts);
-            saveJson(LEADERBOARD_STORAGE_KEY, mergedEntries);
-            updateLeaderboardFilters(mergedEntries);
+            if (cloudAccounts) knownLeaderboardAccounts = cloudAccounts;
+            const entries = buildLeaderboardEntries(mergeAccounts(knownLeaderboardAccounts, local), !cloudAccounts);
+            saveJson(LEADERBOARD_STORAGE_KEY, entries);
+            if (document.body.dataset.tab === "leaders") updateLeaderboardFilters(entries);
+        }
+
+        async function updateLeaderboardFromCloud() {
+            publishLeaderboard();
+            if (!cloudIsConfigured()) return;
+            try {
+                publishLeaderboard(await loadCloudAccounts());
+            } catch (error) {
+                console.warn("Leaders cloud request:", error);
+            }
         }
 
         function updateLeaderboardFilters(entriesOverride = null) {
@@ -5214,6 +5356,113 @@
             if (!list) return;
             updateLeaderboard(getProfile(), null, entriesOverride);
         }
+
+        let avatarDraft = null;
+        let avatarCategory = "animal";
+        let avatarMood = "idle";
+
+        function avatarLock(category, value) {
+            if (category === "outfit" && value === "mantle_gold" && learned.size < 100) {
+                return "Выучи 100 вопросов";
+            }
+            if (category === "accessory" && value === "crown") {
+                const exams = [...getProfileExamResults(), ...(getCurrentAccount()?.examResults || [])];
+                if (!exams.some(result => Number(result.score) >= 80)) return "Набери 80% в тесте";
+            }
+            return "";
+        }
+
+        function openAvatarEditor() {
+            const account = getCurrentAccount();
+            avatarDraft = normalizeAvatar(account?.avatarConfig);
+            avatarCategory = "animal";
+            avatarMood = "idle";
+            document.getElementById("saveAvatarBtn").disabled = !account;
+            document.getElementById("avatarStatus").textContent = account ? "" : "Войди, чтобы сохранить образ.";
+            renderAvatarEditor();
+        }
+
+        function renderAvatarEditor(focusedItem) {
+            document.getElementById("avatarPreview").src = mascotImageSource(avatarDraft, avatarMood);
+            document.querySelectorAll("#avatarMoods [data-mood]").forEach(button => {
+                button.setAttribute("aria-pressed", String(button.dataset.mood === avatarMood));
+            });
+            document.querySelectorAll("#avatarCategories [data-category]").forEach(button => {
+                button.setAttribute("aria-pressed", String(button.dataset.category === avatarCategory));
+            });
+            const cards = Object.entries(AVATAR_ITEMS[avatarCategory]).map(([value, [label]]) => {
+                const lock = avatarLock(avatarCategory, value);
+                const card = document.createElement("button");
+                card.type = "button";
+                card.className = "avatar-item";
+                card.dataset.item = value;
+                card.disabled = Boolean(lock);
+                card.setAttribute("aria-pressed", String(avatarDraft[avatarCategory] === value));
+                card.innerHTML = "<img alt=\"\" width=\"72\" height=\"72\"><span></span>";
+                card.querySelector("img").src = mascotImageSource({ ...avatarDraft, [avatarCategory]: value });
+                card.querySelector("span").textContent = label;
+                if (lock) {
+                    const condition = document.createElement("small");
+                    condition.textContent = lock;
+                    card.appendChild(condition);
+                }
+                return card;
+            });
+            document.getElementById("avatarItems").replaceChildren(...cards);
+            if (focusedItem) cards.find(card => card.dataset.item === focusedItem)?.focus();
+        }
+
+        document.getElementById("avatarMoods").addEventListener("click", event => {
+            const button = event.target.closest("[data-mood]");
+            if (!button) return;
+            avatarMood = button.dataset.mood;
+            renderAvatarEditor();
+        });
+        document.getElementById("avatarCategories").addEventListener("click", event => {
+            const button = event.target.closest("[data-category]");
+            if (!button) return;
+            avatarCategory = button.dataset.category;
+            renderAvatarEditor();
+        });
+        document.getElementById("avatarItems").addEventListener("click", event => {
+            const card = event.target.closest("[data-item]");
+            if (!card || card.disabled) return;
+            avatarDraft[avatarCategory] = card.dataset.item;
+            document.getElementById("avatarStatus").textContent = "";
+            renderAvatarEditor(card.dataset.item);
+        });
+        document.getElementById("saveAvatarBtn").addEventListener("click", async () => {
+            const profile = getProfile();
+            if (!profile || !avatarDraft) return;
+            const key = accountIdentity(profile);
+            const accounts = loadJson(ACCOUNTS_STORAGE_KEY, []);
+            const account = accounts.find(item => accountIdentity(item) === key);
+            if (!account) return;
+            const avatarConfig = normalizeAvatar(avatarDraft);
+            const saved = normalizeAvatar(account.avatarConfig);
+            const status = document.getElementById("avatarStatus");
+            for (const [category, value] of Object.entries(avatarConfig)) {
+                const lock = avatarLock(category, value);
+                if (value !== saved[category] && lock) {
+                    status.textContent = lock;
+                    renderAvatarEditor();
+                    return;
+                }
+            }
+            account.avatarConfig = avatarConfig;
+            account.avatarUpdatedAt = Math.max(Date.now(), Number(account.avatarUpdatedAt || 0) + 1);
+            saveJson(ACCOUNTS_STORAGE_KEY, accounts);
+            status.textContent = "Образ сохранён на устройстве.";
+            renderMenuProfile();
+            setMascot("idle");
+            publishLeaderboard();
+            const synced = await saveCloudAccounts([account], { avatarOnly: true });
+            if (synced && document.body.dataset.tab === "avatar" && avatarDraft &&
+                getCurrentAccount()?.avatarUpdatedAt === account.avatarUpdatedAt &&
+                JSON.stringify(avatarDraft) === JSON.stringify(avatarConfig)) {
+                status.textContent = "Образ сохранён на устройстве и в облаке.";
+            }
+        });
 
         function validateRegistration() {
             const nameValid = normalizeName(document.getElementById("fullNameInput").value).length >= 3;
@@ -5239,6 +5488,10 @@
                     startMode("profile");
                     return;
                 }
+                if (savedNav === "avatar") {
+                    startMode("avatar");
+                    return;
+                }
 
                 if (savedNav === "practice") {
                     if (savedMode === "exam") {
@@ -5249,7 +5502,6 @@
                     return;
                 }
 
-                syncLocalAccountsToCloud();
                 return;
             }
             document.getElementById("welcomeOverlay").classList.add("visible");
@@ -5313,10 +5565,6 @@
             closeLessonDropdown();
             startMode("leaderboard");
             sessionStorage.setItem(NAV_STORAGE_KEY, "leaderboard");
-            // One off-cycle request if using fallback polling
-            if (window.__leadersPoll && !window.__leadersUnsub) {
-                updateLeaderboardFromCloud();
-            }
         });
         document.getElementById("creatorNav").addEventListener("click", () => {
             closeLessonDropdown();
@@ -5328,6 +5576,12 @@
             startMode("profile");
             sessionStorage.setItem(NAV_STORAGE_KEY, "profile");
         });
+        for (const id of ["avatarNav", "editAvatarFromProfile"]) {
+            document.getElementById(id).addEventListener("click", () => {
+                closeLessonDropdown();
+                startMode("avatar");
+            });
+        }
         document.getElementById("welcomeContinueBtn").addEventListener("click", () => {
             document.getElementById("welcomeStep").style.display = "none";
             document.getElementById("registrationStep").style.display = "block";
@@ -5427,6 +5681,8 @@
             saveJson(PROFILE_STORAGE_KEY, { fullName, branch });
             saveJson(SESSION_STORAGE_KEY, fullName);
             document.getElementById("welcomeOverlay").classList.remove("visible");
+            renderMenuProfile();
+            setMascot("idle");
             updateProgress();
             
             // Optimistically add new student to leaderboard state
@@ -5443,17 +5699,16 @@
                         errors: 0,
                         timeSeconds: 0,
                         lessonStats: {},
-                        examResults: [],
-                        avatar: "./assets/mascot_idle.png"
+                        examResults: []
                     });
                     saveJson(LEADERBOARD_STORAGE_KEY, entries);
-                    if (document.getElementById("leaderboardPage").classList.contains("visible")) {
+                    if (document.body.dataset.tab === "leaders") {
                         updateLeaderboardFilters(entries);
                     }
                 }
             }
 
-            saveCloudAccounts(updatedAccounts).catch(error => {
+            saveCloudAccounts([account]).catch(error => {
                 console.warn("saveCloudAccounts: background sync failed", error);
             });
         });
@@ -5482,7 +5737,7 @@
 
             // Cross-device merge: combine local progress with cloud account progress
             const localAccounts = loadJson(ACCOUNTS_STORAGE_KEY, []);
-            const localAccount = localAccounts.find(a => accountNameKey(a.fullName) === accountNameKey(fullName));
+            const localAccount = localAccounts.find(item => accountIdentity(item) === accountIdentity(account));
             if (localAccount) {
                 // Merge learned questions (union)
                 const cloudLearned = new Set(Array.isArray(account.learned) ? account.learned : []);
@@ -5537,15 +5792,17 @@
 
             saveJson(PROFILE_STORAGE_KEY, { fullName: account.fullName, branch: account.branch });
             saveJson(SESSION_STORAGE_KEY, account.fullName);
-            saveJson(ACCOUNTS_STORAGE_KEY, accounts);
+            saveJson(ACCOUNTS_STORAGE_KEY, mergeAccounts(localAccounts, [account]));
             applyAccountProgress(account);
 
             // Save merged account to cloud
-            saveCloudAccounts(accounts).catch(error => {
+            saveCloudAccounts([account]).catch(error => {
                 console.warn("saveCloudAccounts: cross-device merge sync failed", error);
             });
 
             document.getElementById("welcomeOverlay").classList.remove("visible");
+            renderMenuProfile();
+            setMascot("idle");
             updateProgress();
         });
         ["welcomeCharacter", "registrationCharacter"].forEach(id => {
@@ -5733,7 +5990,7 @@
                 };
 
                 saveJson(ACCOUNTS_STORAGE_KEY, accounts);
-                await saveCloudAccounts(accounts);
+                await saveCloudAccounts([accounts[index]]);
 
                 document.getElementById("profileEditor").style.display = "none";
                 const editBtn = document.getElementById("editProfileBtn");
@@ -5751,22 +6008,6 @@
         }
 
         // Menu Page Profile Editor
-        function renderAvatarOptionsMenu(selectedAvatar) {
-            const container = document.getElementById("avatarOptionsMenu");
-            container.innerHTML = "";
-            PROFILE_AVATARS.forEach(avatar => {
-                const div = document.createElement("div");
-                div.className = "avatar-option" + (avatar === selectedAvatar ? " selected" : "");
-                div.innerHTML = `<img src="${avatar}" alt="Аватар">`;
-                div.addEventListener("click", () => {
-                    document.querySelectorAll("#avatarOptionsMenu .avatar-option").forEach(o => o.classList.remove("selected"));
-                    div.classList.add("selected");
-                    document.getElementById("profileAvatarInputMenu").value = avatar;
-                });
-                container.appendChild(div);
-            });
-        }
-
         function renderSubjectSelectorMenu(selectedCombination) {
             const container = document.getElementById("subjectCheckboxesMenu");
             container.innerHTML = "";
@@ -5804,7 +6045,6 @@
             document.getElementById("resetProgressBtnMenu").style.display = "none";
             document.getElementById("logoutAccountBtnMenu").style.display = "none";
 
-            renderAvatarOptionsMenu(account.avatar || PROFILE_AVATARS[0]);
             document.getElementById("profileBioInputMenu").value = account.bio || "";
             renderSubjectSelectorMenu(account.combination || "");
             document.getElementById("profileInstagramInputMenu").value = account.instagram || "";
@@ -5825,7 +6065,6 @@
             const index = accounts.findIndex(a => accountNameKey(a.fullName) === accountNameKey(profile.fullName));
             if (index < 0) return;
 
-            const avatar = document.getElementById("profileAvatarInputMenu").value;
             const bio = document.getElementById("profileBioInputMenu").value.trim();
             const combination = document.getElementById("profileSubjectInputMenu").value;
             const subjects = combination ? [combination] : [];
@@ -5834,7 +6073,6 @@
 
             accounts[index] = {
                 ...accounts[index],
-                avatar,
                 bio,
                 subjects,
                 combination,
@@ -5843,7 +6081,7 @@
             };
 
             saveJson(ACCOUNTS_STORAGE_KEY, accounts);
-            await saveCloudAccounts(accounts);
+            await saveCloudAccounts([accounts[index]]);
 
             document.getElementById("profileEditorMenu").style.display = "none";
             document.getElementById("editProfileBtnMenu").style.display = "";
@@ -5904,10 +6142,11 @@
 
         function showPublicProfile(profileKey) {
             const accounts = loadJson(ACCOUNTS_STORAGE_KEY, []);
-            const account = accounts.find(a => getProfileKey(a) === profileKey);
+            const account = mergeAccounts(knownLeaderboardAccounts, accounts)
+                .find(item => getProfileKey(item) === profileKey);
             if (!account) return;
 
-            document.getElementById("publicProfileAvatar").src = account.avatar || "./assets/mascot_idle.png";
+            document.getElementById("publicProfileAvatar").src = mascotImageSource(account.avatarConfig);
             document.getElementById("publicProfileName").textContent = account.fullName;
             document.getElementById("publicProfileBranch").textContent = account.branch || "";
 
@@ -6132,7 +6371,8 @@
                     const accounts = await loadAdminAccounts();
                     const filtered = accounts.filter(a => accountNameKey(a.fullName) !== accountNameKey(name));
                     saveJson(ACCOUNTS_STORAGE_KEY, filtered);
-                    await saveCloudAccounts(filtered);
+                    await saveCloudAccounts([], { deleteName: accountNameKey(name) });
+                    knownLeaderboardAccounts = knownLeaderboardAccounts.filter(account => accountNameKey(account.fullName) !== accountNameKey(name));
                     // Also remove from leaderboard
                     const leaderboard = loadJson(LEADERBOARD_STORAGE_KEY, []);
                     const filteredLeaderboard = leaderboard.filter(entry => {
@@ -6153,7 +6393,7 @@
                     account.salt = salt;
                     account.hash = hash;
                     saveJson(ACCOUNTS_STORAGE_KEY, accounts);
-                    await saveCloudAccounts(accounts);
+                    await saveCloudAccounts([account]);
                     await refreshAdminTable();
                 }
             });
@@ -6241,6 +6481,10 @@
             }
         });
         window.addEventListener("blur", handleExamLeave);
+        window.addEventListener("online", async () => {
+            await syncLocalAccountsToCloud();
+            if (document.body.dataset.tab === "leaders") await updateLeaderboardFromCloud();
+        });
         window.addEventListener("pagehide", () => {
             saveAccountProgress(getProfile()).catch(() => {});
         });
@@ -6249,10 +6493,17 @@
         async function boot() {
             await loadQuestions();
             initializeProfile();
-            startLeadersRealtime();
+            try {
+                startLeadersRealtime();
+            } catch (error) {
+                console.warn("Leaders listener:", error);
+                startLeadersPollFallback();
+            }
             // Ensure sidebar profile is rendered on load if user is logged in
             if (getProfile()) {
                 renderMenuProfile();
+                setMascot("idle");
+                syncLocalAccountsToCloud();
             }
             // If user was restored in practice mode, ensure first question renders
             const profile = getProfile();
