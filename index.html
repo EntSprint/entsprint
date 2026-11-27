@@ -2924,53 +2924,58 @@
         .quest-card progress { width: 100%; accent-color: #2563EB; }
         .quest-card small { color: #AABAD2; }
         .quest-card button { justify-self: start; }
-        .mascot-stage[data-mood="idle"] { animation: mascotIdleBreath 2.8s ease-in-out infinite; }
-        .mascot-stage[data-mood="happy"] {
+        .mascot-stage.mascot-idle { animation: mascotIdleBreath 2.8s ease-in-out infinite; }
+        .mascot-stage.mascot-happy {
             border-color: #34D399;
             animation: mascotHappyJump 620ms ease-in-out both;
         }
-        .mascot-stage[data-mood="sad"] {
+        .mascot-stage.mascot-sad {
             border-color: #EF4444;
             animation: mascotSadShake 540ms ease-in-out both;
         }
-        .mascot-stage[data-mood="scared"] { animation: mascotScaredShiver 1.45s ease-in-out infinite; }
-        .mascot-stage[data-mood="happy"]::before,
-        .mascot-stage[data-mood="happy"]::after {
-            content: "✦";
+        .mascot-stage.mascot-scared {
+            border-color: #60A5FA;
+            box-shadow: 0 0 0 2px #2563EB, 0 0 12px #2563EB;
+            animation: mascotScaredShiver 760ms ease-in-out infinite;
+        }
+        .mascot-stage.mascot-happy::before,
+        .mascot-stage.mascot-happy::after {
+            content: "✨";
             position: absolute;
             top: 12%;
             z-index: 1;
-            color: #6EE7B7;
-            font-size: 16px;
+            color: #FFD779;
+            font-size: 18px;
             line-height: 1;
+            text-shadow: 0 0 8px #FBBF24;
             pointer-events: none;
             animation: mascotStarBurst 610ms ease-out both;
         }
-        .mascot-stage[data-mood="happy"]::before { left: 0; --star-x: -16px; }
-        .mascot-stage[data-mood="happy"]::after { right: 0; --star-x: 16px; color: #93C5FD; }
+        .mascot-stage.mascot-happy::before { left: 0; --star-x: -23px; }
+        .mascot-stage.mascot-happy::after { right: 0; --star-x: 23px; animation-delay: 65ms; animation-duration: 550ms; }
         @keyframes mascotIdleBreath {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.035, 1.065); }
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-3px) scale(1.035, 1.065); }
         }
         @keyframes mascotHappyJump {
-            0%, 50%, 100% { transform: translateY(0) rotate(0); box-shadow: 0 0 0 0 transparent; }
-            25% { transform: translateY(-9px) rotate(-8deg) scale(1.09); box-shadow: 0 0 0 3px #34D399, 0 0 16px #2563EB; }
-            75% { transform: translateY(-5px) rotate(7deg) scale(1.06); box-shadow: 0 0 0 2px #2563EB, 0 0 14px #34D399; }
+            0%, 48%, 100% { transform: translateY(0) rotate(0); box-shadow: 0 0 0 0 transparent, 0 0 0 transparent; }
+            23% { transform: translateY(-12px) rotate(-6deg) scale(1.09); box-shadow: 0 0 0 4px #34D399, 0 0 20px #10B981; }
+            73% { transform: translateY(-12px) rotate(6deg) scale(1.06); box-shadow: 0 0 0 5px #6EE7B7, 0 0 24px #10B981; }
         }
         @keyframes mascotSadShake {
             0%, 100% { transform: translateX(0); box-shadow: 0 0 0 0 transparent; }
-            20%, 60% { transform: translateX(-5px) rotate(-7deg); box-shadow: 0 0 0 3px #EF4444, 0 0 12px #EF4444; }
-            40%, 80% { transform: translateX(5px) rotate(7deg); }
+            15%, 55% { transform: translateX(-8px) rotate(-7deg); box-shadow: 0 0 0 4px #EF4444, 0 0 18px #DC2626; }
+            35%, 75% { transform: translateX(8px) rotate(7deg); box-shadow: 0 0 0 2px #F87171, 0 0 11px #EF4444; }
         }
         @keyframes mascotScaredShiver {
-            0%, 68%, 100% { transform: translateX(0); }
-            73%, 83%, 93% { transform: translateX(-1px) rotate(-2deg); }
-            78%, 88% { transform: translateX(1px) rotate(2deg); }
+            0%, 100% { transform: translateX(0); }
+            12%, 36%, 60%, 84% { transform: translateX(-1px) rotate(-2deg); }
+            24%, 48%, 72%, 94% { transform: translateX(1px) rotate(2deg); }
         }
         @keyframes mascotStarBurst {
             0% { opacity: 0; transform: scale(.5); }
             24% { opacity: 1; }
-            100% { opacity: 0; transform: translate(var(--star-x), -18px) rotate(32deg) scale(1.25); }
+            100% { opacity: 0; transform: translate(var(--star-x), -28px) rotate(32deg) scale(1.3); }
         }
     </style>
 </head>
@@ -3028,7 +3033,7 @@
                     <div class="progress-bar-compact" id="questionProgressBar" aria-label="Прогресс вопроса">
                         <div class="progress-bar-fill" id="questionProgressFill"></div>
                     </div>
-                    <span class="mascot-stage" data-mood="idle">
+                    <span class="mascot-stage mascot-idle" data-mood="idle">
                         <img class="question-mascot-large" id="questionMascotLarge" src="./assets/mascot_idle.png" alt="Маскот GradeUp" width="42" height="42">
                     </span>
                 </div>
@@ -3194,7 +3199,7 @@
             </div>
             <div class="avatar-picker">
                 <div class="avatar-controls" id="avatarCategories" role="group" aria-label="Категория">
-                    <button type="button" data-category="animal" aria-pressed="true">Животное</button>
+                    <button type="button" data-category="animal" aria-pressed="true">Персонаж</button>
                     <button type="button" data-category="outfit" aria-pressed="false">Одежда</button>
                     <button type="button" data-category="accessory" aria-pressed="false">Аксессуары</button>
                     <button type="button" data-category="bg" aria-pressed="false">Фон</button>
@@ -3557,31 +3562,34 @@
         let lastExamViolationAt = 0;
         let mascotResetTimer = null;
 
-        const AVATAR_ITEMS = {
+        const AVATAR_CATALOG = {
             animal: {
-                monkey: ["Обезьянка", 0], fox: ["Лиса", 60], wolf: ["Волк", 100],
-                leopard: ["Снежный барс", 150], owl: ["Сова", 200]
+                monkey: { name: "Макс", price: 0, portrait: "./assets/mascot_monkey.png" },
+                fox: { name: "Айя", price: 0, portrait: "./assets/mascot_fox.png" },
+                wolf: { name: "Бори", price: 100, portrait: "./assets/mascot_wolf.png" },
+                leopard: { name: "Барыс", price: 150, portrait: "./assets/mascot_leopard.png" },
+                owl: { name: "Дана", price: 200, portrait: "./assets/mascot_owl.png" }
             },
             outfit: {
-                hoodie_blue: ["Синее худи", 0, "#2563EB", '<path d="m48 48-2 11m9-11 2 11" stroke="#BFDBFE" stroke-width="1.3"/>'],
-                tshirt_white: ["Белая футболка", 50, "#F1F5F9", '<path d="M39 43q11 10 27 0" fill="none" stroke="#A8BEDA" stroke-width="2"/>'],
-                sweatshirt_black: ["Чёрный свитшот", 90, "#171D29", '<path d="M39 43q12 10 27 0m-20 24q10 4 20 0" fill="none" stroke="#52617A" stroke-width="2"/>'],
-                jacket_sport: ["Спортивная олимпийка", 140, "#166A83", '<path d="M52 48v22M35 47l5 5m28-5-5 5" stroke="#A5F3FC" stroke-width="1.5"/>'],
-                mantle_gold: ["Золотая мантия", 250, "#D89626", '<path d="m37 43 15 12 15-12-6 25H44Z" fill="#FFE7A1"/><circle cx="52" cy="55" r="2.5" fill="#874510"/>']
+                hoodie_blue: { name: "Синее худи", price: 0, fabric: "#2563EB", trim: '<path d="m48 48-2 11m9-11 2 11" stroke="#BFDBFE" stroke-width="1.3"/>' },
+                tshirt_white: { name: "Белая футболка", price: 0, fabric: "#F1F5F9", trim: '<path d="M39 43q11 10 27 0" fill="none" stroke="#A8BEDA" stroke-width="2"/>' },
+                sweatshirt_black: { name: "Чёрный свитшот", price: 90, fabric: "#171D29", trim: '<path d="M39 43q12 10 27 0m-20 24q10 4 20 0" fill="none" stroke="#52617A" stroke-width="2"/>' },
+                jacket_sport: { name: "Спортивная олимпийка", price: 140, fabric: "#166A83", trim: '<path d="M52 48v22M35 47l5 5m28-5-5 5" stroke="#A5F3FC" stroke-width="1.5"/>' },
+                mantle_gold: { name: "Золотая мантия", price: 250, fabric: "#D89626", trim: '<path d="m37 43 15 12 15-12-6 25H44Z" fill="#FFE7A1"/><circle cx="52" cy="55" r="2.5" fill="#874510"/>' }
             },
             accessory: {
-                none: ["Нет", 0, ""],
-                glasses: ["Очки", 60, '<g fill="#93C5FD" fill-opacity=".18" stroke="#182842" stroke-width="1.6"><rect x="39" y="19" width="12" height="10" rx="3"/><rect x="54" y="19" width="12" height="10" rx="3"/><path d="M51 23h3m-15 0-3-1m30 1 3-1"/></g>'],
-                cap: ["Кепка", 80, '<path d="M35 16Q39 4 53 4q12 0 16 12Z" fill="#2563EB" stroke="#0B0F19" stroke-width="1.2"/><path d="M46 16q11-4 22 0 12 4 7 5-8 1-29-5Z" fill="#163C8F"/>'],
-                headphones: ["Наушники", 120, '<path d="M33 25v-4a19 16 0 0 1 38 0v4" fill="none" stroke="#223A68" stroke-width="3"/><rect x="29" y="21" width="8" height="13" rx="3" fill="#2563EB"/><rect x="68" y="21" width="8" height="13" rx="3" fill="#2563EB"/>'],
-                sunglasses: ["Солнечные очки", 150, '<path d="M37 19h31l-2 8q-5 5-11 0l-2-4h-2l-2 4q-6 5-11 0Z" fill="#0B0F19"/><path d="m41 23 4-2m13 2 4-2" stroke="#91A8CD"/>'],
-                crown: ["Корона", 300, '<path d="m40 16-3-11 8 4 7-8 7 8 8-4-3 11Z" fill="#FFD76C" stroke="#925815" stroke-width="1"/><circle cx="52" cy="11" r="1.7" fill="#2563EB"/>']
+                none: { name: "Нет", price: 0, overlay: "" },
+                glasses: { name: "Очки", price: 60, overlay: '<g fill="#93C5FD" fill-opacity=".18" stroke="#182842" stroke-width="1.6"><rect x="39" y="19" width="12" height="10" rx="3"/><rect x="54" y="19" width="12" height="10" rx="3"/><path d="M51 23h3m-15 0-3-1m30 1 3-1"/></g>' },
+                cap: { name: "Кепка", price: 80, overlay: '<path d="M35 16Q39 4 53 4q12 0 16 12Z" fill="#2563EB" stroke="#0B0F19" stroke-width="1.2"/><path d="M46 16q11-4 22 0 12 4 7 5-8 1-29-5Z" fill="#163C8F"/>' },
+                headphones: { name: "Наушники", price: 120, overlay: '<path d="M33 25v-4a19 16 0 0 1 38 0v4" fill="none" stroke="#223A68" stroke-width="3"/><rect x="29" y="21" width="8" height="13" rx="3" fill="#2563EB"/><rect x="68" y="21" width="8" height="13" rx="3" fill="#2563EB"/>' },
+                sunglasses: { name: "Солнечные очки", price: 150, overlay: '<path d="M37 19h31l-2 8q-5 5-11 0l-2-4h-2l-2 4q-6 5-11 0Z" fill="#0B0F19"/><path d="m41 23 4-2m13 2 4-2" stroke="#91A8CD"/>' },
+                crown: { name: "Корона", price: 300, overlay: '<path d="m40 16-3-11 8 4 7-8 7 8 8-4-3 11Z" fill="#FFD76C" stroke="#925815" stroke-width="1"/><circle cx="52" cy="11" r="1.7" fill="#2563EB"/>' }
             },
             bg: {
-                navy: ["Тёмно-синий", "#0B0F19", "#2563EB"],
-                electric: ["Электрик", "#173C92", "#60A5FA"],
-                aurora: ["Северное сияние", "#164148", "#4CD6BB"],
-                sunset: ["Закат", "#502B54", "#FA9A77"]
+                navy: { name: "Тёмно-синий", price: 0, background: "#0B0F19", accent: "#2563EB" },
+                electric: { name: "Электрик", price: 0, background: "#173C92", accent: "#60A5FA" },
+                aurora: { name: "Северное сияние", price: 0, background: "#164148", accent: "#4CD6BB" },
+                sunset: { name: "Закат", price: 0, background: "#502B54", accent: "#FA9A77" }
             }
         };
         const DEFAULT_AVATAR = { animal: "monkey", outfit: "hoodie_blue", accessory: "none", bg: "navy" };
@@ -3590,7 +3598,7 @@
             const safe = { ...DEFAULT_AVATAR };
             for (const field of Object.keys(safe)) {
                 const value = config?.[field];
-                if (typeof value === "string" && Object.hasOwn(AVATAR_ITEMS[field], value)) safe[field] = value;
+                if (typeof value === "string" && Object.hasOwn(AVATAR_CATALOG[field], value)) safe[field] = value;
             }
             return safe;
         }
@@ -3598,8 +3606,9 @@
         function renderMascotPortrait(image, config) {
             const { animal, outfit, accessory, bg } = normalizeAvatar(config);
             const stage = image.parentElement;
-            const [, background, accent] = AVATAR_ITEMS.bg[bg];
-            const [, , fabric, trim] = AVATAR_ITEMS.outfit[outfit];
+            const { background, accent } = AVATAR_CATALOG.bg[bg];
+            const { fabric, trim } = AVATAR_CATALOG.outfit[outfit];
+            if (image.alt) image.alt = AVATAR_CATALOG.animal[animal].name;
             const garment = outfit === "hoodie_blue" ? "" :
                 `<path d="M35 41q17 10 31 0 8 7 11 21l-9 4-2 4q-14 4-23-2l-4-5-9 1-5-8q3-9 10-15Z" fill="${fabric}" stroke="#152137" stroke-width="1.4"/>`;
             stage.style.setProperty("--mascot-bg", background);
@@ -3608,7 +3617,7 @@
             layers.setAttribute("class", "mascot-layers");
             layers.setAttribute("viewBox", "0 0 100 100");
             layers.setAttribute("aria-hidden", "true");
-            const layersMarkup = garment + trim + AVATAR_ITEMS.accessory[accessory][2];
+            const layersMarkup = garment + trim + AVATAR_CATALOG.accessory[accessory].overlay;
             if (layers.dataset.outfit !== outfit || layers.dataset.accessory !== accessory) {
                 layers.innerHTML = layersMarkup;
                 layers.dataset.outfit = outfit;
@@ -3623,17 +3632,10 @@
             });
         }
 
-        const MASCOT_PORTRAITS = {
-            monkey: "./assets/mascot_monkey.png",
-            fox: "./assets/mascot_fox.png",
-            wolf: "./assets/mascot_wolf.png",
-            leopard: "./assets/mascot_leopard.png",
-            owl: "./assets/mascot_owl.png"
-        };
         const mascotPortraitCache = new Map();
 
         async function loadMascotPortrait(animal) {
-            return await removeMascotBackdrop(MASCOT_PORTRAITS[animal]) ||
+            return await removeMascotBackdrop(AVATAR_CATALOG.animal[animal].portrait) ||
                 await removeMascotBackdrop("./assets/mascot_idle.png");
         }
 
@@ -3692,16 +3694,20 @@
             return mascotPortraitCache.get(source);
         }
 
-        function restartMascotAnimation(stage, mood) {
-            if (stage.dataset.mood === mood && (mood === "idle" || mood === "scared")) return;
-            delete stage.dataset.mood;
+        function restartMascotAnimation(stage, mood, force = false) {
+            const previousMood = stage.dataset.mood;
+            if (previousMood === mood && !force) return;
+            if (previousMood) stage.classList.remove(`mascot-${previousMood}`);
             void stage.offsetWidth;
+            stage.classList.add(`mascot-${mood}`);
             stage.dataset.mood = mood;
         }
 
         const ITEM_PRICES = Object.fromEntries(["animal", "outfit", "accessory"].flatMap(category =>
-            Object.entries(AVATAR_ITEMS[category]).map(([item, [, price]]) => [item, price])
+            Object.entries(AVATAR_CATALOG[category]).map(([item, { price }]) => [item, price])
         ));
+        // Saved purchases for these items were made before they became free.
+        const PURCHASE_LEDGER_PRICES = { ...ITEM_PRICES, fox: 60, tshirt_white: 50 };
         const QUESTS = {
             dailyLearn: ["Выучить 10 вопросов", 10, 20, true],
             dailyStreak: ["Дать 5 верных ответов подряд", 5, 25, true],
@@ -3751,15 +3757,15 @@
         function gradeWallet(first, second) {
             const coinClaims = mergeCoinEvents(first?.coinClaims, second?.coinClaims, rewardForClaim);
             const coinPurchases = mergeCoinEvents(first?.coinPurchases, second?.coinPurchases, item =>
-                Object.hasOwn(ITEM_PRICES, item) && ITEM_PRICES[item] > 0, true
+                Object.hasOwn(PURCHASE_LEDGER_PRICES, item) && PURCHASE_LEDGER_PRICES[item] > 0, true
             );
             const grants = new Set();
             for (const account of [first, second]) {
                 if (!account) continue;
                 const previous = account.coinPurchases ? account.avatarGrants || [] : Object.values(normalizeAvatar(account.avatarConfig));
-                previous.filter(item => Object.hasOwn(ITEM_PRICES, item) && ITEM_PRICES[item] > 0).forEach(item => grants.add(item));
+                previous.filter(item => Object.hasOwn(PURCHASE_LEDGER_PRICES, item) && PURCHASE_LEDGER_PRICES[item] > 0).forEach(item => grants.add(item));
             }
-            const owned = new Set([...Object.keys(ITEM_PRICES).filter(item => ITEM_PRICES[item] === 0), ...grants]);
+            const owned = new Set(grants);
             const events = [
                 ...Object.entries(coinClaims).map(([key, stamp]) => ({ key, stamp, reward: rewardForClaim(key) })),
                 ...Object.entries(coinPurchases).map(([key, stamp]) => ({ key, stamp, reward: 0 }))
@@ -3768,10 +3774,13 @@
             // Replay the same events on every device. Duplicate claims or purchases are charged only once.
             for (const { key, reward } of events) {
                 if (reward) coins += reward;
-                else if (!owned.has(key) && coins >= ITEM_PRICES[key]) {
-                    coins -= ITEM_PRICES[key];
+                else if (!owned.has(key) && coins >= PURCHASE_LEDGER_PRICES[key]) {
+                    coins -= PURCHASE_LEDGER_PRICES[key];
                     owned.add(key);
                 }
+            }
+            for (const [item, price] of Object.entries(ITEM_PRICES)) {
+                if (price === 0) owned.add(item);
             }
             const questMilestones = Object.fromEntries(Object.keys(QUESTS).filter(id => !QUESTS[id][3]).map(id => [
                 id, Math.max(Number(first?.questMilestones?.[id]) || 0, Number(second?.questMilestones?.[id]) || 0)
@@ -4840,6 +4849,7 @@
                     updateStreak();
                     setTimeout(showLearningQuestion, 650);
                 } else {
+                    setMascot("sad");
                     button.classList.add("incorrect");
                     button.disabled = true;
                     wrongInAttempt = true;
@@ -4852,7 +4862,6 @@
                     updateProgress();
                     saveAccountProgress(getProfile()).catch(() => {});
                     playTone("wrong");
-                    setMascot("sad");
                     if (navigator.vibrate) navigator.vibrate(60);
                 }
             } else {
@@ -4956,11 +4965,12 @@
             if (!mascot) return;
             clearTimeout(mascotResetTimer);
             const mood = state === "idle" && mode === "exam" ? "scared" : state;
+            const reacting = mood === "happy" || mood === "sad";
             renderMascotPortrait(mascot, getCurrentAccount()?.avatarConfig);
             mascot.classList.toggle("happy", mood === "happy");
             mascot.classList.toggle("sad", mood === "sad");
-            restartMascotAnimation(mascot.parentElement, mood);
-            if (state === "happy" || state === "sad") {
+            restartMascotAnimation(mascot.parentElement, mood, reacting);
+            if (reacting) {
                 mascotResetTimer = setTimeout(() => setMascot("idle"), 1500);
             }
         }
@@ -5829,10 +5839,10 @@
             renderGradeQuests(account);
         }
 
-        function renderAvatarEditor(focusedItem) {
+        function renderAvatarEditor(focusedItem, replayMood = false) {
             const preview = document.getElementById("avatarPreview");
             renderMascotPortrait(preview, avatarDraft);
-            restartMascotAnimation(preview.parentElement, avatarMood);
+            restartMascotAnimation(preview.parentElement, avatarMood, replayMood);
             document.querySelectorAll("#avatarMoods [data-mood]").forEach(button => {
                 button.setAttribute("aria-pressed", String(button.dataset.mood === avatarMood));
             });
@@ -5841,8 +5851,7 @@
             });
             const account = getCurrentAccount();
             const wallet = account || gradeWallet();
-            const cards = Object.entries(AVATAR_ITEMS[avatarCategory]).map(([value, [label]]) => {
-                const price = ITEM_PRICES[value] || 0;
+            const cards = Object.entries(AVATAR_CATALOG[avatarCategory]).map(([value, { name, price }]) => {
                 const owned = !price || wallet.ownedItems?.includes(value);
                 const selected = avatarDraft[avatarCategory] === value;
                 const card = document.createElement("div");
@@ -5851,7 +5860,7 @@
                 card.dataset.selected = String(selected);
                 card.innerHTML = '<span class="mascot-stage mascot-thumbnail-stage"><img alt="" width="72" height="72"></span><span></span>';
                 renderMascotPortrait(card.querySelector("img"), { ...avatarDraft, [avatarCategory]: value });
-                card.lastElementChild.textContent = label;
+                card.lastElementChild.textContent = name;
                 if (!owned) {
                     const cost = document.createElement("strong");
                     cost.textContent = coinLabel(price);
@@ -5862,7 +5871,7 @@
                 button.dataset.shopAction = owned ? "wear" : "buy";
                 button.disabled = selected || (!owned && !account);
                 button.textContent = selected ? "Надето" : owned ? "Надеть" : "Купить";
-                button.setAttribute("aria-label", `${button.textContent} ${label}`);
+                button.setAttribute("aria-label", `${button.textContent} ${name}`);
                 card.appendChild(button);
                 return card;
             });
@@ -5874,7 +5883,7 @@
             const button = event.target.closest("[data-mood]");
             if (!button) return;
             avatarMood = button.dataset.mood;
-            renderAvatarEditor();
+            renderAvatarEditor(undefined, true);
         });
         document.getElementById("avatarCategories").addEventListener("click", event => {
             const button = event.target.closest("[data-category]");
