@@ -7,10 +7,12 @@
     <meta name="description" content="GradeUp - интерактивная платформа для системной подготовки к ЕНТ.">
     <meta property="og:type" content="website">
     <meta property="og:locale" content="ru_RU">
-    <meta property="og:title" content="GradeUp - Платформа подготовки к ЕНТ">
+    <meta property="og:title" content="GradeUp">
     <meta property="og:description" content="Интервальное заучивание и экзамен по истории Казахстана">
-    <title>GradeUp - Платформа подготовки к ЕНТ</title>
+    <title>GradeUp</title>
     <link rel="icon" type="image/png" href="./assets/favicon.png">
+    <link rel="apple-touch-icon" href="./assets/logo.png">
+    <link rel="manifest" href="./manifest.json">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -1726,57 +1728,7 @@
         .timer.visible { display: block; }
         .timer.danger { color: var(--error); }
 
-        /* ===== Consolidated Layout Rules ===== */
-        .practice-grid {
-            display: grid;
-            grid-template-columns: minmax(0, 1fr) 320px;
-            gap: 24px;
-            align-items: start;
-            width: 100%;
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-        .practice-main { min-width: 0; width: 100%; }
-        .practice-side { min-width: 0; position: sticky; top: 24px; }
-
-        .leaders-card { width: 100%; max-width: 1100px; margin: 0 auto; }
-
-        .creator-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 24px;
-            align-items: start;
-            width: 100%;
-            max-width: 1000px;
-            margin: 0 auto;
-        }
-
-        @media (min-width: 1200px) {
-            .creator-grid {
-                grid-template-columns: 360px minmax(0, 1fr);
-            }
-        }
-
-        .profile-container { width: 100%; max-width: 1000px; margin: 0 auto; }
-
-        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
-
-        @media (min-width: 900px) {
-            .stats-grid { grid-template-columns: repeat(3, 1fr); }
-        }
-
-        @media (min-width: 900px) {
-            .practice-grid {
-                grid-template-columns: minmax(0, 1fr) 320px;
-            }
-            .practice-side { position: sticky; top: 24px; }
-            .options { grid-template-columns: 1fr 1fr; gap: 14px; }
-        }
-
-        @media (max-width: 899px) {
-            .practice-grid { grid-template-columns: 1fr; }
-            .practice-side { position: static; }
-        }
+        
 
         .quiz { padding: 24px 18px 28px; }
 
@@ -2421,9 +2373,9 @@
                 min-height: auto;
             }
 
-            .progress-page, .leaderboard-page, .creator-page, .menu-page {
+            .practice-page, .progress-page, .leaderboard-page, .creator-page, .menu-page {
                 grid-column: 2;
-                max-width: 1200px;
+                max-width: 1320px;
                 margin: 24px auto;
                 border-radius: 16px;
                 min-height: calc(100vh - 120px);
@@ -2722,6 +2674,11 @@
             .option { min-height: 52px; padding: 10px 12px; font-size: 16px; }
             .options { gap: 10px; }
             .quiz { padding: 4px 14px 20px; }
+            .leaderboard-card { flex-wrap: wrap; gap: 8px; }
+            .leaderboard-info { order: 1; flex: 1 1 100%; min-width: 0; }
+            .leaderboard-place-large { order: 0; }
+            .leaderboard-avatar { order: 0; }
+            .leaderboard-score-large { order: 2; font-size: 14px; text-align: right; width: 100%; margin-top: 4px; }
         }
 
         /* ===== HOVER EFFECTS FOR ALL INTERACTIVE ELEMENTS ===== */
@@ -2774,6 +2731,58 @@
                 animation-iteration-count: 1 !important;
                 transition-duration: 0.01ms !important;
             }
+        }
+
+        /* ===== Consolidated Layout Rules (moved to end for priority) ===== */
+        .practice-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 320px;
+            gap: 24px;
+            align-items: start;
+            width: 100%;
+            max-width: 1320px;
+            margin: 0 auto;
+        }
+        .practice-main { min-width: 0; width: 100%; }
+        .practice-side { min-width: 0; position: sticky; top: 24px; }
+
+        .leaders-card { width: 100%; max-width: 1100px; margin: 0 auto; }
+
+        .creator-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 24px;
+            align-items: start;
+            width: 100%;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        @media (min-width: 1200px) {
+            .creator-grid {
+                grid-template-columns: 360px minmax(0, 1fr);
+            }
+        }
+
+        .profile-container { width: 100%; max-width: 1000px; margin: 0 auto; }
+
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+
+        @media (min-width: 900px) {
+            .stats-grid { grid-template-columns: repeat(3, 1fr); }
+        }
+
+        @media (min-width: 900px) {
+            .practice-grid {
+                grid-template-columns: minmax(0, 1fr) 320px;
+            }
+            .practice-side { position: sticky; top: 24px; }
+            .options { grid-template-columns: 1fr 1fr; gap: 14px; }
+        }
+
+        @media (max-width: 899px) {
+            .practice-grid { grid-template-columns: 1fr; }
+            .practice-side { position: static; }
         }
     </style>
 </head>
@@ -3019,13 +3028,7 @@
                     <div class="stat-value" id="statBestExamProfile">0%</div>
                     <div class="stat-label">Лучший результат</div>
                 </article>
-                <article class="stat-card">
-                    <div class="stat-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                    </div>
-                    <div class="stat-value" id="statStudyTimeProfile">0 мин</div>
-                    <div class="stat-label">Время обучения</div>
-                </article>
+                
             </div>
 
             <div class="profile-actions">
@@ -3078,8 +3081,6 @@
                 </div>
             </div>
         </section>
-
-        <p class="credit">Created by Mustafa Orazaly Aslanuly</p>
     <dialog class="confirm-dialog" id="finishConfirmDialog">
         <h2>Завершить тест?</h2>
         <p id="finishConfirmText">Все неотвеченные вопросы будут считаться ошибками.</p>
@@ -3167,8 +3168,8 @@
     <div class="welcome-overlay" id="welcomeOverlay" role="dialog" aria-modal="true" aria-labelledby="welcomeTitle">
         <div class="welcome-dialog" id="welcomeDialog">
             <section id="welcomeStep">
-                <div class="welcome-character" id="welcomeCharacter" role="button" tabindex="0" aria-label="Поздороваться с обезьянкой">
-                    <img src="./assets/mascot_idle.png" alt="Обезьянка-помощник ЕНТ">
+                <div class="welcome-character" id="welcomeCharacter" role="button" tabindex="0" aria-label="GradeUp">
+                    <img src="./assets/logo.png" alt="GradeUp" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover;">
                 </div>
                 <h2 id="welcomeTitle">Добро пожаловать!</h2>
                 <p>Этот сайт создан, чтобы закреплять пройденный материал</p>
@@ -3177,8 +3178,8 @@
                 </div>
             </section>
             <section id="registrationStep" style="display:none">
-                <div class="welcome-character" id="registrationCharacter" role="button" tabindex="0" aria-label="Поздороваться с обезьянкой">
-                    <img src="./assets/mascot_idle.png" alt="Обезьянка-помощник ЕНТ">
+                <div class="welcome-character" id="registrationCharacter" role="button" tabindex="0" aria-label="GradeUp">
+                    <img src="./assets/logo.png" alt="GradeUp" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover;">
                 </div>
                 <div class="auth-switch">
                     <button class="auth-tab active" id="registerTab" type="button">Регистрация</button>
@@ -3274,8 +3275,8 @@
         const ACTIVE_DAYS_STORAGE_KEY = "ent_active_days_v2";
         const NAV_STORAGE_KEY = "gradeup_active_nav";
         const MODE_STORAGE_KEY = "gradeup_active_mode";
-        const UNLOCK_LEARNED_SHARE = 0.8;
-        const UNLOCK_EXAM_SCORE = 70;
+        const UNLOCK_LEARNED_SHARE = 0.5;
+        const UNLOCK_EXAM_SCORE = 60;
 
         if (localStorage.getItem(RESET_RELEASE_KEY) !== "done") {
             [
@@ -4182,7 +4183,7 @@
             currentQuestion = question;
             document.getElementById("progressText").textContent =
                 mode === "learn"
-                    ? `Вопросов: ${baseQuestions.length}`
+                    ? `Осталось: ${learningQueue.length}`
                     : `Вопрос ${examIndex + 1} из ${baseQuestions.length}`;
             
             // Update progress bar
@@ -5177,12 +5178,8 @@
                     `<div class="leaderboard-name-row"><strong>${escapeHtml(entry.fullName)}</strong></div>` +
                     `<span class="leaderboard-branch">${escapeHtml(entry.branch)}</span>` +
                     `</div>` +
-                    `<span class="leaderboard-score-large">${scoreText}</span>` +
-                    `<button class="leaderboard-profile-btn" type="button" aria-label="Открыть профиль ученика" title="Открыть профиль ученика">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                    </button>`;
-                row.addEventListener("click", (e) => {
-                    if (e.target.closest('.leaderboard-profile-btn')) return;
+                    `<span class="leaderboard-score-large">${scoreText}</span>`;
+                row.addEventListener("click", () => {
                     showPublicProfile(entry.key);
                 });
                 list.appendChild(row);
