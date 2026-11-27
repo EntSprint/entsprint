@@ -2927,7 +2927,7 @@
             border-radius: 50%;
             object-fit: contain;
         }
-        .mascot-stage > img:not([src^="data:"]) { visibility: hidden; }
+        .mascot-stage > img:not([data-portrait-ready]) { visibility: hidden; }
         .mascot-stage > .mascot-layers {
             position: absolute;
             inset: 0;
@@ -2936,8 +2936,7 @@
             clip-path: circle(50%);
             pointer-events: none;
         }
-        .mascot-stage > img:not([src^="data:"]) + .mascot-layers,
-        .mascot-stage > img[data-fallback] + .mascot-layers .mascot-garment { visibility: hidden; }
+        .mascot-stage > img:not([data-portrait-ready]) + .mascot-layers { visibility: hidden; }
         .mascot-preview-stage { width: min(100%, 240px); }
         .mascot-thumbnail-stage { width: min(100%, 72px); }
         .mascot-stage.menu-profile-avatar { width: 100px; }
@@ -3730,28 +3729,30 @@
             if (!layers.parentElement) stage.appendChild(layers);
             if (stage.dataset.animal === animal) return;
             stage.dataset.animal = animal;
+            image.removeAttribute("data-portrait-ready");
             image.removeAttribute("src");
-            loadMascotPortrait(animal).then(({ source, fallback }) => {
-                if (source && stage.dataset.animal === animal) {
-                    image.toggleAttribute("data-fallback", fallback);
-                    image.src = source;
+            const portrait = AVATAR_CATALOG.animal[animal].portrait;
+            removeMascotBackdrop(portrait).then(source => {
+                if (stage.dataset.animal !== animal) return;
+                if (!source) {
+                    delete stage.dataset.animal;
+                    return;
                 }
+                image.src = source;
+                image.setAttribute("data-portrait-ready", "");
             });
         }
 
         const mascotPortraitCache = new Map();
 
-        async function loadMascotPortrait(animal) {
-            const source = await removeMascotBackdrop(AVATAR_CATALOG.animal[animal].portrait);
-            if (source) return { source, fallback: false };
-            return { source: await removeMascotBackdrop("./assets/mascot_idle.png"), fallback: true };
-        }
-
         function removeMascotBackdrop(source) {
             if (!mascotPortraitCache.has(source)) {
                 mascotPortraitCache.set(source, new Promise(resolve => {
                     const portrait = new Image();
-                    portrait.onerror = () => resolve(null);
+                    portrait.onerror = () => {
+                        mascotPortraitCache.delete(source);
+                        resolve(null);
+                    };
                     portrait.onload = () => {
                         try {
                             const canvas = document.createElement("canvas");
@@ -3793,7 +3794,7 @@
                             context.putImageData(pixels, 0, 0);
                             resolve(canvas.toDataURL("image/png"));
                         } catch (_) {
-                            resolve(null);
+                            resolve(source);
                         }
                     };
                     portrait.src = source;
