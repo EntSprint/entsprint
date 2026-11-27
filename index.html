@@ -54,10 +54,8 @@
             background: transparent;
             transition: border-color 180ms ease, transform 180ms ease;
         }
-        .question-mascot.happy,
-        .question-mascot-large.happy { border-color: var(--success); animation: mascot-jump 500ms ease; }
-        .question-mascot.sad,
-        .question-mascot-large.sad { border-color: var(--error); animation: mascot-shake 500ms ease; }
+        .question-mascot.happy { border-color: var(--success); animation: mascot-jump 500ms ease; }
+        .question-mascot.sad { border-color: var(--error); animation: mascot-shake 500ms ease; }
 
         /* ===== Custom Lesson Select ===== */
         .lesson-select-wrapper {
@@ -364,12 +362,6 @@
             }
             .header .sound-btn {
                 display: flex;
-            }
-        }
-
-        @media (min-width: 900px) {
-            .header .sound-btn {
-                display: none;
             }
         }
 
@@ -2333,12 +2325,15 @@
 
             .header {
                 grid-column: 2;
+                align-self: start;
+                grid-template-columns: 1fr;
                 padding: 16px 24px;
                 border-bottom: 1px solid var(--card-border);
                 margin-bottom: 0;
             }
 
             .header .brand { display: none; }
+            .header .sound-btn { justify-self: end; }
 
             .brand-logo { height: 40px; max-width: 220px; }
 
@@ -2587,7 +2582,7 @@
 
             .leaderboard-card {
                 display: grid;
-                grid-template-columns: 40px 44px minmax(0, 1fr) 32px;
+                grid-template-columns: 40px 44px minmax(0, 1fr) max-content;
                 align-items: center;
                 gap: 10px;
                 padding: 12px 14px;
@@ -2604,6 +2599,7 @@
             .leaderboard-name-row strong {
                 font-size: 14px;
                 white-space: normal;
+                overflow-wrap: anywhere;
                 overflow: visible;
                 text-overflow: clip;
             }
@@ -2614,8 +2610,21 @@
                 text-overflow: clip;
             }
             .leaderboard-score-large {
-                font-size: 16px;
-                justify-self: center;
+                display: flex;
+                flex-direction: column;
+                align-items: flex-end;
+                justify-self: end;
+                text-align: right;
+                line-height: 1.15;
+                font-size: 18px;
+                font-weight: 700;
+                color: #2563EB;
+            }
+            .leaderboard-score-label {
+                margin-top: 2px;
+                color: #94A3B8;
+                font-size: 11px;
+                font-weight: 500;
             }
             .leaderboard-profile-btn {
                 width: 32px;
@@ -2679,11 +2688,9 @@
             .option { min-height: 52px; padding: 10px 12px; font-size: 16px; }
             .options { gap: 10px; }
             .quiz { padding: 4px 14px 20px; }
-            .leaderboard-card { flex-wrap: wrap; gap: 8px; }
-            .leaderboard-info { order: 1; flex: 1 1 100%; min-width: 0; }
-            .leaderboard-place-large { order: 0; }
-            .leaderboard-avatar { order: 0; }
-            .leaderboard-score-large { order: 2; font-size: 14px; text-align: right; width: 100%; margin-top: 4px; }
+            .leaderboard-card { grid-template-columns: 32px 36px minmax(0, 1fr) max-content; gap: 8px; padding-inline: 10px; }
+            .leaderboard-place-large { width: 32px; height: 32px; }
+            .leaderboard-avatar { width: 36px; height: 36px; }
         }
 
         /* ===== HOVER EFFECTS FOR ALL INTERACTIVE ELEMENTS ===== */
@@ -2836,6 +2843,78 @@
         .avatar-page button:focus-visible { outline: 2px solid #93C5FD; outline-offset: 2px; }
         .avatar-save:disabled { opacity: .65; cursor: not-allowed; }
         .avatar-status { margin: 8px 0 0; font-size: 13px; }
+
+        .nav-icon svg { display: block; width: 20px; height: 20px; margin: auto; }
+
+        .mascot-stage {
+            position: relative;
+            width: 42px;
+            aspect-ratio: 1;
+            flex: none;
+            border: 2px solid var(--primary);
+            border-radius: 50%;
+            background: radial-gradient(circle, var(--mascot-accent, #2563EB), var(--mascot-bg, #0B0F19) 76%);
+            transform-origin: 50% 85%;
+        }
+        .mascot-stage > img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            border: 0;
+            border-radius: 50%;
+        }
+        .mascot-stage > .question-mascot-large:not([src^="data:"]) { visibility: hidden; }
+        .mascot-preview-stage { width: min(100%, 240px); }
+        .mascot-thumbnail-stage { width: min(100%, 72px); }
+        .mascot-thumbnail-stage > img { object-fit: contain; }
+        .mascot-stage[data-mood="idle"] { animation: mascotIdleBreath 2.8s ease-in-out infinite; }
+        .mascot-stage[data-mood="happy"] {
+            border-color: #34D399;
+            animation: mascotHappyJump 620ms ease-in-out both;
+        }
+        .mascot-stage[data-mood="sad"] {
+            border-color: #EF4444;
+            animation: mascotSadShake 540ms ease-in-out both;
+        }
+        .mascot-stage[data-mood="scared"] { animation: mascotScaredShiver 1.45s ease-in-out infinite; }
+        .mascot-stage[data-mood="happy"]::before,
+        .mascot-stage[data-mood="happy"]::after {
+            content: "✦";
+            position: absolute;
+            top: 12%;
+            z-index: 1;
+            color: #6EE7B7;
+            font-size: 16px;
+            line-height: 1;
+            pointer-events: none;
+            animation: mascotStarBurst 610ms ease-out both;
+        }
+        .mascot-stage[data-mood="happy"]::before { left: 0; --star-x: -16px; }
+        .mascot-stage[data-mood="happy"]::after { right: 0; --star-x: 16px; color: #93C5FD; }
+        @keyframes mascotIdleBreath {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.035, 1.065); }
+        }
+        @keyframes mascotHappyJump {
+            0%, 50%, 100% { transform: translateY(0) rotate(0); box-shadow: 0 0 0 0 transparent; }
+            25% { transform: translateY(-9px) rotate(-8deg) scale(1.09); box-shadow: 0 0 0 3px #34D399, 0 0 16px #2563EB; }
+            75% { transform: translateY(-5px) rotate(7deg) scale(1.06); box-shadow: 0 0 0 2px #2563EB, 0 0 14px #34D399; }
+        }
+        @keyframes mascotSadShake {
+            0%, 100% { transform: translateX(0); box-shadow: 0 0 0 0 transparent; }
+            20%, 60% { transform: translateX(-5px) rotate(-7deg); box-shadow: 0 0 0 3px #EF4444, 0 0 12px #EF4444; }
+            40%, 80% { transform: translateX(5px) rotate(7deg); }
+        }
+        @keyframes mascotScaredShiver {
+            0%, 68%, 100% { transform: translateX(0); }
+            73%, 83%, 93% { transform: translateX(-1px) rotate(-2deg); }
+            78%, 88% { transform: translateX(1px) rotate(2deg); }
+        }
+        @keyframes mascotStarBurst {
+            0% { opacity: 0; transform: scale(.5); }
+            24% { opacity: 1; }
+            100% { opacity: 0; transform: translate(var(--star-x), -18px) rotate(32deg) scale(1.25); }
+        }
     </style>
 </head>
 <body data-tab="practice">
@@ -2889,7 +2968,9 @@
                     <div class="progress-bar-compact" id="questionProgressBar" aria-label="Прогресс вопроса">
                         <div class="progress-bar-fill" id="questionProgressFill"></div>
                     </div>
-                    <img class="question-mascot-large" id="questionMascotLarge" src="./assets/mascot_idle.png" alt="Маскот GradeUp" width="42" height="42">
+                    <span class="mascot-stage" data-mood="idle">
+                        <img class="question-mascot-large" id="questionMascotLarge" src="./assets/mascot_idle.png" alt="Маскот GradeUp" width="42" height="42">
+                    </span>
                 </div>
                 <div class="topic-tag" id="topicTag"></div>
                 <h1 class="question" id="questionText">Загрузка вопросов...</h1>
@@ -3038,7 +3119,9 @@
         <section class="avatar-page" id="avatarPage" data-page="avatar" aria-labelledby="avatarTitle">
             <h2 id="avatarTitle">Аватар</h2>
             <div class="avatar-stage">
-                <img class="avatar-preview" id="avatarPreview" alt="Предпросмотр маскота" width="240" height="240">
+                <div class="mascot-stage mascot-preview-stage">
+                    <img class="avatar-preview" id="avatarPreview" alt="Предпросмотр маскота" width="240" height="240">
+                </div>
                 <div class="avatar-controls" id="avatarMoods" role="group" aria-label="Эмоция маскота">
                     <button type="button" data-mood="idle" aria-pressed="true">Обычный</button>
                     <button type="button" data-mood="happy" aria-pressed="false">Верно</button>
@@ -3215,7 +3298,7 @@
         <button class="nav-btn active" id="practiceNav" type="button" data-nav="practice"><span class="nav-icon" aria-hidden="true">✓</span><span class="nav-label">Закрепление</span></button>
         <button class="nav-btn" id="leadersNav" type="button" data-nav="leaders"><span class="nav-icon" aria-hidden="true">♛</span><span class="nav-label">Лидеры</span></button>
         <button class="nav-btn" id="creatorNav" type="button" data-nav="creator"><span class="nav-icon" aria-hidden="true">★</span><span class="nav-label">Creator</span></button>
-        <button class="nav-btn" id="avatarNav" type="button" data-nav="avatar"><span class="nav-icon" aria-hidden="true">◎</span><span class="nav-label">Аватар</span></button>
+        <button class="nav-btn" id="avatarNav" type="button" data-nav="avatar"><span class="nav-icon" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 14a4 4 0 0 0 8 0M9 9h.01M15 9h.01"/></svg></span><span class="nav-label">Аватар</span></button>
         <button class="nav-btn" id="menuNav" type="button" data-nav="profile"><span class="nav-icon" aria-hidden="true">☰</span><span class="nav-label">Профиль</span></button>
         <div class="sidebar-profile">
             <div class="sidebar-profile-top">
@@ -3490,6 +3573,77 @@
 
         function mascotImageSource(config, mood) {
             return "data:image/svg+xml," + encodeURIComponent(renderMascotSVG(config, mood));
+        }
+
+        const MASCOT_PORTRAITS = {
+            monkey: "./assets/mascot_idle.png",
+            fox: "./assets/mascot_fox.png",
+            wolf: "./assets/mascot_wolf.png",
+            leopard: "./assets/mascot_leopard.png",
+            owl: "./assets/mascot_owl.png"
+        };
+        const mascotPortraitCache = new Map();
+
+        function removeMascotBackdrop(source) {
+            if (!mascotPortraitCache.has(source)) {
+                mascotPortraitCache.set(source, new Promise(resolve => {
+                    const portrait = new Image();
+                    portrait.onerror = () => resolve(null);
+                    portrait.onload = () => {
+                        try {
+                            const canvas = document.createElement("canvas");
+                            const scale = Math.min(1, 256 / Math.max(portrait.naturalWidth, portrait.naturalHeight));
+                            const width = canvas.width = Math.max(1, Math.round(portrait.naturalWidth * scale));
+                            const height = canvas.height = Math.max(1, Math.round(portrait.naturalHeight * scale));
+                            const context = canvas.getContext("2d");
+                            context.drawImage(portrait, 0, 0, width, height);
+                            const pixels = context.getImageData(0, 0, width, height);
+                            const colors = pixels.data;
+                            const visited = new Uint8Array(width * height);
+                            const queue = new Uint32Array(visited.length);
+                            let tail = 0;
+                            function clearConnectedPixel(index) {
+                                if (visited[index]) return;
+                                visited[index] = 1;
+                                const offset = index * 4;
+                                if (colors[offset + 3] && Math.max(colors[offset], colors[offset + 1], colors[offset + 2]) > 34) return;
+                                colors[offset + 3] = 0;
+                                queue[tail++] = index;
+                            }
+                            // Follow the dark backdrop from the edges to preserve dark details inside the silhouette.
+                            for (let x = 0; x < width; x++) {
+                                clearConnectedPixel(x);
+                                clearConnectedPixel((height - 1) * width + x);
+                            }
+                            for (let y = 1; y < height - 1; y++) {
+                                clearConnectedPixel(y * width);
+                                clearConnectedPixel(y * width + width - 1);
+                            }
+                            for (let head = 0; head < tail; head++) {
+                                const index = queue[head];
+                                const x = index % width;
+                                if (x > 0) clearConnectedPixel(index - 1);
+                                if (x < width - 1) clearConnectedPixel(index + 1);
+                                if (index >= width) clearConnectedPixel(index - width);
+                                if (index < queue.length - width) clearConnectedPixel(index + width);
+                            }
+                            context.putImageData(pixels, 0, 0);
+                            resolve(canvas.toDataURL("image/png"));
+                        } catch (_) {
+                            resolve(null);
+                        }
+                    };
+                    portrait.src = source;
+                }));
+            }
+            return mascotPortraitCache.get(source);
+        }
+
+        function restartMascotAnimation(stage, mood) {
+            if (stage.dataset.mood === mood && (mood === "idle" || mood === "scared")) return;
+            delete stage.dataset.mood;
+            void stage.offsetWidth;
+            stage.dataset.mood = mood;
         }
 
         function loadJson(key, fallback) {
@@ -4588,12 +4742,12 @@
             const mascot = document.getElementById("questionMascotLarge");
             if (!mascot) return;
             clearTimeout(mascotResetTimer);
-            mascot.classList.remove("happy", "sad");
-
             const mood = state === "idle" && mode === "exam" ? "scared" : state;
             mascot.src = mascotImageSource(getCurrentAccount()?.avatarConfig, mood);
+            mascot.classList.toggle("happy", mood === "happy");
+            mascot.classList.toggle("sad", mood === "sad");
+            restartMascotAnimation(mascot.parentElement, mood);
             if (state === "happy" || state === "sad") {
-                mascot.classList.add(state);
                 mascotResetTimer = setTimeout(() => setMascot("idle"), 1500);
             }
         }
@@ -5291,10 +5445,10 @@
                 const row = document.createElement("div");
                 row.className = "leaderboard-card";
                 row.dataset.profileKey = entry.key;
-                let scoreText = "";
+                let scoreText = String(score);
                 if (criterion === "exam") scoreText = `${score}%`;
                 else if (criterion === "time") scoreText = formatSiteTime(score);
-                else scoreText = `${score} выучено`;
+                const scoreLabel = criterion === "learned" ? ' <span class="leaderboard-score-label">выучено</span>' : "";
 
                 let placeClass = "";
                 let placeContent = index + 1;
@@ -5309,7 +5463,7 @@
                     `<div class="leaderboard-name-row"><strong>${escapeHtml(entry.fullName)}</strong></div>` +
                     `<span class="leaderboard-branch">${escapeHtml(entry.branch)}</span>` +
                     `</div>` +
-                    `<span class="leaderboard-score-large">${scoreText}</span>`;
+                    `<span class="leaderboard-score-large"><span>${escapeHtml(scoreText)}</span>${scoreLabel}</span>`;
                 row.querySelector(".leaderboard-avatar").src = mascotImageSource(entry.avatarConfig);
                 row.addEventListener("click", () => {
                     showPublicProfile(entry.key);
@@ -5383,7 +5537,9 @@
         }
 
         function renderAvatarEditor(focusedItem) {
-            document.getElementById("avatarPreview").src = mascotImageSource(avatarDraft, avatarMood);
+            const preview = document.getElementById("avatarPreview");
+            preview.src = mascotImageSource(avatarDraft, avatarMood);
+            restartMascotAnimation(preview.parentElement, avatarMood);
             document.querySelectorAll("#avatarMoods [data-mood]").forEach(button => {
                 button.setAttribute("aria-pressed", String(button.dataset.mood === avatarMood));
             });
@@ -5398,9 +5554,18 @@
                 card.dataset.item = value;
                 card.disabled = Boolean(lock);
                 card.setAttribute("aria-pressed", String(avatarDraft[avatarCategory] === value));
-                card.innerHTML = "<img alt=\"\" width=\"72\" height=\"72\"><span></span>";
-                card.querySelector("img").src = mascotImageSource({ ...avatarDraft, [avatarCategory]: value });
-                card.querySelector("span").textContent = label;
+                card.innerHTML = '<span class="mascot-stage mascot-thumbnail-stage"><img alt="" width="72" height="72"></span><span></span>';
+                const thumbnail = card.querySelector("img");
+                thumbnail.src = mascotImageSource({ ...avatarDraft, [avatarCategory]: value });
+                if (avatarCategory === "animal") {
+                    const [, background, accent] = AVATAR_ITEMS.bg[avatarDraft.bg];
+                    thumbnail.parentElement.style.setProperty("--mascot-bg", background);
+                    thumbnail.parentElement.style.setProperty("--mascot-accent", accent);
+                    removeMascotBackdrop(MASCOT_PORTRAITS[value]).then(source => {
+                        if (source && thumbnail.isConnected) thumbnail.src = source;
+                    });
+                }
+                card.lastElementChild.textContent = label;
                 if (lock) {
                     const condition = document.createElement("small");
                     condition.textContent = lock;
@@ -6434,6 +6599,7 @@
         function handleDesktopKeyboard(event) {
             if (window.innerWidth < 900) return;
             if (isTextInputFocused()) return;
+            if (event.key === "Enter" && document.activeElement?.id === "soundBtn") return;
             if (mode !== "learn" && mode !== "exam") return;
             if (!currentQuestion) return;
 
@@ -6489,6 +6655,7 @@
             saveAccountProgress(getProfile()).catch(() => {});
         });
         updateSoundButton();
+        setMascot("idle");
 
         async function boot() {
             await loadQuestions();
