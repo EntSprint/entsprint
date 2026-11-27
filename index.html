@@ -4362,10 +4362,15 @@
                 if (!response.ok) {
                     throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                 }
-                questions = await response.json();
-                if (!Array.isArray(questions) || questions.length === 0) {
+                const bank = await response.json();
+                if (!Array.isArray(bank) || bank.length === 0) {
                     throw new Error("Questions data is empty or invalid");
                 }
+                questions = bank.map(question => ({
+                    ...question,
+                    lesson: /^[0-9]+$/.test(question.lesson) ? `Урок ${question.lesson}` : question.lesson,
+                    answer: question.correct ?? question.answer
+                }));
                 updateSubject(currentSubject);
                 
                 // If user is already logged in, ensure first question renders
@@ -4816,9 +4821,13 @@
             const context = typeof question?.context === "string" ? question.context.trim() : "";
             const dialog = document.getElementById("questionImageDialog");
             if (dialog.open) dialog.close();
-            if (source) image.src = source;
-            else image.removeAttribute("src");
-            imageButton.hidden = !source;
+            if (!source) {
+                imageButton.hidden = true;
+                image.removeAttribute("src");
+            } else if (image.getAttribute("src") !== source) {
+                imageButton.hidden = true;
+                image.src = source;
+            }
             contextBlock.textContent = context;
             contextBlock.hidden = !context;
         }
@@ -7103,9 +7112,17 @@
             }
         }
 
-        document.getElementById("questionImageButton").addEventListener("click", () => {
+        const questionImage = document.getElementById("questionImage");
+        const questionImageButton = document.getElementById("questionImageButton");
+        questionImage.addEventListener("load", () => {
+            questionImageButton.hidden = !questionImage.hasAttribute("src") || !questionImage.naturalWidth;
+        });
+        questionImage.addEventListener("error", () => {
+            questionImageButton.hidden = true;
+        });
+        questionImageButton.addEventListener("click", () => {
             const dialog = document.getElementById("questionImageDialog");
-            document.getElementById("enlargedQuestionImage").src = document.getElementById("questionImage").src;
+            document.getElementById("enlargedQuestionImage").src = questionImage.src;
             dialog.showModal();
         });
         document.addEventListener("keydown", handleDesktopKeyboard);
