@@ -1641,11 +1641,6 @@
         }
 
         @media (min-width: 1200px) {
-            .app {
-                max-width: 1400px;
-                margin-left: 240px;
-            }
-
             .subject-switch,
             .mode-switch {
                 max-width: none;
@@ -2326,9 +2321,11 @@
         /* ===== DESKTOP: @media (min-width: 900px) ===== */
         @media (min-width: 900px) {
             .app {
+                width: 100%;
                 max-width: 100%;
+                margin: 0;
                 display: grid;
-                grid-template-columns: 240px 1fr;
+                grid-template-columns: 240px minmax(0, 1fr);
                 min-height: 100vh;
                 padding: 0;
             }
@@ -2379,6 +2376,13 @@
                 margin: 24px auto;
                 border-radius: 16px;
                 min-height: calc(100vh - 120px);
+            }
+
+            .practice-page {
+                width: 100%;
+                min-width: 0;
+                padding: 0 24px;
+                box-sizing: border-box;
             }
 
             .quiz { padding: 32px 40px 40px; }
@@ -2774,10 +2778,14 @@
 
         @media (min-width: 900px) {
             .practice-grid {
-                grid-template-columns: minmax(0, 1fr) 320px;
+                grid-template-columns: minmax(0, 1fr) clamp(220px, 23vw, 320px);
+                align-items: start;
+            }
+            body[data-tab="practice"][data-mode="progress"] .practice-grid {
+                grid-template-columns: minmax(0, 1fr);
             }
             .practice-side { position: sticky; top: 24px; }
-            .options { grid-template-columns: 1fr 1fr; gap: 14px; }
+            .options { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
         }
 
         @media (max-width: 899px) {
@@ -2870,6 +2878,7 @@
                 <h2>Здесь скоро будут вопросы</h2>
             </div>
         </div>
+                </div>
 
         <div class="practice-side">
             <aside class="practice-sidebar" id="practiceSidebar" aria-label="Статистика ученика">
