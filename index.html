@@ -352,6 +352,29 @@
             width: 100%;
             margin-bottom: 0;
         }
+        .history-tracks {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 145px), 1fr));
+            gap: 8px;
+        }
+        .history-tracks[hidden], #lessonSelectWrapper[hidden] { display: none; }
+        .history-track {
+            display: grid;
+            align-content: center;
+            gap: 4px;
+            min-height: 56px;
+            padding: 8px 11px;
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            background: #0B0F19;
+            color: #F1F5F9;
+            font: 700 13px Inter, sans-serif;
+            text-align: left;
+            cursor: pointer;
+        }
+        .history-track[aria-pressed="true"] { background: #2563EB; border-color: #60A5FA; }
+        .history-track:focus-visible { outline: 2px solid #93C5FD; outline-offset: 2px; }
+        .history-track small { color: #E2E8F0; font-size: 11px; font-weight: 500; }
         .sound-btn-header {
             display: none;
         }
@@ -3282,6 +3305,13 @@
                             <button class="subject-btn" type="button" data-subject="Мат. грамотность">Мат. грамотность<span class="subject-badge">Скоро</span></button>
                         </div>
 
+                        <div class="history-tracks" id="historyTracks" role="group" aria-label="Программы по истории Казахстана">
+                            <button class="history-track" type="button" data-history-track="0" aria-pressed="true">Уроки</button>
+                            <button class="history-track" type="button" data-history-track="1" aria-pressed="false">Проходной балл<small>0 из 500</small></button>
+                            <button class="history-track" type="button" data-history-track="2" aria-pressed="false">Получи грант<small>0 из 2000</small></button>
+                            <button class="history-track" type="button" data-history-track="3" aria-pressed="false">Алтын белгі<small>0 из 4000</small></button>
+                        </div>
+
                         <div class="mode-switch">
                             <button class="mode-btn active" id="learnMode" type="button">Заучивание</button>
                             <button class="mode-btn" id="examMode" type="button">Тест</button>
@@ -3836,6 +3866,13 @@
 
         let questions = [];
         let currentSubject = "История Казахстана";
+        const HISTORY_TRACKS = [
+            null,
+            { title: "Проходной балл", target: 500 },
+            { title: "Получи грант", target: 2000 },
+            { title: "Алтын белгі", target: 4000 }
+        ];
+        let historyTrack = 0;
         let baseQuestions = [];
         let mode = "learn";
         let learningQueue = [];
@@ -4651,6 +4688,13 @@
 
         async function loadQuestions() {
             try {
+                const nctBank = fetch("./questions-history-nct.json").then(response => {
+                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                    return response.json();
+                }).catch(error => {
+                    console.warn("История Казахстана: банк подготовки недоступен", error);
+                    return [];
+                });
                 const response = await fetch("./questions.json");
                 if (!response.ok) {
                     throw new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -4659,7 +4703,8 @@
                 if (!Array.isArray(bank) || bank.length === 0) {
                     throw new Error("Questions data is empty or invalid");
                 }
-                questions = bank.map(question => ({
+                const nctQuestions = await nctBank;
+                questions = [...bank, ...(Array.isArray(nctQuestions) ? nctQuestions : [])].map(question => ({
                     ...question,
                     lesson: /^[0-9]+$/.test(question.lesson) ? `Урок ${question.lesson}` : question.lesson,
                     answer: question.correct ?? question.answer
@@ -4688,14 +4733,70 @@
             return question.subject || "История Казахстана";
         }
 
+        function getHistoryTrackQuestions(track = historyTrack) {
+            return questions.filter(question => question.nctLevel && question.nctLevel <= track)
+                .slice(0, HISTORY_TRACKS[track].target);
+        }
+
+        function buildHistoryTrackTest(bank) {
+            const standalone = [];
+            const contextGroups = new Map();
+            for (const question of bank) {
+                if (!question.contextId) {
+                    standalone.push(question);
+                    continue;
+                }
+                if (!contextGroups.has(question.contextId)) contextGroups.set(question.contextId, []);
+                contextGroups.get(question.contextId).push(question);
+            }
+            const groups = [...contextGroups.values()].filter(group => group.length >= 5);
+            if (standalone.length < 10 || groups.length < 2) return shuffled(bank).slice(0, 20);
+            return [
+                ...shuffled(standalone).slice(0, 10),
+                ...shuffled(groups).slice(0, 2).flatMap(group => group.slice(0, 5))
+            ];
+        }
+
+        function renderHistoryTracks() {
+            const controls = document.getElementById("historyTracks");
+            controls.hidden = currentSubject !== "История Казахстана";
+            document.getElementById("lessonSelectWrapper").hidden = Boolean(historyTrack);
+            controls.querySelectorAll("[data-history-track]").forEach(button => {
+                const track = Number(button.dataset.historyTrack);
+                button.setAttribute("aria-pressed", String(track === historyTrack));
+                if (track) button.querySelector("small").textContent =
+                    `${getHistoryTrackQuestions(track).length} из ${HISTORY_TRACKS[track].target} вопросов`;
+            });
+        }
+
+        async function selectHistoryTrack(track) {
+            if (track === historyTrack || !await confirmExitExam()) return;
+            closeLessonDropdown();
+            clearInterval(timerId);
+            timerId = null;
+            if (!track) {
+                await updateSubject(currentSubject);
+                return;
+            }
+            historyTrack = track;
+            currentQuestion = null;
+            renderHistoryTracks();
+            await startMode(mode);
+            scrollToTop();
+        }
+
         async function updateSubject(subject) {
             if (!await confirmExitExam()) return;
+            clearInterval(timerId);
+            timerId = null;
             currentSubject = subject;
+            historyTrack = 0;
+            currentQuestion = null;
+            renderHistoryTracks();
             document.querySelectorAll(".subject-btn").forEach(button => {
                 button.classList.toggle("active", button.dataset.subject === subject);
             });
 
-            const subjectQuestions = questions.filter(question => subjectOf(question) === subject);
             const lessons = getSubjectLessons(subject);
 
             if (!lessons.length) {
@@ -4904,6 +5005,10 @@
             return document.getElementById("lessonSelectBtn")?.dataset.value || "";
         }
 
+        function getPracticeLabel() {
+            return HISTORY_TRACKS[historyTrack]?.title || getLessonSelectValue();
+        }
+
         function showEmpty() {
             document.getElementById("cardHead").style.display = "none";
             document.getElementById("quiz").style.display = "none";
@@ -5040,7 +5145,15 @@
             document.getElementById("results").classList.remove("visible");
             clearInterval(timerId);
 
-            if (!baseQuestions.length) return;
+            if (historyTrack) {
+                const bank = getHistoryTrackQuestions();
+                baseQuestions = mode === "exam" ? buildHistoryTrackTest(bank) : bank;
+            }
+            if (!baseQuestions.length) {
+                showEmpty();
+                return;
+            }
+            document.getElementById("empty").style.display = "none";
             displayedQuestions = new Map();
 
             // Render practice sidebar for logged-in users
@@ -5263,8 +5376,8 @@
                                 : null;
                             if (entry) {
                                 entry.lessonStats = entry.lessonStats || {};
-                                entry.lessonStats[currentQuestion.lesson || "Все уроки"] =
-                                    Number(entry.lessonStats[currentQuestion.lesson || "Все уроки"] || 0) + 1;
+                                const label = currentQuestion.lesson || getPracticeLabel() || "Все уроки";
+                                entry.lessonStats[label] = Number(entry.lessonStats[label] || 0) + 1;
                                 saveJson(LEADERBOARD_STORAGE_KEY, entries);
                             }
                         }
@@ -5276,7 +5389,10 @@
                         playTone("correct");
                     }
                     updateStreak();
-                    setTimeout(showLearningQuestion, 650);
+                    const answeredQuestion = currentQuestion;
+                    setTimeout(() => {
+                        if (mode === "learn" && currentQuestion === answeredQuestion) showLearningQuestion();
+                    }, 650);
                 } else {
                     setMascot("sad");
                     button.classList.add("incorrect");
@@ -5368,9 +5484,9 @@
                 : 0;
             recordExamResult(percentage);
             if (examAnswered > 0 && examViolationCount < 2) recordQuestActivity("exam");
-            const finishedLesson = getLessonSelectValue();
+            const finishedLesson = historyTrack ? "" : getLessonSelectValue();
             const finishedNumber = lessonNumber(finishedLesson);
-            rebuildLessonSelect(finishedLesson);
+            if (!historyTrack) rebuildLessonSelect(finishedLesson);
             const nextLesson = getSubjectLessons(currentSubject).find(lesson =>
                 lessonNumber(lesson) === finishedNumber + 1
             );
@@ -5823,7 +5939,7 @@
                     entry.timeSeconds = Number(timeByProfile[key] || 0);
                     entry.activeDays = profileActiveDays.length;
                     entry.lessonTimeStats = entry.lessonTimeStats || {};
-                    const lesson = getLessonSelectValue();
+                    const lesson = getPracticeLabel();
                     if (lesson) {
                         entry.lessonTimeStats[lesson] =
                             Number(entry.lessonTimeStats[lesson] || 0) + 30;
@@ -5846,7 +5962,7 @@
             if (!entry) return;
             entry.examResults = Array.isArray(entry.examResults) ? entry.examResults : [];
             entry.examResults.push({
-                lesson: getLessonSelectValue(),
+                lesson: getPracticeLabel(),
                 score: Number(score)
             });
             saveJson(LEADERBOARD_STORAGE_KEY, entries);
@@ -5891,9 +6007,7 @@
         function renderSubjectProgress(subjectName, suffix) {
             const subjectQuestions = questions.filter(question => subjectOf(question) === subjectName);
             const total = subjectQuestions.length;
-            const learnedInSubject = [...learned].filter(id =>
-                subjectQuestions.some(question => question.id === id)
-            ).length;
+            const learnedInSubject = subjectQuestions.filter(question => learned.has(question.id)).length;
             const remaining = Math.max(0, total - learnedInSubject);
             const percent = total > 0 ? Math.round((learnedInSubject / total) * 100) : 0;
 
@@ -5935,11 +6049,10 @@
         }
 
         function renderProgressRing() {
-            const subjectQuestions = questions.filter(question => subjectOf(question) === currentSubject);
+            const subjectQuestions = historyTrack ? getHistoryTrackQuestions() :
+                questions.filter(question => subjectOf(question) === currentSubject && !question.nctLevel);
             const total = subjectQuestions.length;
-            const learnedInSubject = [...learned].filter(id =>
-                subjectQuestions.some(question => question.id === id)
-            ).length;
+            const learnedInSubject = subjectQuestions.filter(question => learned.has(question.id)).length;
             const percent = total > 0 ? Math.round((learnedInSubject / total) * 100) : 0;
 
             // Update ring
@@ -5960,7 +6073,8 @@
                 const entries = loadJson(LEADERBOARD_STORAGE_KEY, []);
                 const entry = entries.find(item => item.key === getProfileKey(profile));
                 if (entry && Array.isArray(entry.examResults)) {
-                    bestExam = entry.examResults.reduce((best, result) =>
+                    const results = historyTrack ? entry.examResults.filter(result => result.lesson === getPracticeLabel()) : entry.examResults;
+                    bestExam = results.reduce((best, result) =>
                         Math.max(best, Number(result.score || 0)), 0);
                 }
             }
@@ -6472,6 +6586,9 @@
                 closeLessonDropdown();
                 updateSubject(button.dataset.subject);
             });
+        });
+        document.querySelectorAll("[data-history-track]").forEach(button => {
+            button.addEventListener("click", () => selectHistoryTrack(Number(button.dataset.historyTrack)));
         });
         document.getElementById("learnMode").addEventListener("click", () => {
             closeLessonDropdown();
