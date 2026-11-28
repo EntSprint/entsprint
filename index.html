@@ -2919,7 +2919,8 @@
             background: radial-gradient(circle, var(--mascot-accent, #2563EB), var(--mascot-bg, #0B0F19) 76%);
             transform-origin: 50% 85%;
         }
-        .mascot-stage > img {
+        .mascot-figure { position: absolute; inset: 0; display: block; transform-origin: 50% 66%; }
+        :is(.mascot-stage, .mascot-figure) > img {
             display: block;
             width: 100%;
             height: 100%;
@@ -2927,8 +2928,8 @@
             border-radius: 50%;
             object-fit: contain;
         }
-        .mascot-stage > img:not([data-portrait-ready]) { visibility: hidden; }
-        .mascot-stage > .mascot-layers {
+        :is(.mascot-stage, .mascot-figure) > img:not([data-portrait-ready]) { visibility: hidden; }
+        :is(.mascot-stage, .mascot-figure) > .mascot-layers {
             position: absolute;
             inset: 0;
             width: 100%;
@@ -2936,7 +2937,7 @@
             clip-path: circle(50%);
             pointer-events: none;
         }
-        .mascot-stage > img:not([data-portrait-ready]) + .mascot-layers { visibility: hidden; }
+        :is(.mascot-stage, .mascot-figure) > img:not([data-portrait-ready]) + .mascot-layers { visibility: hidden; }
         .mascot-preview-stage { width: min(100%, 240px); }
         .mascot-thumbnail-stage { width: min(100%, 72px); }
         .mascot-stage.menu-profile-avatar { width: 100px; }
@@ -2980,6 +2981,13 @@
         }
         .avatar-item button:disabled { background: #151D2B; color: #AABAD2; cursor: default; }
         .avatar-item strong { color: #FFD779; }
+        .avatar-item .avatar-animation-badge {
+            padding: 3px 7px;
+            border-radius: 8px;
+            background: #122853;
+            color: #BFDBFE;
+            font-weight: 700;
+        }
         .quest-section { margin-top: 16px; }
         .quest-section h3 { margin: 0 0 12px; }
         .quest-section h4 { margin: 16px 0 8px; }
@@ -2991,19 +2999,19 @@
         .mascot-stage.mascot-idle { animation: mascotIdleBreath 2.8s ease-in-out infinite; }
         .mascot-stage.mascot-happy {
             border-color: #34D399;
-            animation: mascotHappyJump 620ms ease-in-out both;
         }
         .mascot-stage.mascot-sad {
             border-color: #EF4444;
-            animation: mascotSadShake 540ms ease-in-out both;
         }
+        .mascot-stage.mascot-happy:not([data-action]) { animation: mascotHappyJump 620ms ease-in-out both; }
+        .mascot-stage.mascot-sad:not([data-action]) { animation: mascotSadShake 540ms ease-in-out both; }
         .mascot-stage.mascot-scared {
             border-color: #60A5FA;
             box-shadow: 0 0 0 2px #2563EB, 0 0 12px #2563EB;
             animation: mascotScaredShiver 760ms ease-in-out infinite;
         }
-        .mascot-stage.mascot-happy::before,
-        .mascot-stage.mascot-happy::after {
+        .mascot-stage.mascot-happy:not([data-action])::before,
+        .mascot-stage.mascot-happy:not([data-action])::after {
             content: "✨";
             position: absolute;
             top: 12%;
@@ -3015,8 +3023,217 @@
             pointer-events: none;
             animation: mascotStarBurst 610ms ease-out both;
         }
-        .mascot-stage.mascot-happy::before { left: 0; --star-x: -23px; }
-        .mascot-stage.mascot-happy::after { right: 0; --star-x: 23px; animation-delay: 65ms; animation-duration: 550ms; }
+        .mascot-stage.mascot-happy:not([data-action])::before { left: 0; --star-x: -23px; }
+        .mascot-stage.mascot-happy:not([data-action])::after { right: 0; --star-x: 23px; animation-delay: 65ms; animation-duration: 550ms; }
+        .mascot-stage[data-action] {
+            --reaction-duration: 950ms;
+            --reaction-color: #FCA5A5;
+            --reaction-size: 15px;
+            z-index: 1;
+        }
+        .mascot-preview-stage[data-action] { --reaction-size: 30px; }
+        .mascot-stage.mascot-happy { --reaction-duration: 600ms; --reaction-color: #6EE7B7; }
+        .mascot-stage:is([data-action="howl"], [data-action="wolf-aura"]) { --reaction-color: #60A5FA; }
+        .mascot-stage:is([data-action="ice-recoil"], [data-action="ice-stars"]) { --reaction-color: #BAE6FD; }
+        .mascot-stage[data-action="scroll"] { --reaction-color: #E9D5FF; }
+        .mascot-stage[data-action="gold-feathers"] { --reaction-color: #FFD779; }
+        .mascot-stage.mascot-happy[data-action] { border-color: var(--reaction-color); }
+        .mascot-stage:is([data-action="shock"], [data-action="wolf-aura"], [data-action="ice-stars"], [data-action="gold-feathers"]) {
+            animation: mascotReactionGlow var(--reaction-duration) ease-out both;
+        }
+        .mascot-stage[data-action] .mascot-figure { animation: var(--mascot-motion) var(--reaction-duration) ease-in-out both; }
+        [data-action="facepalm"] { --mascot-motion: mascotFacepalm; }
+        [data-action="shock"] { --mascot-motion: mascotShock; }
+        [data-action="turn-away"] { --mascot-motion: mascotTurnAway; }
+        [data-action="howl"] { --mascot-motion: mascotHowl; }
+        [data-action="ice-recoil"] { --mascot-motion: mascotIceRecoil; }
+        [data-action="scroll"] { --mascot-motion: mascotWingbeat; }
+        [data-action="cheer"], [data-action="wolf-aura"] { --mascot-motion: mascotCheer; }
+        [data-action="bounce"], [data-action="ice-stars"] { --mascot-motion: mascotBounce; }
+        [data-action="gold-feathers"] { --mascot-motion: mascotWingbeat; }
+        .mascot-reaction { position: absolute; inset: 0; pointer-events: none; }
+        .mascot-particle {
+            position: absolute;
+            left: var(--particle-left);
+            top: var(--particle-top);
+            color: var(--reaction-color);
+            font-size: var(--reaction-size);
+            font-weight: 800;
+            line-height: 1;
+            text-shadow: 0 0 .45em currentColor;
+            animation: mascotParticle calc(var(--reaction-duration) - var(--particle-delay)) ease-out both;
+            animation-delay: var(--particle-delay);
+        }
+        [data-action="shock"] .mascot-particle { animation-name: mascotPunctuation; }
+        [data-action="ice-recoil"] .mascot-particle, [data-action="ice-stars"] .mascot-particle { animation-name: mascotIceParticle; }
+        [data-action="scroll"] .mascot-particle, [data-action="gold-feathers"] .mascot-particle {
+            left: 0;
+            top: 0;
+            offset-path: circle(45% at 50% 50%);
+            offset-distance: var(--particle-left);
+            animation-name: mascotOrbit;
+        }
+        .mascot-feather {
+            width: .48em;
+            height: .92em;
+            border-radius: 90% 15% 90% 18%;
+            background: currentColor;
+            box-shadow: 0 0 .32em currentColor;
+        }
+        .mascot-feather::after {
+            content: "";
+            position: absolute;
+            top: 18%;
+            left: 40%;
+            width: 1px;
+            height: 94%;
+            background: #725526;
+            transform: rotate(16deg);
+        }
+        [data-action="scroll"] .mascot-feather { color: #F8FAFC; }
+        .mascot-particle.mascot-paw {
+            color: #D89863;
+            left: 45%;
+            top: 25%;
+            width: 1.05em;
+            height: .85em;
+            border: 1px solid #0B0F19;
+            border-radius: 60% 60% 48% 48%;
+            background: currentColor;
+            box-shadow: inset 0 -.15em #976044;
+            animation-name: mascotPawToBrow;
+        }
+        .mascot-paw::before, .mascot-track::before {
+            content: "";
+            position: absolute;
+            top: -.23em;
+            left: .08em;
+            width: .27em;
+            height: .33em;
+            border-radius: 50%;
+            background: currentColor;
+            box-shadow: .24em -.08em currentColor, .49em -.01em currentColor;
+        }
+        [data-animal="wolf"] .mascot-paw, [data-animal="owl"] .mascot-paw { color: #CBD5E1; }
+        .mascot-track {
+            width: .65em;
+            height: .4em;
+            border-radius: 58% 58% 36% 36%;
+            background: currentColor;
+            font-size: calc(var(--reaction-size) * .78);
+        }
+        .mascot-track::before { left: -.03em; width: .19em; height: .22em; box-shadow: .23em -.08em currentColor, .46em 0 currentColor; }
+        [data-action="ice-recoil"] .mascot-reaction::before {
+            content: "";
+            position: absolute;
+            inset: 5% -8%;
+            border: 2px solid transparent;
+            border-top-color: var(--reaction-color);
+            border-bottom-color: var(--reaction-color);
+            border-radius: 50%;
+            filter: drop-shadow(0 0 4px #60A5FA);
+            animation: mascotSnowGust var(--reaction-duration) ease-out both;
+        }
+        .mascot-reaction-line {
+            position: absolute;
+            right: 10%;
+            bottom: 70%;
+            background: #0B0F19;
+            color: #F1F5F9;
+            border: 1px solid var(--reaction-color);
+            border-radius: 10px 10px 2px 10px;
+            padding: 3px 7px;
+            font: 700 12px Inter, sans-serif;
+            white-space: nowrap;
+            animation: mascotReactionLine var(--reaction-duration) ease-out both;
+        }
+        .mascot-preview-stage .mascot-reaction-line { right: 0; bottom: 80%; font-size: 14px; }
+        @keyframes mascotFacepalm {
+            19% { transform: translate(-10%, -5%) rotate(-15deg); }
+            42%, 68% { transform: translate(-4%, 8%) rotate(13deg) scale(.91); }
+        }
+        @keyframes mascotShock {
+            17% { transform: translateY(18%) scale(1.09, .68); }
+            39% { transform: translateY(-11%) scale(.93, 1.11); }
+            66% { transform: translateY(5%) scale(1.04, .91); }
+        }
+        @keyframes mascotTurnAway {
+            30%, 68% { transform: perspective(12em) translate(10%, 9%) rotateY(-49deg) rotate(-9deg) scale(.87); }
+            44%, 57% { transform: perspective(12em) translate(7%, 10%) rotateY(-36deg) rotate(8deg) scale(.84); }
+        }
+        @keyframes mascotHowl {
+            16% { transform: translateY(8%) scale(1.04, .88); }
+            40%, 71% { transform: translate(-8%, -12%) rotate(-23deg) skewX(-9deg) scale(.98, 1.12); }
+            55% { transform: translate(-8%, -14%) rotate(-26deg) skewX(-9deg) scale(.98, 1.18); }
+        }
+        @keyframes mascotIceRecoil {
+            18% { transform: translate(-18%, 7%) rotate(-23deg) scale(.86); }
+            36% { transform: translate(-10%, -7%) rotate(-13deg) scale(.96); }
+            54%, 68% { transform: translate(-9%, 3%) rotate(-8deg); }
+            61% { transform: translate(-13%, 5%) rotate(-13deg); }
+        }
+        @keyframes mascotWingbeat {
+            19%, 51% { transform: translateY(-15%) rotate(-8deg) scale(1.16, .93); }
+            35%, 66% { transform: translateY(-4%) rotate(8deg) scale(.92, 1.06); }
+        }
+        @keyframes mascotCheer {
+            17% { transform: translateY(8%) scale(1.1, .87); }
+            45% { transform: translateY(-24%) rotate(-10deg) scale(1.06); }
+            75% { transform: translateY(4%) scale(1.06, .92); }
+        }
+        @keyframes mascotBounce {
+            25%, 65% { transform: translateY(-14%) rotate(-9deg) scale(1.07); }
+            46% { transform: translateY(4%) rotate(7deg) scale(1.05, .93); }
+        }
+        @keyframes mascotReactionGlow {
+            15%, 38% { box-shadow: 0 0 0 3px var(--reaction-color), 0 0 21px var(--reaction-color), inset 0 0 16px var(--reaction-color); }
+            70% { box-shadow: 0 0 0 6px transparent, 0 0 9px var(--reaction-color); }
+        }
+        @keyframes mascotParticle {
+            0% { opacity: 0; transform: translate(-50%, -25%) scale(.35); }
+            25%, 61% { opacity: 1; }
+            100% { opacity: 0; transform: translate(-50%, -120%) rotate(-27deg) scale(1.16); }
+        }
+        @keyframes mascotPunctuation {
+            0% { opacity: 0; transform: translate(-50%, 45%) scale(.2); }
+            26%, 60% { opacity: 1; transform: translate(-50%, -50%) rotate(12deg) scale(1.2); }
+            44% { transform: translate(-50%, 5%) rotate(-13deg) scale(.85); }
+            100% { opacity: 0; transform: translate(-50%, -95%) scale(.75); }
+        }
+        @keyframes mascotIceParticle {
+            0% { opacity: 0; transform: translate(75%, -85%) rotate(-80deg) scale(.4); }
+            30%, 53% { opacity: 1; }
+            100% { opacity: 0; transform: translate(-155%, 98%) rotate(150deg) scale(1.22); }
+        }
+        @keyframes mascotOrbit {
+            0% { opacity: 0; transform: scale(.5); }
+            25%, 67% { opacity: 1; }
+            100% { opacity: 0; offset-distance: calc(var(--particle-left) + 54%); transform: scale(1.17); }
+        }
+        @keyframes mascotSnowGust {
+            0% { opacity: 0; transform: translateX(14%) rotate(-35deg) scale(.6); }
+            31% { opacity: 1; }
+            100% { opacity: 0; transform: translateX(-19%) rotate(185deg) scale(1.16); }
+        }
+        @keyframes mascotPawToBrow {
+            0%, 16% { opacity: 0; transform: translate(-95%, 110%) rotate(-38deg); }
+            39%, 67% { opacity: 1; transform: translate(-45%, 0) rotate(15deg); }
+            100% { opacity: 0; transform: translate(-95%, 110%) rotate(-25deg); }
+        }
+        @keyframes mascotReactionLine {
+            0%, 10% { opacity: 0; transform: translateY(5px) scale(.88); }
+            25%, 74% { opacity: 1; transform: none; }
+            100% { opacity: 0; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .mascot-stage[data-mood], .mascot-stage[data-mood]::before, .mascot-stage[data-mood]::after,
+            .mascot-stage[data-action] .mascot-figure, .mascot-particle, .mascot-reaction-line,
+            [data-action="ice-recoil"] .mascot-reaction::before {
+                animation: none;
+            }
+            .mascot-reaction { animation: mascotReactionFade var(--reaction-duration) step-end both; }
+            @keyframes mascotReactionFade { to { visibility: hidden; } }
+        }
         @keyframes mascotIdleBreath {
             0%, 100% { transform: translateY(0) scale(1); }
             50% { transform: translateY(-3px) scale(1.035, 1.065); }
@@ -3098,7 +3315,9 @@
                         <div class="progress-bar-fill" id="questionProgressFill"></div>
                     </div>
                     <span class="mascot-stage mascot-idle" data-mood="idle">
-                        <img class="question-mascot-large" id="questionMascotLarge" src="./assets/mascot_idle.png" alt="Маскот GradeUp" width="42" height="42">
+                        <span class="mascot-figure">
+                            <img class="question-mascot-large" id="questionMascotLarge" src="./assets/mascot_idle.png" alt="Маскот GradeUp" width="42" height="42">
+                        </span>
                     </span>
                 </div>
                 <div class="topic-tag" id="topicTag"></div>
@@ -3257,7 +3476,9 @@
             </div>
             <div class="avatar-stage">
                 <div class="mascot-stage mascot-preview-stage">
-                    <img class="avatar-preview" id="avatarPreview" alt="Предпросмотр маскота" width="240" height="240">
+                    <span class="mascot-figure">
+                        <img class="avatar-preview" id="avatarPreview" alt="Предпросмотр маскота" width="240" height="240">
+                    </span>
                 </div>
                 <div class="avatar-controls" id="avatarMoods" role="group" aria-label="Эмоция маскота">
                     <button type="button" data-mood="idle" aria-pressed="true">Обычный</button>
@@ -3640,11 +3861,11 @@
 
         const AVATAR_CATALOG = {
             animal: {
-                monkey: { name: "Макс", price: 0, portrait: "./assets/mascot_monkey.png" },
-                fox: { name: "Айя", price: 0, portrait: "./assets/mascot_fox.png" },
-                wolf: { name: "Бори", price: 100, portrait: "./assets/mascot_wolf.png" },
-                leopard: { name: "Барыс", price: 150, portrait: "./assets/mascot_leopard.png" },
-                owl: { name: "Дана", price: 200, portrait: "./assets/mascot_owl.png" }
+                monkey: { name: "Абу", price: 0, portrait: "./assets/mascot_monkey.png" },
+                fox: { name: "Ник", price: 0, portrait: "./assets/mascot_fox.png" },
+                wolf: { name: "Акела", price: 100, portrait: "./assets/mascot_wolf.png", wrongAction: "howl", correctAction: "wolf-aura" },
+                leopard: { name: "Диего", price: 150, portrait: "./assets/mascot_leopard.png", wrongAction: "ice-recoil", correctAction: "ice-stars" },
+                owl: { name: "Букля", price: 200, portrait: "./assets/mascot_owl.png", wrongAction: "scroll", correctAction: "gold-feathers" }
             },
             outfit: {
                 hoodie_blue: { name: "Синее худи", price: 0 },
@@ -3709,12 +3930,13 @@
 
         function renderMascotPortrait(image, config) {
             const { animal, outfit, accessory, bg } = normalizeAvatar(config);
-            const stage = image.parentElement;
+            const figure = image.parentElement;
+            const stage = figure.closest(".mascot-stage");
             const { background, accent } = AVATAR_CATALOG.bg[bg];
             if (image.alt) image.alt = AVATAR_CATALOG.animal[animal].name;
             stage.style.setProperty("--mascot-bg", background);
             stage.style.setProperty("--mascot-accent", accent);
-            const layers = stage.querySelector(".mascot-layers") || document.createElementNS("http://www.w3.org/2000/svg", "svg");
+            const layers = figure.querySelector(".mascot-layers") || document.createElementNS("http://www.w3.org/2000/svg", "svg");
             layers.setAttribute("class", "mascot-layers");
             layers.setAttribute("viewBox", "0 0 100 100");
             layers.setAttribute("aria-hidden", "true");
@@ -3726,7 +3948,7 @@
                 layers.innerHTML = garment + AVATAR_CATALOG.accessory[accessory].overlay;
                 layers.dataset.avatar = layerKey;
             }
-            if (!layers.parentElement) stage.appendChild(layers);
+            if (!layers.parentElement) figure.appendChild(layers);
             if (stage.dataset.animal === animal) return;
             stage.dataset.animal = animal;
             image.removeAttribute("data-portrait-ready");
@@ -3803,13 +4025,84 @@
             return mascotPortraitCache.get(source);
         }
 
-        function restartMascotAnimation(stage, mood, force = false) {
+        const MASCOT_WRONG_ACTIONS = ["facepalm", "shock", "turn-away"];
+        const MASCOT_CORRECT_ACTIONS = ["cheer", "bounce"];
+        const MASCOT_PARTICLE_SHAPES = { paw: "mascot-paw", track: "mascot-track", feather: "mascot-feather" };
+        const MASCOT_REACTIONS = {
+            facepalm: { lines: ["Эх...", "Ну почти!"], particles: [["paw", 45, 25], ["💧", 83, 38]] },
+            shock: { lines: ["Ой-ой!"], particles: [["?", 18, 18], ["?!", 100, 25], ["!", 72, 8]] },
+            "turn-away": { particles: [["💨", 20, 64]] },
+            howl: { lines: ["Аууу!"], particles: [["☾", 91, 20], ["track", 80, 72], ["track", 60, 85], ["✦", 72, 14]] },
+            "ice-recoil": { lines: ["Холодно, мимо!"], particles: [["❄", 88, 24], ["◆", 96, 52], ["❅", 62, 38], ["◈", 45, 58], ["❄", 27, 28]] },
+            scroll: { lines: ["Повтори!"], particles: [["📜", 8, 0], ["feather", 25, 0], ["ᚱ", 44, 0], ["feather", 66, 0], ["ᛟ", 84, 0]] },
+            cheer: { particles: [["✦", 9, 37], ["✧", 91, 43], ["✦", 62, 12]] },
+            bounce: { particles: [["✧", 15, 68], ["✦", 90, 64], ["✧", 27, 18], ["✦", 76, 24]] },
+            "wolf-aura": { particles: [["✦", 10, 49], ["✧", 90, 48], ["☾", 67, 20], ["✦", 32, 16]] },
+            "ice-stars": { particles: [["❄", 90, 20], ["✦", 75, 52], ["❅", 41, 40], ["✧", 28, 12], ["✦", 62, 68]] },
+            "gold-feathers": { particles: [["feather", 4, 0], ["★", 23, 0], ["✦", 42, 0], ["feather", 62, 0], ["★", 81, 0]] }
+        };
+        const previewWrongActions = new Map();
+        let lastPracticeWrongAction;
+        const lastCorrectActions = new WeakMap();
+
+        function pickMascotAction(actions, previous) {
+            const available = actions.filter(action => action !== previous);
+            return available[Math.floor(Math.random() * available.length)];
+        }
+
+        function triggerMascotWrongAction(characterId, stage = document.getElementById("questionMascotLarge").closest(".mascot-stage"), preview = false) {
+            const special = AVATAR_CATALOG.animal[characterId].wrongAction;
+            const actions = special ? [...MASCOT_WRONG_ACTIONS, special] : MASCOT_WRONG_ACTIONS;
+            if (preview) {
+                const index = ((previewWrongActions.get(characterId) ?? -1) + 1) % actions.length;
+                previewWrongActions.set(characterId, index);
+                restartMascotAnimation(stage, "sad", true, actions[index]);
+                return;
+            }
+            lastPracticeWrongAction = pickMascotAction(actions, lastPracticeWrongAction);
+            restartMascotAnimation(stage, "sad", true, lastPracticeWrongAction);
+        }
+
+        function triggerMascotCorrectAction(characterId, stage) {
+            const action = AVATAR_CATALOG.animal[characterId].correctAction ||
+                pickMascotAction(MASCOT_CORRECT_ACTIONS, lastCorrectActions.get(stage));
+            lastCorrectActions.set(stage, action);
+            restartMascotAnimation(stage, "happy", true, action);
+        }
+
+        function restartMascotAnimation(stage, mood, force = false, action) {
             const previousMood = stage.dataset.mood;
             if (previousMood === mood && !force) return;
             if (previousMood) stage.classList.remove(`mascot-${previousMood}`);
+            delete stage.dataset.action;
+            stage.querySelector(".mascot-reaction")?.remove();
             void stage.offsetWidth;
             stage.classList.add(`mascot-${mood}`);
             stage.dataset.mood = mood;
+            if (!action) return;
+            stage.dataset.action = action;
+            const reaction = document.createElement("span");
+            reaction.className = "mascot-reaction";
+            reaction.setAttribute("aria-hidden", "true");
+            const { particles, lines } = MASCOT_REACTIONS[action];
+            particles.forEach(([symbol, left, top], index) => {
+                const particle = document.createElement("span");
+                particle.className = "mascot-particle";
+                const shape = MASCOT_PARTICLE_SHAPES[symbol];
+                if (shape) particle.classList.add(shape);
+                else particle.textContent = symbol;
+                particle.style.setProperty("--particle-left", `${left}%`);
+                particle.style.setProperty("--particle-top", `${top}%`);
+                particle.style.setProperty("--particle-delay", `${index * 24}ms`);
+                reaction.appendChild(particle);
+            });
+            if (lines) {
+                const line = document.createElement("span");
+                line.className = "mascot-reaction-line";
+                line.textContent = lines[Math.floor(Math.random() * lines.length)];
+                reaction.appendChild(line);
+            }
+            stage.appendChild(reaction);
         }
 
         const ITEM_PRICES = Object.fromEntries(["animal", "outfit", "accessory"].flatMap(category =>
@@ -5102,10 +5395,19 @@
             clearTimeout(mascotResetTimer);
             const mood = state === "idle" && mode === "exam" ? "scared" : state;
             const reacting = mood === "happy" || mood === "sad";
-            renderMascotPortrait(mascot, getCurrentAccount()?.avatarConfig);
+            const config = getCurrentAccount()?.avatarConfig;
+            const stage = mascot.closest(".mascot-stage");
+            renderMascotPortrait(mascot, config);
             mascot.classList.toggle("happy", mood === "happy");
             mascot.classList.toggle("sad", mood === "sad");
-            restartMascotAnimation(mascot.parentElement, mood, reacting);
+            const characterId = normalizeAvatar(config).animal;
+            if (mode === "learn" && mood === "sad") {
+                triggerMascotWrongAction(characterId, stage);
+            } else if (mode === "learn" && mood === "happy") {
+                triggerMascotCorrectAction(characterId, stage);
+            } else {
+                restartMascotAnimation(stage, mood, reacting);
+            }
             if (reacting) {
                 mascotResetTimer = setTimeout(() => setMascot("idle"), 1500);
             }
@@ -5977,8 +6279,16 @@
 
         function renderAvatarEditor(focusedItem, replayMood = false) {
             const preview = document.getElementById("avatarPreview");
+            const stage = preview.closest(".mascot-stage");
+            if (stage.dataset.animal !== avatarDraft.animal && !replayMood) avatarMood = "idle";
             renderMascotPortrait(preview, avatarDraft);
-            restartMascotAnimation(preview.parentElement, avatarMood, replayMood);
+            if (replayMood && avatarMood === "sad") {
+                triggerMascotWrongAction(avatarDraft.animal, stage, true);
+            } else if (replayMood && avatarMood === "happy") {
+                triggerMascotCorrectAction(avatarDraft.animal, stage);
+            } else {
+                restartMascotAnimation(stage, avatarMood, replayMood);
+            }
             document.querySelectorAll("#avatarMoods [data-mood]").forEach(button => {
                 button.setAttribute("aria-pressed", String(button.dataset.mood === avatarMood));
             });
@@ -5987,7 +6297,7 @@
             });
             const account = getCurrentAccount();
             const wallet = account || gradeWallet();
-            const cards = Object.entries(AVATAR_CATALOG[avatarCategory]).map(([value, { name, price }]) => {
+            const cards = Object.entries(AVATAR_CATALOG[avatarCategory]).map(([value, { name, price, wrongAction }]) => {
                 const owned = !price || wallet.ownedItems?.includes(value);
                 const selected = avatarDraft[avatarCategory] === value;
                 const card = document.createElement("div");
@@ -5997,6 +6307,12 @@
                 card.innerHTML = '<span class="mascot-stage mascot-thumbnail-stage"><img alt="" width="72" height="72"></span><span></span>';
                 renderMascotPortrait(card.querySelector("img"), { ...avatarDraft, [avatarCategory]: value });
                 card.lastElementChild.textContent = name;
+                if (wrongAction) {
+                    const badge = document.createElement("small");
+                    badge.className = "avatar-animation-badge";
+                    badge.textContent = "Уникальная анимация";
+                    card.appendChild(badge);
+                }
                 if (!owned) {
                     const cost = document.createElement("strong");
                     cost.textContent = coinLabel(price);
